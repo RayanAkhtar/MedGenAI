@@ -41,8 +41,9 @@ jobs:
       # 5: Deploy to Heroku
       - name: Deploy to Heroku
         env:
-          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}  # Add your Heroku API key in GitHub Secrets
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }} 
         run: |
+          cd ./backend  
           git remote add heroku https://git.heroku.com/med-gen-ai.git
           git push heroku DevOps  
         # TODO change later to be main instead of devops
