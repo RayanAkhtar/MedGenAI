@@ -46,3 +46,6 @@ backend/instance
 instance
 
 testscript.py
+
+# Python evnv
+venv/
