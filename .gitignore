@@ -44,3 +44,5 @@ __pycache__/
 .pytest_cache/
 backend/instance
 instance
+
+testscript.py
