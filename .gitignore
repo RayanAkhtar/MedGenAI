@@ -44,3 +44,7 @@ __pycache__/
 .pytest_cache/
 backend/instance
 instance
+
+
+# Python evnv
+venv/

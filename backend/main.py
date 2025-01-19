@@ -3,12 +3,14 @@ from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import text
+from flask_cors import CORS
 
 # Uncomment when debugging
 # logging.basicConfig(level=logging.DEBUG)
 
 
 app = Flask(__name__)
+CORS(app)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///medgen.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -69,4 +71,4 @@ def execute_sql():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=5328)
