@@ -3,12 +3,18 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { useAuth } from '@/app/context/AuthContext'
+import { login } from '@/app/firebase/login'
 
 export default function Login() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [isValidEmail, setIsValidEmail] = useState(false)
-
+    const [isLoading, setIsLoading] = useState(false)
+    const [error, setError] = useState('')
+    const router = useRouter()
+    const { user, loading } = useAuth()
     // Email validation function
     const validateEmail = (email: string) => {
         const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -19,6 +25,30 @@ export default function Login() {
     useEffect(() => {
         setIsValidEmail(validateEmail(email))
     }, [email])
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault()
+        if (isValidEmail && password) {
+            setIsLoading(true)
+            setError('')
+            try {
+                await login(email, password)
+                router.push('/dashboard')
+            } catch (error) {
+                setError('Invalid email or password')
+            } finally {
+                setIsLoading(false)
+            }
+        }
+    }
+
+    // Wait for initial auth check
+    if (loading) return null; // AuthContext's loading spinner will show
+    
+    // Redirect if already logged in
+    if (user) {
+        router.push('/dashboard')
+    }
 
     return (
         <div className="flex min-h-screen">
@@ -49,7 +79,13 @@ export default function Login() {
                             </Link>
                         </p>
 
-                        <form className="mt-8 space-y-4">
+                        {error && (
+                            <div className="p-3 text-sm text-red-500 bg-red-50 border border-red-200 rounded-md">
+                                {error}
+                            </div>
+                        )}
+
+                        <form onSubmit={handleSubmit} className="mt-8 space-y-4">
                             <div>
                                 <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                                     Email
@@ -84,14 +120,18 @@ export default function Login() {
 
                             <button
                                 type="submit"
-                                disabled={!isValidEmail || !password}
-                                className={`w-full py-3 px-4 border border-transparent rounded-md shadow-sm text-white transition-all duration-200 ${
-                                    isValidEmail && password
+                                disabled={!isValidEmail || !password || isLoading}
+                                className={`w-full py-3 px-4 border border-transparent rounded-md shadow-sm text-white transition-all duration-200 flex items-center justify-center ${
+                                    isValidEmail && password && !isLoading
                                     ? 'bg-[var(--heartflow-blue)] hover:bg-[var(--heartflow-blue)]/90 cursor-pointer' 
                                     : 'bg-[#8DACC3] cursor-not-allowed'
                                 }`}
                             >
-                                Sign in
+                                {isLoading ? (
+                                    <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>
+                                ) : (
+                                    'Sign in'
+                                )}
                             </button>
 
                         </form>

@@ -3,6 +3,9 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { useAuth } from '@/app/context/AuthContext'
+import { signup } from '@/app/firebase/signup'
 
 export default function Signup() {
     const [firstName, setFirstName] = useState('')
@@ -11,14 +14,16 @@ export default function Signup() {
     const [password, setPassword] = useState('')
     const [isValidEmail, setIsValidEmail] = useState(false)
     const [showPassword, setShowPassword] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
+    const [error, setError] = useState('')
+    const router = useRouter()
+    const { user, loading } = useAuth()
 
-    // Email validation function
     const validateEmail = (email: string) => {
         const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
         return regex.test(email)
     }
 
-    // Handle continue button click
     const handleContinue = (e: React.FormEvent) => {
         e.preventDefault()
         if (isValidEmail) {
@@ -26,12 +31,26 @@ export default function Signup() {
         }
     }
 
-    // Handle final form submission
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         if (isValidEmail && password) {
-            // Handle signup logic here
-            console.log('Signing up with:', { firstName, lastName, email, password })
+            setIsLoading(true)
+            setError('')  // Clear any previous errors
+            try {
+                await signup(email, password, `${firstName} ${lastName}`)
+                router.push('/dashboard')
+            } catch (error: any) {
+                // Handle specific Firebase error messages
+                if (error.code === 'auth/email-already-in-use') {
+                    setError('An account with this email already exists')
+                } else if (error.code === 'auth/weak-password') {
+                    setError('Password should be at least 6 characters')
+                } else {
+                    setError('Failed to create account. Please try again.')
+                }
+            } finally {
+                setIsLoading(false)
+            }
         }
     }
 
@@ -39,6 +58,15 @@ export default function Signup() {
     useEffect(() => {
         setIsValidEmail(validateEmail(email))
     }, [email])
+
+    // Wait for initial auth check
+    if (loading) return null; // AuthContext's loading spinner will show
+    
+    // Redirect if already logged in
+    if (user) {
+        router.push('/dashboard')
+        return null;
+    }
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen py-12 px-4 sm:px-6 lg:px-8">
@@ -59,6 +87,12 @@ export default function Signup() {
                     <h2 className="text-center text-2xl font-semibold text-gray-900">
                         Signup to join Medical GenAI
                     </h2>
+
+                    {error && (
+                        <div className="p-3 text-sm text-red-500 bg-red-50 border border-red-200 rounded-md">
+                            {error}
+                        </div>
+                    )}
 
                     <form onSubmit={showPassword ? handleSubmit : handleContinue} className="mt-8 space-y-4">
                         <div className="grid grid-cols-2 gap-4">
@@ -133,14 +167,18 @@ export default function Signup() {
 
                         <button
                             type="submit"
-                            disabled={!isValidEmail || (showPassword && !password) || !firstName || !lastName}
-                            className={`w-full py-3 px-4 border border-transparent rounded-md shadow-sm text-white transition-all duration-200 ${
-                                (isValidEmail && (!showPassword || password) && firstName && lastName)
+                            disabled={!isValidEmail || (showPassword && !password) || !firstName || !lastName || isLoading}
+                            className={`w-full py-3 px-4 border border-transparent rounded-md shadow-sm text-white transition-all duration-200 flex items-center justify-center ${
+                                (isValidEmail && (!showPassword || password) && firstName && lastName && !isLoading)
                                 ? 'bg-[var(--heartflow-blue)] hover:bg-[var(--heartflow-blue)]/90 cursor-pointer' 
                                 : 'bg-[#8DACC3] cursor-not-allowed'
                             }`}
                         >
-                            {showPassword ? 'Sign up' : 'Continue'}
+                            {isLoading ? (
+                                <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>
+                            ) : (
+                                showPassword ? 'Sign up' : 'Continue'
+                            )}
                         </button>
 
                     </form>
