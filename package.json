@@ -9,8 +9,14 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.7.2",
+    "@fortawesome/free-brands-svg-icons": "^6.7.2",
+    "@fortawesome/free-regular-svg-icons": "^6.7.2",
+    "@fortawesome/free-solid-svg-icons": "^6.7.2",
+    "@fortawesome/react-fontawesome": "^0.2.2",
     "concurrently": "^8.2.2",
     "cross-env": "^7.0.3",
+    "font-awesome": "^4.7.0",
     "next": "^15.1.5",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
