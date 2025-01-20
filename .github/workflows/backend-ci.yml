@@ -1,4 +1,4 @@
-name: Backend CI/CD Pipeline
+name: Frontend CI/CD Pipeline
 
 on:
   push:
@@ -9,40 +9,39 @@ on:
       - main
 
 jobs:
-  backend:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      # 1: Checkout the code
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-      # 2: Set up Python
-      - name: Set up Python 3.9
-        uses: actions/setup-python@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
         with:
-          python-version: '3.9'
+          node-version: '14'
 
-      # 3: Install dependencies
       - name: Install dependencies
-        working-directory: ./backend
-        run: |
-          python -m venv venv
-          source venv/bin/activate
-          pip install -r requirements.txt
+        run: npm install
 
-      # 4: Run tests
-      - name: Run backend tests
-        working-directory: ./backend
-        run: |
-          source venv/bin/activate
-          pytest
+      - name: Build application
+        run: npm run build
 
-      # 5: Deploy to Heroku
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install Heroku CLI
+        run: |
+          curl https://cli-assets.heroku.com/install.sh | sh
+
       - name: Deploy to Heroku
         env:
-          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }} 
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         run: |
-          cd ./backend  
-          git remote add heroku https://git.heroku.com/med-gen-ai.git
-          git push heroku main  
+          heroku git:remote -a med-gen-ai
+          git push heroku main
