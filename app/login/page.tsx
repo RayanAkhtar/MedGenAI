@@ -48,6 +48,7 @@ export default function Login() {
     // Redirect if already logged in
     if (user) {
         router.push('/dashboard')
+        return null // Return null to prevent rendering the login form
     }
 
     return (
