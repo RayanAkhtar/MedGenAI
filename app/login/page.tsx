@@ -36,7 +36,7 @@ export default function Login() {
                 router.push('/dashboard')
             } catch (error) {
                 console.error('Login error:', error)
-                setError('Invalid email or password')
+                setError('Invalid email or password...')
             } finally {
                 setIsLoading(false)
             }
