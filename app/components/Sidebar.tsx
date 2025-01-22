@@ -6,7 +6,6 @@ import { signout } from '@/app/firebase/signout'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { 
     faHome, 
-    faChartLine, 
     faTrophy,
     faHistory,
     faSignOutAlt,
