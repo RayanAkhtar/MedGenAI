@@ -4,6 +4,7 @@ import { Fragment } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faGamepad, faTrophy, faStar, faChevronRight } from '@fortawesome/free-solid-svg-icons'
+import { useRouter } from 'next/navigation'
 
 interface GameTypeModalProps {
     isOpen: boolean
@@ -11,26 +12,36 @@ interface GameTypeModalProps {
 }
 
 const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
+    const router = useRouter()
+
     const gameTypes = [
         {
             name: 'Classic',
             description: 'Practice at your own pace',
             icon: faGamepad,
             color: 'bg-blue-500',
+            route: '/game/classic'
         },
         {
             name: 'Competitive',
             description: 'Compete against others',
             icon: faTrophy,
             color: 'bg-[var(--heartflow-red)]',
+            route: '/game/competitive'
         },
         {
             name: 'Special',
             description: 'Limited time challenges',
             icon: faStar,
             color: 'bg-purple-500',
+            route: '/game/special'
         },
     ]
+
+    const handleGameSelect = (route: string) => {
+        closeModal()
+        router.push(route)
+    }
 
     return (
         <Transition appear show={isOpen} as={Fragment}>
@@ -71,7 +82,7 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
                                         <button
                                             key={type.name}
                                             className="w-full p-4 flex items-center justify-between rounded-xl border border-gray-200 hover:border-[var(--heartflow-blue)] hover:shadow-md transition-all duration-200"
-                                            onClick={closeModal}
+                                            onClick={() => handleGameSelect(type.route)}
                                         >
                                             <div className="flex items-center">
                                                 <div className={`${type.color} w-10 h-10 rounded-lg flex items-center justify-center`}>
@@ -98,4 +109,4 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
     )
 }
 
-export default GameTypeModal 
+export default GameTypeModal
