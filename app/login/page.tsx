@@ -26,6 +26,13 @@ export default function Login() {
         setIsValidEmail(validateEmail(email))
     }, [email])
 
+    // Add this useEffect for handling redirects
+    useEffect(() => {
+        if (user) {
+            router.push('/dashboard')
+        }
+    }, [user, router])
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         if (isValidEmail && password) {
@@ -33,7 +40,6 @@ export default function Login() {
             setError('')
             try {
                 await login(email, password)
-                router.push('/dashboard')
             } catch (error) {
                 console.error('Login error:', error)
                 setError('Invalid email or password...')
@@ -43,14 +49,8 @@ export default function Login() {
         }
     }
 
-    // Wait for initial auth check
-    if (loading) return null; // AuthContext's loading spinner will show
-    
-    // Redirect if already logged in
-    if (user) {
-        router.push('/dashboard')
-        return null
-    }
+    // Remove the immediate redirect
+    if (loading) return null;
 
     return (
         <div className="flex min-h-screen">
