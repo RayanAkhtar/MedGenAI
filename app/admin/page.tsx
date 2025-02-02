@@ -140,7 +140,7 @@ export default function Admin() {
             View Individual Feedback
           </Link>
           <Link
-            href="/heatmap-feedback"
+            href="/admin/heatmap-feedback"
             className="w-full sm:w-auto px-6 py-3 bg-[var(--heartflow-blue)] text-white rounded-3xl hover:bg-[var(--heartflow-blue)]/90 transition-all duration-300 ease-in-out transform hover:scale-105 text-center"
           >
             View Heatmap Feedback
