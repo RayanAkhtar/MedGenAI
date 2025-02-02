@@ -134,7 +134,7 @@ export default function Admin() {
       <section className="p-8 bg-gray-50 text-black">
         <div className="flex justify-evenly w-full items-center gap-4">
           <Link
-            href="/individual-feedback"
+            href="/admin/individual-feedback"
             className="w-full sm:w-auto px-6 py-3 bg-[var(--heartflow-blue)] text-white rounded-3xl hover:bg-[var(--heartflow-blue)]/90 transition-all duration-300 ease-in-out transform hover:scale-105 text-center"
           >
             View Individual Feedback
