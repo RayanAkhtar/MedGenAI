@@ -1,7 +1,7 @@
 'use client';
 
 import Navbar from "@/app/components/Navbar";
-import AdminStats from "../components/AdminStats";
+import AdminStats from "./AdminStats";
 import { Pie } from "react-chartjs-2";
 import {
   Chart as ChartJS,
