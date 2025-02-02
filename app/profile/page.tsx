@@ -120,6 +120,7 @@ export default function Profile() {
         },
         scales: {
             y: {
+                type: 'linear' as const,
                 beginAtZero: false,
                 min: 60,
                 max: 100,
@@ -127,7 +128,9 @@ export default function Profile() {
                     color: 'rgba(0, 0, 0, 0.05)'
                 },
                 ticks: {
-                    callback: (value: number) => `${value}%`
+                    callback: function(tickValue: number | string) {
+                        return `${tickValue}%`
+                    }
                 }
             },
             x: {
