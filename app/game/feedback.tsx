@@ -8,10 +8,18 @@ export default function FeedbackBox() {
     if (feedback.trim() === "") return;
 
     try {
-      await fetch("/api/submit-feedback", {
+      // Dummy values used for now
+      await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/user-response`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ feedback }),
+        body: JSON.stringify({ 
+          imageID: "img123",
+          userID: "user456",
+          user_guess_type: "right",
+          x: 150,
+          y: 250,
+          feedback: feedback 
+        }),
       });
 
       setSubmitted(true);
