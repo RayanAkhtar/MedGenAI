@@ -6,63 +6,44 @@ import Image from "next/image";
 import { Dialog } from "@headlessui/react";
 import { X } from "lucide-react";
 
-// Card Component
-const Card = ({ children, className }: { children: React.ReactNode; className?: string }) => (
-  <div className={`bg-white shadow-md rounded-2xl p-6 ${className}`}>{children}</div>
-);
-
-const CardHeader = ({ children }: { children: React.ReactNode }) => (
-  <div className="border-b pb-2 mb-4 text-xl font-bold text-black">{children}</div>
-);
-
-const CardContent = ({ children }: { children: React.ReactNode }) => (
-  <div className="text-black">{children}</div>
-);
-
-// Badge Component
-const Badge = ({ children, className }: { children: React.ReactNode; className?: string }) => (
-  <span className={`inline-block px-4 py-1 text-sm font-semibold rounded-full text-white ${className}`}>
-    {children}
-  </span>
-);
-
-interface FeedbackData {
-  imageUrl: string;
-  x: number; // X pixel coordinate
-  y: number; // Y pixel coordinate
-  correct: boolean;
+interface Dot {
+  x: number;
+  y: number;
   message: string;
-  imageWidth: number; // Image width for positioning dot
-  imageHeight: number; // Image height for positioning dot
 }
 
-const dummyFeedback: FeedbackData = {
-  imageUrl: "/sample-image.jpg", // Replace with a real image path
-  x: 150, // Example pixel coordinates
-  y: 220,
-  correct: true,
-  message: "Excellent focus on the main subject!",
-  imageWidth: 600, // Set your image width here
-  imageHeight: 400, // Set your image height here
+const dummyFeedback = {
+  imageUrl: "/images/placeholder1.jpg",
+  imageWidth: 600,
+  imageHeight: 400,
+  dots: [
+    { x: 150, y: 220, message: "This part is too dark, real CT scans are brighter." },
+    { x: 300, y: 180, message: "Focus on this brighter area for better clarity." },
+  ],
 };
 
 export default function IndividualFeedbackPage() {
   const [isImageExpanded, setIsImageExpanded] = useState(false);
+  const [showDots, setShowDots] = useState(true);
 
   const toggleImageExpansion = () => {
     setIsImageExpanded(!isImageExpanded);
   };
 
+  const toggleDotsVisibility = () => {
+    setShowDots(!showDots);
+  };
+
   return (
     <main className="h-screen bg-[var(--background)] text-[var(--foreground)] overflow-y-auto">
       <Navbar />
-      
+
       <div className="min-h-screen flex justify-center items-center bg-gray-50 p-8">
-        <Card className="max-w-3xl w-full">
-          <CardHeader>Individual Feedback</CardHeader>
-          <CardContent>
+        <div className="w-full max-w-3xl">
+          <div className="bg-white shadow-md rounded-2xl p-6">
+            <h1 className="border-b pb-2 mb-4 text-xl font-bold text-black">Individual Feedback</h1>
+
             <div className="relative">
-              {/* Clickable Image */}
               <Image
                 src={dummyFeedback.imageUrl}
                 alt="Feedback Image"
@@ -71,41 +52,70 @@ export default function IndividualFeedbackPage() {
                 className="rounded-lg cursor-pointer mx-auto"
                 onClick={toggleImageExpansion}
               />
-              {/* Dot overlay */}
-              <div
-                className="absolute bg-red-500 w-4 h-4 rounded-full border-2 border-white"
-                style={{
-                  top: `${dummyFeedback.y}px`,
-                  left: `${dummyFeedback.x}px`,
-                  transform: "translate(-50%, -50%)",
-                }}
-              ></div>
+              {showDots &&
+                dummyFeedback.dots.map((dot, index) => (
+                  <div
+                    key={index}
+                    className="absolute bg-red-500 w-6 h-6 rounded-full border-2 border-white flex items-center justify-center text-white text-xs"
+                    style={{
+                      top: `${dot.y}px`,
+                      left: `${dot.x}px`,
+                      transform: "translate(-50%, -50%)",
+                    }}
+                  >
+                    {index + 1}
+                  </div>
+                ))}
             </div>
 
-            {/* Correct or Incorrect Guess */}
             <div className="my-4 text-center">
-              <Badge className={dummyFeedback.correct ? "bg-[var(--heartflow-blue)]" : "bg-[var(--heartflow-red)]"}>
-                {dummyFeedback.correct ? "Accurate Guess" : "Incorrect Guess"}
-              </Badge>
+              <button
+                onClick={toggleDotsVisibility}
+                className={`px-4 py-2 text-sm font-semibold rounded-full ${
+                  showDots ? "bg-blue-600 text-white" : "bg-gray-300 text-black"
+                }`}
+              >
+                {showDots ? "Hide Dots" : "Show Dots"}
+              </button>
             </div>
 
-            {/* Feedback Message */}
-            <p className="text-center text-black mt-4">{dummyFeedback.message}</p>
-          </CardContent>
-        </Card>
+            <div className="mt-4">
+              {dummyFeedback.dots.map((dot, index) => (
+                <p key={index} className="text-black">
+                  <strong>Dot {index + 1}:</strong> {dot.message}
+                </p>
+              ))}
+            </div>
+          </div>
+        </div>
 
-        {/* Expanded Image Modal */}
         <Dialog open={isImageExpanded} onClose={toggleImageExpansion} className="relative z-50">
           <div className="fixed inset-0 bg-black bg-opacity-70" aria-hidden="true" />
           <div className="fixed inset-0 flex items-center justify-center p-4">
             <Dialog.Panel className="relative">
-              <Image
-                src={dummyFeedback.imageUrl}
-                alt="Expanded Feedback Image"
-                width={dummyFeedback.imageWidth}
-                height={dummyFeedback.imageHeight}
-                className="rounded-lg"
-              />
+              <div className="relative">
+                <Image
+                  src={dummyFeedback.imageUrl}
+                  alt="Expanded Feedback Image"
+                  width={dummyFeedback.imageWidth}
+                  height={dummyFeedback.imageHeight}
+                  className="rounded-lg"
+                />
+                {showDots &&
+                  dummyFeedback.dots.map((dot, index) => (
+                    <div
+                      key={index}
+                      className="absolute bg-red-500 w-6 h-6 rounded-full border-2 border-white flex items-center justify-center text-white text-xs"
+                      style={{
+                        top: `${dot.y}px`,
+                        left: `${dot.x}px`,
+                        transform: "translate(-50%, -50%)",
+                      }}
+                    >
+                      {index + 1}
+                    </div>
+                  ))}
+              </div>
               <button
                 onClick={toggleImageExpansion}
                 className="absolute top-2 right-2 bg-white rounded-full p-1"
