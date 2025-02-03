@@ -4,7 +4,8 @@ import { useState } from "react";
 import Navbar from "@/app/components/Navbar";
 import Image from "next/image";
 import { Dialog } from "@headlessui/react";
-import { X } from "lucide-react";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTimes } from '@fortawesome/free-solid-svg-icons'; // Font Awesome close (X) icon
 
 interface Dot {
   x: number;
@@ -120,7 +121,7 @@ export default function IndividualFeedbackPage() {
                 onClick={toggleImageExpansion}
                 className="absolute top-2 right-2 bg-white rounded-full p-1"
               >
-                <X className="w-5 h-5 text-black" />
+                <FontAwesomeIcon icon={faTimes} className="w-5 h-5 text-black" /> {/* Font Awesome X icon */}
               </button>
             </Dialog.Panel>
           </div>

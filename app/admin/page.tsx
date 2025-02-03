@@ -52,10 +52,10 @@ export default function Admin() {
 
       <section className="flex flex-wrap gap-8 p-8 bg-white justify-center">
         <div className="w-full md:w-[48%]">
-          <AdminStats title="Total Engagement" />
+          <AdminStats title="Total Engagement" graphType="engagement" />
         </div>
         <div className="w-full md:w-[48%]">
-          <AdminStats title="User Accuracy" />
+          <AdminStats title="User Accuracy" graphType="accuracy" />
         </div>
       </section>
 
