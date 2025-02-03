@@ -67,12 +67,11 @@ export default function Admin() {
       if (elements.length > 0) {
         const index = elements[0].index;
         const filter = index === 0 ? "complete" : "incomplete";
-        window.location.href = `/all-feedback?filter=${filter}`;
+        window.location.href = `admin/feedback-page?filter=${filter}`;
       }
     },
     plugins: { legend: { position: "bottom" } },
   };
-
 
   const handleRealImageChange = (event) => {
     const file = event.target.files[0];
@@ -82,7 +81,6 @@ export default function Admin() {
     }
   };
 
-
   const handleAiImageChange = (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -91,14 +89,13 @@ export default function Admin() {
     }
   };
 
-
   const uploadRealImage = async () => {
     if (!realImage) {
       alert("Please select an image.");
       return;
     }
 
-    console.log(realImage)
+    console.log(realImage);
 
     const formData = new FormData();
     formData.append("file", realImage);
@@ -122,7 +119,6 @@ export default function Admin() {
       alert("An error occurred while uploading the image.");
     }
   };
-
 
   const uploadAiImage = async () => {
     if (!aiImage) {
@@ -174,9 +170,9 @@ export default function Admin() {
               <p>Total images: {totalImagesData.realImages}</p>
               <p>Percentage detected: {totalImagesData.realImagesPercent.toFixed(2)}%</p>
               <div className="flex flex-wrap gap-4 mt-6">
-                <button className="flex-1 min-w-[150px] px-6 py-3 bg-[var(--heartflow-blue)] text-white rounded-3xl hover:bg-[var(--heartflow-blue)]/90 transition-all duration-300 ease-in-out transform hover:scale-105">
+                <Link href="/admin/feedback-page?filter=real" className="flex-1 min-w-[150px] px-6 py-3 bg-[var(--heartflow-blue)] text-white rounded-3xl hover:bg-[var(--heartflow-blue)]/90 transition-all duration-300 ease-in-out transform hover:scale-105">
                   View Feedback
-                </button>
+                </Link>
                 <div className="flex-1 min-w-[150px]">
                   <input
                     type="file"
@@ -206,9 +202,9 @@ export default function Admin() {
               <p>Total images: {totalImagesData.aiImages}</p>
               <p>Percentage detected: {totalImagesData.aiImagesPercent.toFixed(2)}%</p>
               <div className="flex flex-wrap gap-4 mt-6">
-                <button className="flex-1 min-w-[150px] px-6 py-3 bg-[var(--heartflow-blue)] text-white rounded-3xl hover:bg-[var(--heartflow-blue)]/90 transition-all duration-300 ease-in-out transform hover:scale-105">
+                <Link href="/admin/feedback-page?filter=ai" className="flex-1 min-w-[150px] px-6 py-3 bg-[var(--heartflow-blue)] text-white rounded-3xl hover:bg-[var(--heartflow-blue)]/90 transition-all duration-300 ease-in-out transform hover:scale-105">
                   View Feedback
-                </button>
+                </Link>
                 <div className="flex-1 min-w-[150px]">
                   <input
                     type="file"
@@ -282,18 +278,18 @@ export default function Admin() {
           </div>
 
           <div className="w-1/2 flex flex-col gap-4 items-center">
-            <Link href="/all-feedback?filter=all" className="px-6 py-3 bg-[var(--heartflow-blue)] text-white rounded-3xl hover:bg-[var(--heartflow-blue)]/90 transition-all duration-300 ease-in-out transform hover:scale-105">
+            <Link href="admin/feedback-page?filter=all" className="px-6 py-3 bg-[var(--heartflow-blue)] text-white rounded-3xl hover:bg-[var(--heartflow-blue)]/90 transition-all duration-300 ease-in-out transform hover:scale-105">
               View All Feedback
             </Link>
-            <Link href="/all-feedback?filter=complete" className="px-6 py-3 bg-[var(--heartflow-blue)] text-white rounded-3xl hover:bg-[var(--heartflow-blue)]/90 transition-all duration-300 ease-in-out transform hover:scale-105">
+            <Link href="admin/feedback-page?filter=complete" className="px-6 py-3 bg-[var(--heartflow-blue)] text-white rounded-3xl hover:bg-[var(--heartflow-blue)]/90 transition-all duration-300 ease-in-out transform hover:scale-105">
               View Complete Feedback
             </Link>
-            <Link href="/all-feedback?filter=incomplete" className="px-6 py-3 bg-[var(--heartflow-blue)] text-white rounded-3xl hover:bg-[var(--heartflow-blue)]/90 transition-all duration-300 ease-in-out transform hover:scale-105">
+            <Link href="admin/feedback-page?filter=incomplete" className="px-6 py-3 bg-[var(--heartflow-blue)] text-white rounded-3xl hover:bg-[var(--heartflow-blue)]/90 transition-all duration-300 ease-in-out transform hover:scale-105">
               View Incomplete Feedback
             </Link>
-          </div>
+            </div>
         </div>
       </section>
     </main>
-  );
+  )
 }
