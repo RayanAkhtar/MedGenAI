@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from "react";
 import Navbar from "@/app/components/Navbar";
 import AdminStats from "./AdminStats";
 import { Pie } from "react-chartjs-2";
@@ -14,20 +15,52 @@ import Link from "next/link";
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 export default function Admin() {
-  const feedbackData = [
-    { imageId: "IMG001", message: "Blurry in top corner." },
-    { imageId: "IMG002", message: "Perfect exposure." },
-    { imageId: "IMG003", message: "Colors are inconsistent." },
-    { imageId: "IMG004", message: "Excellent alignment." },
-    { imageId: "IMG005", message: "Requires retouching." },
-  ];
+  const [feedbackStatusData, setFeedbackStatusData] = useState({ complete: 0, incomplete: 0 });
+  const [totalImagesData, setTotalImagesData] = useState({ realImages: 0, aiImages: 0, realImagesPercent: 0, aiImagesPercent: 0 });
+
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const feedbackStatusResponse = await fetch(process.env.NEXT_PUBLIC_API_BASE_URL + '/admin/getFeedbackResolutionStatus');
+        const feedbackStatus = await feedbackStatusResponse.json();
+
+        const complete = feedbackStatus[0].resolvedCount;
+        const incomplete = feedbackStatus[0].unresolvedCount;
+        setFeedbackStatusData({ complete, incomplete });
+
+        const realImagesResponse = await fetch(process.env.NEXT_PUBLIC_API_BASE_URL + '/admin/getTotalRealImages');
+        const aiImagesResponse = await fetch(process.env.NEXT_PUBLIC_API_BASE_URL + '/admin/getTotalAIImages');
+        
+        let realImages = await realImagesResponse.json();
+        let aiImages = await aiImagesResponse.json();
+        realImages = realImages[0];
+        aiImages = aiImages[0];
+
+
+        if (realImages && typeof realImages.totalReal === 'number' && typeof realImages.percentageDetected === 'number') {
+          setTotalImagesData(prev => ({ ...prev, realImages: realImages.totalReal, realImagesPercent: realImages.percentageDetected * 100 }));
+        }
+
+        if (aiImages && typeof aiImages.totalAI === 'number' && typeof aiImages.percentageDetected === 'number') {
+          setTotalImagesData(prev => ({ ...prev, aiImages: aiImages.totalAI, aiImagesPercent: aiImages.percentageDetected * 100 }));
+        }
+
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
 
   const chartData = {
     labels: ["Complete", "Incomplete"],
     datasets: [
       {
         label: "Feedback Status",
-        data: [80, 20],  // Complete: incomplete ratio
+        data: [feedbackStatusData.complete, feedbackStatusData.incomplete],
         backgroundColor: ["rgba(54, 162, 235, 0.6)", "rgba(255, 99, 132, 0.6)"],
       },
     ],
@@ -64,8 +97,8 @@ export default function Admin() {
           <div className="flex flex-col gap-8 w-full lg:w-3/4">
             <div className="bg-white p-6 shadow-md rounded-2xl text-black">
               <h2 className="text-xl font-bold mb-4">Real Images</h2>
-              <p>Total images: 582</p>
-              <p>Interpretation: 82%</p>
+              <p>Total images: {totalImagesData.realImages}</p>
+              <p>Percentage detected: {totalImagesData.realImagesPercent.toFixed(2)}%</p>
               <div className="flex flex-wrap gap-4 mt-6">
                 <button className="flex-1 min-w-[150px] px-6 py-3 bg-[var(--heartflow-blue)] text-white rounded-3xl hover:bg-[var(--heartflow-blue)]/90 transition-all duration-300 ease-in-out transform hover:scale-105">
                   View Feedback
@@ -78,8 +111,8 @@ export default function Admin() {
 
             <div className="bg-white p-6 shadow-md rounded-2xl text-black">
               <h2 className="text-xl font-bold mb-4">AI Images</h2>
-              <p>Total images: 792</p>
-              <p>Interpretation: 50%</p>
+              <p>Total images: {totalImagesData.aiImages}</p>
+              <p>Percentage detected: {totalImagesData.aiImagesPercent.toFixed(2)}%</p>
               <div className="flex flex-wrap gap-4 mt-6">
                 <button className="flex-1 min-w-[150px] px-6 py-3 bg-[var(--heartflow-blue)] text-white rounded-3xl hover:bg-[var(--heartflow-blue)]/90 transition-all duration-300 ease-in-out transform hover:scale-105">
                   View Feedback
