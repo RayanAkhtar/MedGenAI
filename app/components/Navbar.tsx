@@ -14,7 +14,7 @@ const Navbar = () => {
         <nav className="flex items-center justify-between px-8 py-5 bg-white shadow-sm">
             <Link href="/" className="ml-4 sm:ml-6 md:ml-8 lg:ml-10">
                 <Image 
-                    src="images/heartflow-logo-blue.svg" 
+                    src="/images/heartflow-logo-blue.svg" 
                     alt="Logo" 
                     width={140}
                     height={8}
