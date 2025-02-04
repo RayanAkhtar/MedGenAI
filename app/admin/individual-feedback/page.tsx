@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import Navbar from "@/app/components/Navbar";
 import Image from "next/image";
 import { Dialog } from "@headlessui/react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes } from '@fortawesome/free-solid-svg-icons'; // Font Awesome close (X) icon
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
 
 interface Dot {
   x: number;
@@ -13,19 +14,53 @@ interface Dot {
   message: string;
 }
 
-const dummyFeedback = {
-  imageUrl: "/images/placeholder1.jpg",
-  imageWidth: 600,
-  imageHeight: 400,
-  dots: [
-    { x: 150, y: 220, message: "This part is too dark, real CT scans are brighter." },
-    { x: 300, y: 180, message: "Focus on this brighter area for better clarity." },
-  ],
-};
-
 export default function IndividualFeedbackPage() {
   const [isImageExpanded, setIsImageExpanded] = useState(false);
   const [showDots, setShowDots] = useState(true);
+  const [imageData, setImageData] = useState<any>(null);
+  const [imageSrc, setImageSrc] = useState<string | null>(null);
+
+  const searchParams = useSearchParams();
+  const imageId = searchParams?.get("imageid");
+
+  useEffect(() => {
+    const fetchImageData = async () => {
+      try {
+        if (!imageId) return;
+
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getImageById/${imageId}`);
+        const metadata = await response.json();
+
+        if (metadata && metadata.image_path) {
+          const cleanedPath = metadata.image_path.split('/').slice(4).join('/');
+          const apiUrl = `${process.env.NEXT_PUBLIC_API_IMAGE_URL}/fetchImageByPath/${encodeURIComponent(cleanedPath)}`;
+
+          const imageResponse = await fetch(apiUrl);
+          if (!imageResponse.ok) {
+            throw new Error("Failed to fetch the image");
+          }
+
+          const imageBlob = await imageResponse.blob();
+          const imageUrl = URL.createObjectURL(imageBlob);
+
+          setImageSrc(imageUrl);
+
+          setImageData({
+            imageWidth: 600,
+            imageHeight: 400,
+            dots: metadata.dots || [
+              { x: 150, y: 220, message: "This part is too dark, real CT scans are brighter." },
+              { x: 300, y: 180, message: "Focus on this brighter area for better clarity." },
+            ],
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching images:", error);
+      }
+    };
+
+    fetchImageData();
+  }, [imageId]);
 
   const toggleImageExpansion = () => {
     setIsImageExpanded(!isImageExpanded);
@@ -34,6 +69,10 @@ export default function IndividualFeedbackPage() {
   const toggleDotsVisibility = () => {
     setShowDots(!showDots);
   };
+
+  if (!imageSrc) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <main className="h-screen bg-[var(--background)] text-[var(--foreground)] overflow-y-auto">
@@ -46,15 +85,15 @@ export default function IndividualFeedbackPage() {
 
             <div className="relative">
               <Image
-                src={dummyFeedback.imageUrl}
+                src={imageSrc}
                 alt="Feedback Image"
-                width={dummyFeedback.imageWidth}
-                height={dummyFeedback.imageHeight}
+                width={imageData.imageWidth}
+                height={imageData.imageHeight}
                 className="rounded-lg cursor-pointer mx-auto"
                 onClick={toggleImageExpansion}
               />
               {showDots &&
-                dummyFeedback.dots.map((dot, index) => (
+                imageData.dots.map((dot, index) => (
                   <div
                     key={index}
                     className="absolute bg-red-500 w-6 h-6 rounded-full border-2 border-white flex items-center justify-center text-white text-xs"
@@ -72,16 +111,14 @@ export default function IndividualFeedbackPage() {
             <div className="my-4 text-center">
               <button
                 onClick={toggleDotsVisibility}
-                className={`px-4 py-2 text-sm font-semibold rounded-full ${
-                  showDots ? "bg-blue-600 text-white" : "bg-gray-300 text-black"
-                }`}
+                className={`px-4 py-2 text-sm font-semibold rounded-full ${showDots ? "bg-blue-600 text-white" : "bg-gray-300 text-black"}`}
               >
                 {showDots ? "Hide Dots" : "Show Dots"}
               </button>
             </div>
 
             <div className="mt-4">
-              {dummyFeedback.dots.map((dot, index) => (
+              {imageData.dots.map((dot, index) => (
                 <p key={index} className="text-black">
                   <strong>Dot {index + 1}:</strong> {dot.message}
                 </p>
@@ -96,14 +133,14 @@ export default function IndividualFeedbackPage() {
             <Dialog.Panel className="relative">
               <div className="relative">
                 <Image
-                  src={dummyFeedback.imageUrl}
+                  src={imageSrc}
                   alt="Expanded Feedback Image"
-                  width={dummyFeedback.imageWidth}
-                  height={dummyFeedback.imageHeight}
+                  width={imageData.imageWidth}
+                  height={imageData.imageHeight}
                   className="rounded-lg"
                 />
                 {showDots &&
-                  dummyFeedback.dots.map((dot, index) => (
+                  imageData.dots.map((dot, index) => (
                     <div
                       key={index}
                       className="absolute bg-red-500 w-6 h-6 rounded-full border-2 border-white flex items-center justify-center text-white text-xs"
@@ -121,7 +158,7 @@ export default function IndividualFeedbackPage() {
                 onClick={toggleImageExpansion}
                 className="absolute top-2 right-2 bg-white rounded-full p-1"
               >
-                <FontAwesomeIcon icon={faTimes} className="w-5 h-5 text-black" /> {/* Font Awesome X icon */}
+                <FontAwesomeIcon icon={faTimes} className="w-5 h-5 text-black" />
               </button>
             </Dialog.Panel>
           </div>
