@@ -68,7 +68,6 @@ const FeedbackPage = () => {
       <Navbar />
       <div className='h-screen bg-white text-[var(--foreground)] overflow-y-auto text-black'>
         <h1 className='text-3xl font-bold text-center py-8'>Feedback Page</h1>
-
         <div className='flex flex-wrap gap-6 justify-center p-8 bg-white rounded-2xl shadow-lg mb-8'>
           <div className='flex flex-col gap-4 w-full md:w-1/3'>
             <label className='font-bold text-lg'>Image Type:</label>
@@ -82,7 +81,6 @@ const FeedbackPage = () => {
               <option value='ai'>AI</option>
             </select>
           </div>
-
           <div className='flex flex-col gap-4 w-full md:w-1/3'>
             <label className='font-bold text-lg'>Resolved:</label>
             <select
@@ -99,14 +97,12 @@ const FeedbackPage = () => {
               <option value='false'>Unresolved</option>
             </select>
           </div>
-
           <div className='flex flex-col gap-4 w-full md:w-1/3'>
             <label className='font-bold text-lg'>Sort By:</label>
             <select
               onChange={e => setSortBy(e.target.value)}
               value={sortBy}
-              className='px-6 py-3 bg-[var(--heartflow-blue)] text-white rounded-3xl focus:outline-none focus:ring-2 focus:ring-[var(--heartflow-blue)]'
-            >
+              className='px-6 py-3 bg-[var(--heartflow-blue)] text-white rounded-3xl focus:outline-none focus:ring-2 focus:ring-[var(--heartflow-blue)]'>
               <option value='last_feedback_time'>Time of Last Feedback</option>
               <option value='unresolved_count'>
                 Amount of Unresolved Feedback
@@ -116,19 +112,19 @@ const FeedbackPage = () => {
             </select>
           </div>
         </div>
-
         <div className='overflow-x-auto p-8 bg-white rounded-2xl shadow-lg'>
           <table className='min-w-full table-auto'>
-            <thead>
-              <tr className='bg-[var(--heartflow-blue)] text-white'>
-                <th className='px-6 py-4 text-left'>Image</th>
-                <th className='px-6 py-4 text-left'>Image Type</th>
-                <th className='px-6 py-4 text-left'>Unresolved Feedback</th>
-                <th className='px-6 py-4 text-left'>Last Feedback Time</th>
-                <th className='px-6 py-4 text-left'>Upload Time</th>
-                <th className='px-6 py-4 text-left'>Actions</th>{' '}
-              </tr>
-            </thead>
+          <thead>
+            <tr className="bg-[var(--heartflow-blue)] text-white">
+              <th className="px-6 py-4 text-left">Image</th>
+              <th className="px-6 py-4 text-left">Image Type</th>
+              <th className="px-6 py-4 text-left">Unresolved Feedback</th>
+              <th className="px-6 py-4 text-left">Last Feedback Time</th>
+              <th className="px-6 py-4 text-left">Upload Time</th>
+              <th className="px-6 py-4 text-left">Actions</th>
+            </tr>
+          </thead>
+
             <tbody>
               {feedbacks.map(feedback => (
                 <tr

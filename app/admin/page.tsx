@@ -243,7 +243,7 @@ export default function Admin() {
                   Admin Dashboard
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link href="/reports" className="block px-4 py-2 bg-[var(--heartflow-red)] text-white rounded-lg hover:bg-[var(--heartflow-blue)] transition-colors duration-300">
                   Reports
                 </Link>
@@ -252,24 +252,13 @@ export default function Admin() {
                 <Link href="/support" className="block px-4 py-2 bg-[var(--heartflow-red)] text-white rounded-lg hover:bg-[var(--heartflow-blue)] transition-colors duration-300">
                   Support
                 </Link>
-              </li>
+              </li> */}
             </ul>
           </div>
         </div>
       </section>
 
-      <section className="p-8 bg-gray-50 text-black">
-        <div className="flex justify-evenly w-full items-center gap-4">
-          <Link href="/admin/individual-feedback" className="w-full sm:w-auto px-6 py-3 bg-[var(--heartflow-blue)] text-white rounded-3xl hover:bg-[var(--heartflow-blue)]/90 transition-all duration-300 ease-in-out transform hover:scale-105 text-center">
-            View Individual Feedback
-          </Link>
-          <Link href="/admin/heatmap-feedback" className="w-full sm:w-auto px-6 py-3 bg-[var(--heartflow-blue)] text-white rounded-3xl hover:bg-[var(--heartflow-blue)]/90 transition-all duration-300 ease-in-out transform hover:scale-105 text-center">
-            View Heatmap Feedback
-          </Link>
-        </div>
-      </section>
-
-      <section className="p-8 bg-gray-50 text-black text-center">
+      <section className="p-8 bg-white text-black text-center">
         <h2 className="text-2xl font-bold mb-6 text-center">Feedback Navigation</h2>
 
         <div className="flex justify-between items-center gap-8">
@@ -280,12 +269,6 @@ export default function Admin() {
           <div className="w-1/2 flex flex-col gap-4 items-center">
             <Link href="admin/feedback-page?filter=all" className="px-6 py-3 bg-[var(--heartflow-blue)] text-white rounded-3xl hover:bg-[var(--heartflow-blue)]/90 transition-all duration-300 ease-in-out transform hover:scale-105">
               View All Feedback
-            </Link>
-            <Link href="admin/feedback-page?filter=complete" className="px-6 py-3 bg-[var(--heartflow-blue)] text-white rounded-3xl hover:bg-[var(--heartflow-blue)]/90 transition-all duration-300 ease-in-out transform hover:scale-105">
-              View Complete Feedback
-            </Link>
-            <Link href="admin/feedback-page?filter=incomplete" className="px-6 py-3 bg-[var(--heartflow-blue)] text-white rounded-3xl hover:bg-[var(--heartflow-blue)]/90 transition-all duration-300 ease-in-out transform hover:scale-105">
-              View Incomplete Feedback
             </Link>
             </div>
         </div>
