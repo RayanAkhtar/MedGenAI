@@ -59,14 +59,15 @@ export default function Signup() {
         setIsValidEmail(validateEmail(email))
     }, [email])
 
-    // Wait for initial auth check
-    if (loading) return null; // AuthContext's loading spinner will show
-    
-    // Redirect if already logged in
-    if (user) {
-        router.push('/dashboard')
-        return null;
-    }
+    useEffect(() => {
+        if (user && !loading) {
+            router.push('/dashboard')
+        }
+    }, [user, loading, router])
+
+    // Remove the direct navigation
+    if (loading) return null;
+
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen py-12 px-4 sm:px-6 lg:px-8">
