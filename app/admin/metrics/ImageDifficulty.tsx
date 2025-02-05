@@ -1,8 +1,6 @@
 'use client'
 
-import Navbar from '@/app/components/Navbar'
 import { useState, useEffect } from 'react'
-import Link from 'next/link'
 
 interface ImageDifficultyProps {
   sampleDifficulty: { image_id: string; difficulty_score: number; image_path: string; total_guesses: number; incorrect_guesses: number}[];

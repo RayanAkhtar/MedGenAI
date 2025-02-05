@@ -14,7 +14,6 @@ const MetricsPage = () => {
 
   const fetchData = async () => {
     try {
-      // Fetch all the data from the API
       const accuracyResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getImageDetectionAccuracy`);
       const accuracyData = await accuracyResponse.json();
 
@@ -30,7 +29,6 @@ const MetricsPage = () => {
       const sampleDifficultyResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getImageDifficulty`);
       const sampleDifficultyData = await sampleDifficultyResponse.json();
 
-      // Combine all the data into one object
       setMetricsData({
         accuracyData: accuracyData,
         confusionMatrix: confusionMatrixData,

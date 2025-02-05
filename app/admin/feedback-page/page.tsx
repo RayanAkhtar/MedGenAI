@@ -38,12 +38,11 @@ const FeedbackPage = () => {
     }
   }
 
-  // Runs on any filter changes
   useEffect(() => {
     fetchFeedbacks()
   }, [imageType, resolved, sortBy])
 
-  // Runs after feedbacks are loaded
+
   useEffect(() => {
     const loadImages = async () => {
       const newImages = {}

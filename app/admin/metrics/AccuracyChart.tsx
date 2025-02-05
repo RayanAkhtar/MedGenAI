@@ -1,7 +1,6 @@
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
 
-// Register the necessary components
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -13,9 +12,8 @@ ChartJS.register(
 );
 
 const AccuracyChart = ({ accuracyData }) => {
-  // Calculate max value and set a buffer
   const maxAccuracy = Math.max(...accuracyData.map(data => data.accuracy));
-  const yAxisMax = maxAccuracy < 1 ? 1 : maxAccuracy + 0.05; // Adds 5% buffer to max accuracy
+  const yAxisMax = maxAccuracy < 1 ? 1 : maxAccuracy + 0.05;
 
   const data = {
     labels: accuracyData.map(item => item.month),
@@ -25,7 +23,7 @@ const AccuracyChart = ({ accuracyData }) => {
         data: accuracyData.map(item => item.accuracy),
         fill: false,
         borderColor: 'rgba(75, 192, 192, 1)',
-        tension: 0.4, // Increase this value for a smoother curve (0 to 1)
+        tension: 0.4,
       },
     ],
   };
@@ -34,9 +32,9 @@ const AccuracyChart = ({ accuracyData }) => {
     scales: {
       y: {
         min: 0,
-        max: yAxisMax, // Set the maximum value of y-axis with a buffer
+        max: yAxisMax,
         ticks: {
-          stepSize: 0.1, // You can adjust the step size depending on your range
+          stepSize: 0.1,
         },
       },
     },
