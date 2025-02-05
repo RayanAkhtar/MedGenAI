@@ -1,32 +1,85 @@
-interface SampleDifficultyProps {
-    sampleDifficulty: { sampleId: string; difficultyScore: number }[];
-  }
-  
-  const SampleDifficulty = ({ sampleDifficulty }: SampleDifficultyProps) => {
-    return (
-      <div className="mb-12">
-        <h3 className="text-2xl font-semibold text-center mb-6">Image Difficulty</h3>
-        <div className="overflow-x-auto shadow-md rounded-lg">
-          <table className="min-w-full table-auto text-center">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="px-4 py-2 text-sm font-medium text-gray-500">Sample</th>
-                <th className="px-4 py-2 text-sm font-medium text-gray-500">Difficulty Score</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sampleDifficulty.map((sample, index) => (
-                <tr key={index} className="border-b">
-                  <td className="px-4 py-2 text-sm">{sample.sampleId}</td>
-                  <td className="px-4 py-2 text-sm">{sample.difficultyScore}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    );
+'use client'
+
+import Navbar from '@/app/components/Navbar'
+import { useState, useEffect } from 'react'
+import Link from 'next/link'
+
+interface ImageDifficultyProps {
+  sampleDifficulty: { image_id: string; difficulty_score: number; image_path: string; total_guesses: number; incorrect_guesses: number}[];
+}
+
+const SampleDifficulty = ({ sampleDifficulty }: ImageDifficultyProps) => {
+  console.log("passed in", sampleDifficulty)
+
+  const [images, setImages] = useState<{ [key: string]: string }>({});
+
+  const fetchImage = async (imagePath: string) => {
+    try {
+      const cleanedPath = imagePath.split('/').slice(4).join('/');
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_IMAGE_URL}/fetchImageByPath/${encodeURIComponent(cleanedPath)}`
+      );
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      return url;
+    } catch (error) {
+      console.error('Error fetching image:', error);
+      return null;
+    }
   };
-  
-  export default SampleDifficulty;
-  
+
+  useEffect(() => {
+    const loadImages = async () => {
+      const newImages: { [key: string]: string } = {};
+      for (const sample of sampleDifficulty) {
+        if (!newImages[sample.image_id]) {
+          const imageUrl = await fetchImage(sample.image_path);
+          if (imageUrl) {
+            newImages[sample.image_id] = imageUrl;
+          }
+        }
+      }
+      setImages(newImages);
+    };
+
+    loadImages();
+  }, [sampleDifficulty]);
+
+  return (
+    <div className="mb-12">
+      <h3 className="text-2xl font-semibold text-center mb-6">Image Difficulty</h3>
+      <div className="overflow-x-auto shadow-md rounded-lg">
+        <table className="min-w-full table-auto text-center">
+          <thead className="bg-gray-100">
+            <tr>
+              <th className="px-4 py-2 text-sm font-medium text-gray-500">Image</th>
+              <th className="px-4 py-2 text-sm font-medium text-gray-500">Image ID</th>
+              <th className="px-4 py-2 text-sm font-medium text-gray-500">Difficulty Score</th>
+              <th className="px-4 py-2 text-sm font-medium text-gray-500">Total Guesses</th>
+              <th className="px-4 py-2 text-sm font-medium text-gray-500">Incorrect Guesses</th>
+            </tr>
+          </thead>
+          <tbody>
+            {sampleDifficulty.map((sample, index) => (
+              <tr key={index} className="border-b">
+                <td className="px-4 py-2 text-sm">
+                  {images[sample.image_id] ? (
+                    <img src={images[sample.image_id]} alt={sample.image_id} width={50} />
+                  ) : (
+                    <span>Loading...</span>
+                  )}
+                </td>
+                <td className="px-4 py-2 text-sm">{sample.image_id}</td>
+                <td className="px-4 py-2 text-sm">{sample.difficulty_score.toFixed(2)}</td>
+                <td className="px-4 py-2 text-sm">{sample.total_guesses}</td>
+                <td className="px-4 py-2 text-sm">{sample.incorrect_guesses}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
+
+export default SampleDifficulty;

@@ -1,4 +1,4 @@
-"use client"
+'use client';
 
 import { useEffect, useState } from 'react';
 import AccuracyChart from './AccuracyChart';
@@ -12,41 +12,42 @@ import Link from 'next/link';
 const MetricsPage = () => {
   const [metricsData, setMetricsData] = useState<any>(null);
 
+  const fetchData = async () => {
+    try {
+      // Fetch all the data from the API
+      const accuracyResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getImageDetectionAccuracy`);
+      const accuracyData = await accuracyResponse.json();
+
+      const confusionMatrixResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getConfusionMatrix`);
+      const confusionMatrixData = await confusionMatrixResponse.json();
+
+      const mlMetricsResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getMLMetrics`);
+      const mlMetricsData = await mlMetricsResponse.json();
+
+      const leaderboardResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getLeaderboard`);
+      const leaderboardData = await leaderboardResponse.json();
+
+      const sampleDifficultyResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getImageDifficulty`);
+      const sampleDifficultyData = await sampleDifficultyResponse.json();
+
+      // Combine all the data into one object
+      setMetricsData({
+        accuracyData: accuracyData,
+        confusionMatrix: confusionMatrixData,
+        accuracy: mlMetricsData.accuracy,
+        precision: mlMetricsData.precision,
+        recall: mlMetricsData.recall,
+        f1Score: mlMetricsData.f1Score,
+        leaderboardData: leaderboardData,
+        sampleDifficulty: sampleDifficultyData,
+      });
+      
+    } catch (error) {
+      console.error("Error fetching metrics data:", error);
+    }
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      const dummyData = {
-        accuracyData: [
-          { month: 'Jan', accuracy: 0.85 },
-          { month: 'Feb', accuracy: 0.88 },
-          { month: 'Mar', accuracy: 0.90 },
-          { month: 'Apr', accuracy: 0.87 },
-          { month: 'May', accuracy: 0.92 },
-        ],
-        confusionMatrix: {
-          truePositive: 1500,
-          falsePositive: 200,
-          trueNegative: 1300,
-          falseNegative: 300,
-        },
-        accuracy: 0.85,
-        precision: 0.88,
-        recall: 0.82,
-        f1Score: 0.85,
-        leaderboardData: [
-          { user: 'Alice', accuracy: 0.90 },
-          { user: 'Bob', accuracy: 0.87 },
-          { user: 'Charlie', accuracy: 0.92 },
-        ],
-        sampleDifficulty: [
-          { sampleId: 'Sample1', difficultyScore: 0.75 },
-          { sampleId: 'Sample2', difficultyScore: 0.85 },
-          { sampleId: 'Sample3', difficultyScore: 0.65 },
-        ],
-      };
-
-      setMetricsData(dummyData);
-    };
-
     fetchData();
   }, []);
 
