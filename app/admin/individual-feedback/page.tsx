@@ -7,6 +7,7 @@ import Image from "next/image";
 import { Dialog } from "@headlessui/react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import Link from "next/link";
 
 interface Dot {
   x: number;
@@ -75,10 +76,18 @@ export default function IndividualFeedbackPage() {
   }
 
   return (
-    <main className="h-screen bg-[var(--background)] text-[var(--foreground)] overflow-y-auto">
+    <main className="h-screen bg-white text-[var(--foreground)] overflow-y-auto">
       <Navbar />
 
-      <div className="min-h-screen flex justify-center items-center bg-gray-50 p-8">
+      <div className="mt-10">
+        <Link href="/admin/feedback-page">
+          <button className="ml-5 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-all duration-300 ease-in-out">
+            Back to Feedback
+          </button>
+        </Link>
+      </div>
+
+      <div className="min-h-screen flex justify-center items-center  p-8">
         <div className="w-full max-w-3xl">
           <div className="bg-white shadow-md rounded-2xl p-6">
             <h1 className="border-b pb-2 mb-4 text-xl font-bold text-black">Individual Feedback</h1>
