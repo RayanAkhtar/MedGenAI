@@ -38,12 +38,11 @@ const FeedbackPage = () => {
     }
   }
 
-  // Runs on any filter changes
   useEffect(() => {
     fetchFeedbacks()
   }, [imageType, resolved, sortBy])
 
-  // Runs after feedbacks are loaded
+
   useEffect(() => {
     const loadImages = async () => {
       const newImages = {}
@@ -64,8 +63,17 @@ const FeedbackPage = () => {
   }, [feedbacks])
 
   return (
-    <div>
+    <div className='bg-white'>
       <Navbar />
+
+      <div className="mt-10">
+        <Link href="/admin">
+          <button className="ml-5 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-all duration-300 ease-in-out">
+            Back to Admin
+          </button>
+        </Link>
+      </div>
+
       <div className='h-screen bg-white text-[var(--foreground)] overflow-y-auto text-black'>
         <h1 className='text-3xl font-bold text-center py-8'>Feedback Page</h1>
         <div className='flex flex-wrap gap-6 justify-center p-8 bg-white rounded-2xl shadow-lg mb-8'>
