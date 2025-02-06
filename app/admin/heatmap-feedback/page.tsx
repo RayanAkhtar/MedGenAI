@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation"; // Import useSearchParams
+import { useSearchParams } from "next/navigation"; 
 import Navbar from "@/app/components/Navbar";
 import Image from "next/image";
 import { Dialog } from "@headlessui/react";
@@ -12,41 +12,12 @@ import Link from "next/link";
 interface HeatmapPoint {
   x: number;
   y: number;
-  message: string;
+  msg: string;
 }
-
-const dummyHeatmapData = {
-  imageUrl: "/images/placeholder1.jpg", // Initially set to placeholder
-  imageWidth: 600,
-  imageHeight: 400,
-  heatmapPoints: [
-    { x: 150, y: 220, message: "This area indicates an abnormal density." },
-    { x: 300, y: 180, message: "Possible artifact interference detected." },
-    { x: 400, y: 300, message: "Bright spot observed, needs review." },
-    { x: 310, y: 190, message: "Edge artifact near tissue boundary." },
-    { x: 290, y: 170, message: "Potential lesion detected in this region." },
-    { x: 405, y: 305, message: "Consider verifying this shadowed region." },
-    { x: 250, y: 250, message: "New potential observation here." },
-    { x: 370, y: 320, message: "Verify adjacent tissue contrast." },
-    { x: 420, y: 280, message: "Irregular shape requires assessment." },
-    { x: 120, y: 350, message: "Unusual bright spot at this location." },
-    { x: 500, y: 90, message: "Check for consistent contrast." },
-    { x: 180, y: 200, message: "Review this shadowed zone." },
-    { x: 220, y: 260, message: "Potential irregular structure." },
-    { x: 400, y: 150, message: "Possible abnormal density detected." },
-    { x: 420, y: 310, message: "Bright tissue anomaly observed." },
-    { x: 300, y: 100, message: "Evaluate possible misalignment." },
-    { x: 360, y: 250, message: "Check texture variation in this region." },
-    { x: 520, y: 320, message: "Assess bright area near tissue boundary." },
-    { x: 480, y: 220, message: "High density structure observed." },
-    { x: 250, y: 150, message: "Irregular shadow near midpoint." },
-  ],
-};
 
 const fetchImageData = async (imageId: string) => {
   try {
     if (!imageId) return null;
-
 
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getImageById/${imageId}`);
     const metadata = await response.json();
@@ -67,13 +38,30 @@ const fetchImageData = async (imageId: string) => {
         imageUrl,
         imageWidth: 600,
         imageHeight: 400,
-        heatmapPoints: metadata.dots || dummyHeatmapData.heatmapPoints,
+        feedbackDots: [],
       };
     }
     return null;
   } catch (error) {
     console.error("Error fetching image data:", error);
     return null;
+  }
+};
+
+const fetchFeedbackData = async (imageId: string): Promise<HeatmapPoint[]> => {
+  try {
+    const feedbackResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getMatchingFeedbackForImage/${imageId}`);
+    let feedbackData = await feedbackResponse.json();
+    console.log("feedback data", feedbackData);
+
+    if (!Array.isArray(feedbackData)) {
+      feedbackData = [];
+    }
+
+    return feedbackData;
+  } catch (error) {
+    console.error("Error fetching feedback data:", error);
+    return [];
   }
 };
 
@@ -86,7 +74,7 @@ export default function HeatmapFeedbackPage() {
     imageUrl: string;
     imageWidth: number;
     imageHeight: number;
-    heatmapPoints: HeatmapPoint[];
+    feedbackDots: HeatmapPoint[];
   } | null>(null);
 
   const searchParams = useSearchParams();
@@ -94,12 +82,16 @@ export default function HeatmapFeedbackPage() {
 
   useEffect(() => {
     const loadData = async () => {
-      const data = await fetchImageData(imageId || ''); 
-      if (data) {
-        setImageData(data);
-      } else {
-
-        setImageData(dummyHeatmapData);
+      if (imageId) {
+        const imageData = await fetchImageData(imageId);
+        if (imageData) {
+          const feedbackData = await fetchFeedbackData(imageId);
+          console.log("feedback data is", feedbackData)
+          setImageData({
+            ...imageData,
+            feedbackDots: feedbackData,
+          });
+        }
       }
     };
 
@@ -108,7 +100,12 @@ export default function HeatmapFeedbackPage() {
     }
   }, [imageId]);
 
-  const { imageUrl, imageWidth, imageHeight, heatmapPoints } = imageData || dummyHeatmapData;
+  const { imageUrl, imageWidth, imageHeight, feedbackDots } = imageData || {
+    imageUrl: "/images/placeholder1.jpg", 
+    imageWidth: 600, 
+    imageHeight: 400, 
+    feedbackDots: [] 
+  };
 
   function getHeatmapColor(frequency: number, maxFrequency: number): string {
     const percentage = frequency / maxFrequency;
@@ -134,7 +131,7 @@ export default function HeatmapFeedbackPage() {
     });
   }
 
-  const heatmapFrequencyData = calculateHeatmapFrequency(heatmapPoints, 50);
+  const heatmapFrequencyData = calculateHeatmapFrequency(feedbackDots, 50);
   const maxFrequency = Math.max(...heatmapFrequencyData.map((data) => data.frequency));
 
   const toggleImageExpansion = () => {
@@ -159,6 +156,7 @@ export default function HeatmapFeedbackPage() {
     setShowFeedbackOverlay(false);
   };
 
+  
   return (
     <main className="h-screen bg-white text-[var(--foreground)] overflow-y-auto">
       <Navbar />
@@ -199,7 +197,6 @@ export default function HeatmapFeedbackPage() {
                       width: "50px",
                       height: "50px",
                       backgroundColor: getHeatmapColor(data.frequency, maxFrequency),
-                      borderRadius: "12px",
                       transform: "translate(-50%, -50%)",
                       transition: "background-color 0.3s ease-in-out",
                     }}
@@ -253,7 +250,7 @@ export default function HeatmapFeedbackPage() {
                     <div className="bg-white p-4 rounded-lg shadow-md max-w-sm">
                       {selectedPoints.map((point, i) => (
                         <p key={i} className="text-black">
-                          {point.message}
+                          {point.msg}
                         </p>
                       ))}
                       <button
