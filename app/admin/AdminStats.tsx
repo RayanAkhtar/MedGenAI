@@ -37,7 +37,8 @@ export default function AdminStats() {
 
         const guessesData = await guessesResponse.json();
         const accuracyData = await accuracyResponse.json();
-
+        console.log("guesss data is", guessesData)
+        console.log("accuracy data is", accuracyData)
         setEngagementData(guessesData);
         setAccuracyData(accuracyData);
       } catch (err) {
@@ -61,7 +62,7 @@ export default function AdminStats() {
     datasets: [
       {
         label: 'User Engagement (Guesses)',
-        data: engagementData.map((data) => data.guessCount),
+        data: engagementData.map((data) => data.guess_count),
         borderColor: 'rgba(54, 162, 235, 1)',
         backgroundColor: 'rgba(54, 162, 235, 0.2)',
         tension: 0.4,

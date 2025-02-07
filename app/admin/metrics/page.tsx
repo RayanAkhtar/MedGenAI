@@ -19,6 +19,8 @@ const MetricsPage = () => {
 
       const confusionMatrixResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getConfusionMatrix`);
       const confusionMatrixData = await confusionMatrixResponse.json();
+      confusionMatrixData.truepositive = 1
+      confusionMatrixData.falsepositive = 1
 
       const mlMetricsResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getMLMetrics`);
       const mlMetricsData = await mlMetricsResponse.json();
@@ -26,8 +28,11 @@ const MetricsPage = () => {
       const leaderboardResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getLeaderboard`);
       const leaderboardData = await leaderboardResponse.json();
 
+      console.log("a", leaderboardData)
+
       const sampleDifficultyResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getImageDifficulty`);
       const sampleDifficultyData = await sampleDifficultyResponse.json();
+      console.log("sample", sampleDifficultyData)
 
       setMetricsData({
         accuracyData: accuracyData,

@@ -7,23 +7,25 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 
 interface ConfusionMatrixProps {
   confusionMatrix: {
-    truePositive: number;
-    falsePositive: number;
-    trueNegative: number;
-    falseNegative: number;
+    truepositive: number;
+    falsepositive: number;
+    truenegative: number;
+    falsenegative: number;
   };
 }
 
 const ConfusionMatrix = ({ confusionMatrix }: ConfusionMatrixProps) => {
+  console.log("confusion matrix", confusionMatrix)
+
   const chartData = {
     labels: ['True Positive', 'False Positive', 'True Negative', 'False Negative'],
     datasets: [
       {
         data: [
-          confusionMatrix.truePositive,
-          confusionMatrix.falsePositive,
-          confusionMatrix.trueNegative,
-          confusionMatrix.falseNegative,
+          confusionMatrix.truepositive,
+          confusionMatrix.falsepositive,
+          confusionMatrix.truenegative,
+          confusionMatrix.falsenegative,
         ],
         backgroundColor: [
           'rgba(54, 162, 235, 0.6)',
@@ -47,19 +49,19 @@ const ConfusionMatrix = ({ confusionMatrix }: ConfusionMatrixProps) => {
         <div className="grid grid-cols-2 gap-4 text-center">
           <div className="flex flex-col items-center bg-gray-100 p-4 rounded-lg">
             <span className="font-semibold text-gray-700">True Positive</span>
-            <span>{confusionMatrix.truePositive}</span>
+            <span>{confusionMatrix.truepositive}</span>
           </div>
           <div className="flex flex-col items-center bg-gray-100 p-4 rounded-lg">
             <span className="font-semibold text-gray-700">False Positive</span>
-            <span>{confusionMatrix.falsePositive}</span>
+            <span>{confusionMatrix.falsepositive}</span>
           </div>
           <div className="flex flex-col items-center bg-gray-100 p-4 rounded-lg">
             <span className="font-semibold text-gray-700">True Negative</span>
-            <span>{confusionMatrix.trueNegative}</span>
+            <span>{confusionMatrix.truenegative}</span>
           </div>
           <div className="flex flex-col items-center bg-gray-100 p-4 rounded-lg">
             <span className="font-semibold text-gray-700">False Negative</span>
-            <span>{confusionMatrix.falseNegative}</span>
+            <span>{confusionMatrix.falsenegative}</span>
           </div>
         </div>
       </div>
