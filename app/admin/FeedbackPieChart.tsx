@@ -45,14 +45,11 @@ export default function FeedbackPieChart({
 
   return (
     <div className="w-full mx-auto flex flex-col md:flex-row justify-between gap-8 md:gap-12">
-      {/* Pie Chart Section */}
       <div className="w-full md:w-1/2 h-64 flex justify-center md:px-8">
         <Pie data={chartData} options={chartOptions} />
       </div>
 
-      {/* Stats and Button Section */}
       <div className="w-full md:w-1/2 flex flex-col items-center justify-center gap-6">
-        {/* Feedback Counts and Ratios */}
         <div className="text-center space-y-2">
           <p className="text-lg font-semibold text-black">
             Resolved: {complete} ({completeRatio}%)
@@ -62,7 +59,6 @@ export default function FeedbackPieChart({
           </p>
         </div>
 
-        {/* View All Feedback Button */}
         <div className="w-full flex justify-center">
           <Link
             href="admin/feedback-page?filter=all"

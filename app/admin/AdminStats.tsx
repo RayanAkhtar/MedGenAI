@@ -14,12 +14,23 @@ import {
 } from 'chart.js';
 import { useRouter } from 'next/navigation';
 
+// Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
+interface EngagementDataItem {
+  month: string;
+  guess_count: number;
+}
+
+interface AccuracyDataItem {
+  month: string;
+  accuracy: number;
+}
+
 export default function AdminStats() {
-  const [engagementData, setEngagementData] = useState<any[]>([]);
-  const [accuracyData, setAccuracyData] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [engagementData, setEngagementData] = useState<EngagementDataItem[]>([]);
+  const [accuracyData, setAccuracyData] = useState<AccuracyDataItem[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
@@ -35,10 +46,8 @@ export default function AdminStats() {
           throw new Error('Failed to fetch admin stats data');
         }
 
-        const guessesData = await guessesResponse.json();
-        const accuracyData = await accuracyResponse.json();
-        console.log("guesss data is", guessesData)
-        console.log("accuracy data is", accuracyData)
+        const guessesData: EngagementDataItem[] = await guessesResponse.json();
+        const accuracyData: AccuracyDataItem[] = await accuracyResponse.json();
         setEngagementData(guessesData);
         setAccuracyData(accuracyData);
       } catch (err) {
@@ -100,8 +109,8 @@ export default function AdminStats() {
     scales: {
       y: {
         beginAtZero: true,
-        suggestedMin: Math.max(0, Math.min(...engagementData.map((data) => data.guessCount)) * 0.8), 
-        suggestedMax: Math.max(...engagementData.map((data) => data.guessCount)) * 1.2,
+        suggestedMin: Math.max(0, Math.min(...engagementData.map((data) => data.guess_count)) * 0.8),
+        suggestedMax: Math.max(...engagementData.map((data) => data.guess_count)) * 1.2,
       },
     },
   };
@@ -129,7 +138,6 @@ export default function AdminStats() {
     return <div className="p-8 text-center text-red-500">{error}</div>;
   }
 
-
   const handleMetricsClick = () => {
     router.push('/admin/metrics');
   };
@@ -150,7 +158,6 @@ export default function AdminStats() {
         <Line data={accuracyChartData} options={chartOptionsAccuracy} />
       </div>
 
-      {/* Buttons for navigation */}
       <div className="flex justify-center gap-4 mt-8">
         <button
           onClick={handleMetricsClick}
@@ -165,8 +172,6 @@ export default function AdminStats() {
           Download Data
         </button>
       </div>
-
-
     </div>
   );
 }

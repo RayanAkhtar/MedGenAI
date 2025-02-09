@@ -11,7 +11,16 @@ ChartJS.register(
   Legend
 );
 
-const AccuracyChart = ({ accuracyData }) => {
+interface AccuracyDataItem {
+  month: string;
+  accuracy: number;
+}
+
+interface AccuracyChartProps {
+  accuracyData: AccuracyDataItem[];
+}
+
+const AccuracyChart: React.FC<AccuracyChartProps> = ({ accuracyData }) => {
   const maxAccuracy = Math.max(...accuracyData.map(data => data.accuracy));
   const yAxisMax = maxAccuracy < 1 ? 1 : maxAccuracy + 0.05;
 

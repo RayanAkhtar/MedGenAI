@@ -4,36 +4,49 @@ import Navbar from '@/app/components/Navbar'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 
-const FeedbackPage = () => {
-  const [feedbacks, setFeedbacks] = useState([])
-  const [imageType, setImageType] = useState('all')
-  const [resolved, setResolved] = useState(null)
-  const [sortBy, setSortBy] = useState('last_feedback_time')
-  const [images, setImages] = useState({})
-  const [currentPage, setCurrentPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(1)
+interface Feedback {
+  image_id: string;
+  image_type: string;
+  unresolved_count: number;
+  last_feedback_time: string;
+  upload_time: string;
+  image_path: string;
+}
 
-  const fetchFeedbacks = async (page = 1) => {
+interface FeedbackData {
+  feedback: Feedback[];
+  total_count: number;
+}
+
+const FeedbackPage = () => {
+  const [feedbacks, setFeedbacks] = useState<Feedback[]>([])
+  const [imageType, setImageType] = useState<string>('all')
+  const [resolved, setResolved] = useState<boolean | null>(null)
+  const [sortBy, setSortBy] = useState<string>('last_feedback_time') 
+  const [images, setImages] = useState<{ [key: string]: string }>({})
+  const [currentPage, setCurrentPage] = useState<number>(1)
+  const [totalPages, setTotalPages] = useState<number>(1)
+
+  const fetchFeedbacks = async (page = 1): Promise<void> => {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getFeedbacks?image_type=${imageType}&resolved=${resolved}&sort_by=${sortBy}&page=${page}&limit=20`
     )
-    const data = await response.json()
+    const data: FeedbackData = await response.json()
     console.log('Fetched feedback data:', data)
-    
-    setFeedbacks(data) 
+    setFeedbacks(data.feedback)
   }
 
-  const fetchFeedbackCount = async () => {
+  const fetchFeedbackCount = async (): Promise<void> => {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getFeedbackCount?image_type=${imageType}&resolved=${resolved}`
     )
-    const data = await response.json()
+    const data: { total_count: number } = await response.json()
     console.log('Total feedback count:', data.total_count)
 
     setTotalPages(Math.ceil(data.total_count / 20))
   }
 
-  const fetchImage = async imagePath => {
+  const fetchImage = async (imagePath: string): Promise<string | null> => {
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/images/view/${encodeURIComponent(imagePath)}`
@@ -47,15 +60,15 @@ const FeedbackPage = () => {
     }
   }
 
-
   useEffect(() => {
     fetchFeedbacks(currentPage)
     fetchFeedbackCount()
   }, [imageType, resolved, sortBy, currentPage])
 
   useEffect(() => {
-    const loadImages = async () => {
-      const newImages = {}
+    const loadImages = async (): Promise<void> => {
+      const newImages: { [key: string]: string } = {}
+
       for (const feedback of feedbacks) {
         if (!newImages[feedback.image_id]) {
           const imageUrl = await fetchImage(feedback.image_path)
@@ -72,7 +85,7 @@ const FeedbackPage = () => {
     }
   }, [feedbacks])
 
-  const goToPage = (page) => {
+  const goToPage = (page: number): void => {
     if (page < 1 || page > totalPages) return;
     setCurrentPage(page);
     fetchFeedbacks(page);
