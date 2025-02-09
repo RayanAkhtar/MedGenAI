@@ -23,8 +23,7 @@ const fetchImageData = async (imageId: string) => {
     const metadata = await response.json();
 
     if (metadata && metadata.image_path) {
-      const cleanedPath = metadata.image_path.split('/').slice(4).join('/');
-      const apiUrl = `${process.env.NEXT_PUBLIC_API_IMAGE_URL}/fetchImageByPath/${encodeURIComponent(cleanedPath)}`;
+      const apiUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/images/view/${encodeURIComponent(metadata.image_path)}`;
 
       const imageResponse = await fetch(apiUrl);
       if (!imageResponse.ok) {

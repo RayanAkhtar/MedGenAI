@@ -23,11 +23,8 @@ const FeedbackPage = () => {
 
   const fetchImage = async imagePath => {
     try {
-      const cleanedPath = imagePath.split('/').slice(4).join('/')
       const response = await fetch(
-        `${
-          process.env.NEXT_PUBLIC_API_IMAGE_URL
-        }/fetchImageByPath/${encodeURIComponent(cleanedPath)}`
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/images/view/${encodeURIComponent(imagePath)}`
       )
       const blob = await response.blob() 
       const url = URL.createObjectURL(blob)
