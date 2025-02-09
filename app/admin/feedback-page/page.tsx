@@ -10,15 +10,27 @@ const FeedbackPage = () => {
   const [resolved, setResolved] = useState(null)
   const [sortBy, setSortBy] = useState('last_feedback_time')
   const [images, setImages] = useState({})
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
 
-
-  const fetchFeedbacks = async () => {
+  const fetchFeedbacks = async (page = 1) => {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getFeedbacks?image_type=${imageType}&resolved=${resolved}&sort_by=${sortBy}`
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getFeedbacks?image_type=${imageType}&resolved=${resolved}&sort_by=${sortBy}&page=${page}&limit=20`
     )
     const data = await response.json()
     console.log('Fetched feedback data:', data)
-    setFeedbacks(data)
+    
+    setFeedbacks(data) 
+  }
+
+  const fetchFeedbackCount = async () => {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getFeedbackCount?image_type=${imageType}&resolved=${resolved}`
+    )
+    const data = await response.json()
+    console.log('Total feedback count:', data.total_count)
+
+    setTotalPages(Math.ceil(data.total_count / 20))
   }
 
   const fetchImage = async imagePath => {
@@ -26,7 +38,7 @@ const FeedbackPage = () => {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/images/view/${encodeURIComponent(imagePath)}`
       )
-      const blob = await response.blob() 
+      const blob = await response.blob()
       const url = URL.createObjectURL(blob)
       return url
     } catch (error) {
@@ -35,10 +47,11 @@ const FeedbackPage = () => {
     }
   }
 
-  useEffect(() => {
-    fetchFeedbacks()
-  }, [imageType, resolved, sortBy])
 
+  useEffect(() => {
+    fetchFeedbacks(currentPage)
+    fetchFeedbackCount()
+  }, [imageType, resolved, sortBy, currentPage])
 
   useEffect(() => {
     const loadImages = async () => {
@@ -58,6 +71,12 @@ const FeedbackPage = () => {
       loadImages()
     }
   }, [feedbacks])
+
+  const goToPage = (page) => {
+    if (page < 1 || page > totalPages) return;
+    setCurrentPage(page);
+    fetchFeedbacks(page);
+  };
 
   return (
     <div className='bg-white'>
@@ -117,18 +136,19 @@ const FeedbackPage = () => {
             </select>
           </div>
         </div>
+
         <div className='overflow-x-auto p-8 bg-white rounded-2xl shadow-lg'>
           <table className='min-w-full table-auto'>
-          <thead>
-            <tr className="bg-[var(--heartflow-blue)] text-white">
-              <th className="px-6 py-4 text-left">Image</th>
-              <th className="px-6 py-4 text-left">Image Type</th>
-              <th className="px-6 py-4 text-left">Unresolved Feedback</th>
-              <th className="px-6 py-4 text-left">Last Feedback Time</th>
-              <th className="px-6 py-4 text-left">Upload Time</th>
-              <th className="px-6 py-4 text-left">Actions</th>
-            </tr>
-          </thead>
+            <thead>
+              <tr className="bg-[var(--heartflow-blue)] text-white">
+                <th className="px-6 py-4 text-left">Image</th>
+                <th className="px-6 py-4 text-left">Image Type</th>
+                <th className="px-6 py-4 text-left">Unresolved Feedback</th>
+                <th className="px-6 py-4 text-left">Last Feedback Time</th>
+                <th className="px-6 py-4 text-left">Upload Time</th>
+                <th className="px-6 py-4 text-left">Actions</th>
+              </tr>
+            </thead>
 
             <tbody>
               {feedbacks.map(feedback => (
@@ -175,6 +195,26 @@ const FeedbackPage = () => {
               ))}
             </tbody>
           </table>
+        </div>
+
+        <div className="flex justify-center gap-4 mt-6">
+          <button
+            onClick={() => goToPage(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="px-4 py-2 bg-gray-500 text-white rounded-full disabled:bg-gray-300"
+          >
+            Previous
+          </button>
+          <span className="px-4 py-2 text-lg">
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            onClick={() => goToPage(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="px-4 py-2 bg-gray-500 text-white rounded-full disabled:bg-gray-300"
+          >
+            Next
+          </button>
         </div>
       </div>
     </div>
