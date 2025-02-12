@@ -29,6 +29,7 @@ const MLMetrics = ({ accuracy, precision, recall, f1Score, confusionMatrix }: ML
   return (
     <div className="mb-12">
       <h3 className="text-2xl font-semibold text-center mb-6">Machine Learning Metrics</h3>
+      <p>Please note that since only one row of the confusion matrix will ever be non-zero, we have adjusted the definitions of the metris provide necessary non-zero output.</p>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-8 text-center">
         <div className="bg-gray-100 p-6 rounded-lg shadow-md">
           <h4 className="font-semibold text-gray-700">Accuracy</h4>
@@ -57,19 +58,19 @@ const ConfusionMatrix = ({ confusionMatrix }: { confusionMatrix: { [key: string]
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-8 text-center">
       <div className="bg-gray-100 p-6 rounded-lg shadow-md">
         <h5 className="font-semibold text-gray-700">True Positive (TP)</h5>
-        <p className="text-xl font-semibold">{confusionMatrix.TP}</p>
+        <p className="text-xl font-semibold">{confusionMatrix.truepositive}</p>
       </div>
       <div className="bg-gray-100 p-6 rounded-lg shadow-md">
         <h5 className="font-semibold text-gray-700">False Positive (FP)</h5>
-        <p className="text-xl font-semibold">{confusionMatrix.FP}</p>
+        <p className="text-xl font-semibold">{confusionMatrix.falsepositive}</p>
       </div>
       <div className="bg-gray-100 p-6 rounded-lg shadow-md">
         <h5 className="font-semibold text-gray-700">True Negative (TN)</h5>
-        <p className="text-xl font-semibold">{confusionMatrix.TN}</p>
+        <p className="text-xl font-semibold">{confusionMatrix.truenegative}</p>
       </div>
       <div className="bg-gray-100 p-6 rounded-lg shadow-md">
         <h5 className="font-semibold text-gray-700">False Negative (FN)</h5>
-        <p className="text-xl font-semibold">{confusionMatrix.FN}</p>
+        <p className="text-xl font-semibold">{confusionMatrix.falsenegative}</p>
       </div>
     </div>
   </div>
@@ -124,6 +125,24 @@ const fetchFeedbackData = async (imageId: string): Promise<HeatmapPoint[]> => {
   }
 };
 
+const fetchMlMetrics = async (imageId: string) => {
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getImageMlMetrics/${imageId}`);
+    const data = await response.json();
+
+    if (response.ok) {
+      return data;
+    } else {
+      console.error("Failed to fetch ML metrics:", data.error);
+      return null;
+    }
+  } catch (error) {
+    console.error("Error fetching ML metrics:", error);
+    return null;
+  }
+};
+
+
 export default function HeatmapFeedbackPage() {
   const [isImageExpanded, setIsImageExpanded] = useState(false);
   const [showHeatmap, setShowHeatmap] = useState(true);
@@ -141,7 +160,7 @@ export default function HeatmapFeedbackPage() {
     precision: 0.893, 
     recall: 0.878, 
     f1Score: 0.885, 
-    confusionMatrix: { TP: 80, FP: 10, TN: 75, FN: 15 }
+    confusionMatrix: { truepositive: 80, falsepositive: 10, truenegative: 75, falsenegative: 15 }
   });
 
   const searchParams = useSearchParams();
@@ -153,11 +172,16 @@ export default function HeatmapFeedbackPage() {
         const imageData = await fetchImageData(imageId);
         if (imageData) {
           const feedbackData = await fetchFeedbackData(imageId);
-          console.log("feedback data is", feedbackData)
           setImageData({
             ...imageData,
             feedbackDots: feedbackData,
           });
+
+          const metrics = await fetchMlMetrics(imageId);
+          if (metrics) {
+            console.log("metrics is", metrics)
+            setMlMetrics(metrics);
+          }
         }
       }
     };
