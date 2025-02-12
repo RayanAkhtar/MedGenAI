@@ -22,9 +22,9 @@ const Sidebar = () => {
             {/* Logo */}
             <div className="p-6">
                 <Image
-                    src="/images/heartflow-logo-blue.svg"
+                    src="/images/cod_logo_full.png"
                     alt="HeartFlow Logo"
-                    width={150}
+                    width={300}
                     height={40}
                     priority
                 />

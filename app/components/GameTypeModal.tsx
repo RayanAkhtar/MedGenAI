@@ -71,7 +71,6 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
                     }
 
                     const idToken = await user.getIdToken(true)
-
                     const response = await fetch('/api/game/initialize', {
                         method: 'POST',
                         headers: {
@@ -86,18 +85,16 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
 
                     if (!response.ok) {
                         const errorData = await response.json()
-                        if (response.status === 401) {
-                            throw new Error('Unauthorized')
-                        }
-                        throw new Error('Failed to initialize game')
+                        throw new Error(errorData.error || 'Failed to initialize game')
                     }
 
-                    const { gameId } = await response.json()
+                    const data = await response.json()
+                    console.log("Received game data:", data)
                     closeModal()
-                    router.push(`${route}?gameId=${gameId}&count=${imageCount}`)
-                } catch (error) {
+                    router.push(`/game/classic?gameId=${data.gameId}&count=${imageCount}`)
+                } catch (error: any) {
                     console.error('Failed to start game:', error)
-                    setError(error instanceof Error ? error.message : 'Unknown error')
+                    setError(error.message)
                 } finally {
                     setIsLoading(false)
                 }

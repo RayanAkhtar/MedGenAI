@@ -4,32 +4,53 @@ import Navbar from '@/app/components/Navbar'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 
+interface Feedback {
+  image_id: string;
+  image_type: string;
+  unresolved_count: number;
+  last_feedback_time: string;
+  upload_time: string;
+  image_path: string;
+}
+
+interface FeedbackData {
+  feedback: Feedback[];
+  total_count: number;
+}
+
 const FeedbackPage = () => {
-  const [feedbacks, setFeedbacks] = useState([])
-  const [imageType, setImageType] = useState('all')
-  const [resolved, setResolved] = useState(null)
-  const [sortBy, setSortBy] = useState('last_feedback_time')
-  const [images, setImages] = useState({})
+  const [feedbacks, setFeedbacks] = useState<Feedback[]>([])
+  const [imageType, setImageType] = useState<string>('all')
+  const [resolved, setResolved] = useState<boolean | null>(null)
+  const [sortBy, setSortBy] = useState<string>('last_feedback_time') 
+  const [images, setImages] = useState<{ [key: string]: string }>({})
+  const [currentPage, setCurrentPage] = useState<number>(1)
+  const [totalPages, setTotalPages] = useState<number>(1)
 
-
-  const fetchFeedbacks = async () => {
+  const fetchFeedbacks = async (page = 1): Promise<void> => {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getFeedbacks?image_type=${imageType}&resolved=${resolved}&sort_by=${sortBy}`
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getFeedbacks?image_type=${imageType}&resolved=${resolved}&sort_by=${sortBy}&page=${page}&limit=20`
     )
-    const data = await response.json()
-    console.log('Fetched feedback data:', data)
+    const data: FeedbackData = await response.json()
     setFeedbacks(data)
   }
 
-  const fetchImage = async imagePath => {
+  const fetchFeedbackCount = async (): Promise<void> => {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getFeedbackCount?image_type=${imageType}&resolved=${resolved}`
+    )
+    const data: { total_count: number } = await response.json()
+    console.log('Total feedback count:', data.total_count)
+
+    setTotalPages(Math.ceil(data.total_count / 20))
+  }
+
+  const fetchImage = async (imagePath: string): Promise<string | null> => {
     try {
-      const cleanedPath = imagePath.split('/').slice(4).join('/')
       const response = await fetch(
-        `${
-          process.env.NEXT_PUBLIC_API_IMAGE_URL
-        }/fetchImageByPath/${encodeURIComponent(cleanedPath)}`
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/images/view/${encodeURIComponent(imagePath)}`
       )
-      const blob = await response.blob() 
+      const blob = await response.blob()
       const url = URL.createObjectURL(blob)
       return url
     } catch (error) {
@@ -39,13 +60,14 @@ const FeedbackPage = () => {
   }
 
   useEffect(() => {
-    fetchFeedbacks()
-  }, [imageType, resolved, sortBy])
-
+    fetchFeedbacks(currentPage)
+    fetchFeedbackCount()
+  }, [imageType, resolved, sortBy, currentPage])
 
   useEffect(() => {
-    const loadImages = async () => {
-      const newImages = {}
+    const loadImages = async (): Promise<void> => {
+      const newImages: { [key: string]: string } = {}
+
       for (const feedback of feedbacks) {
         if (!newImages[feedback.image_id]) {
           const imageUrl = await fetchImage(feedback.image_path)
@@ -61,6 +83,12 @@ const FeedbackPage = () => {
       loadImages()
     }
   }, [feedbacks])
+
+  const goToPage = (page: number): void => {
+    if (page < 1 || page > totalPages) return;
+    setCurrentPage(page);
+    fetchFeedbacks(page);
+  };
 
   return (
     <div className='bg-white'>
@@ -120,18 +148,19 @@ const FeedbackPage = () => {
             </select>
           </div>
         </div>
+
         <div className='overflow-x-auto p-8 bg-white rounded-2xl shadow-lg'>
           <table className='min-w-full table-auto'>
-          <thead>
-            <tr className="bg-[var(--heartflow-blue)] text-white">
-              <th className="px-6 py-4 text-left">Image</th>
-              <th className="px-6 py-4 text-left">Image Type</th>
-              <th className="px-6 py-4 text-left">Unresolved Feedback</th>
-              <th className="px-6 py-4 text-left">Last Feedback Time</th>
-              <th className="px-6 py-4 text-left">Upload Time</th>
-              <th className="px-6 py-4 text-left">Actions</th>
-            </tr>
-          </thead>
+            <thead>
+              <tr className="bg-[var(--heartflow-blue)] text-white">
+                <th className="px-6 py-4 text-left">Image</th>
+                <th className="px-6 py-4 text-left">Image Type</th>
+                <th className="px-6 py-4 text-left">Unresolved Feedback</th>
+                <th className="px-6 py-4 text-left">Last Feedback Time</th>
+                <th className="px-6 py-4 text-left">Upload Time</th>
+                <th className="px-6 py-4 text-left">Actions</th>
+              </tr>
+            </thead>
 
             <tbody>
               {feedbacks.map(feedback => (
@@ -178,6 +207,26 @@ const FeedbackPage = () => {
               ))}
             </tbody>
           </table>
+        </div>
+
+        <div className="flex justify-center gap-4 mt-6">
+          <button
+            onClick={() => goToPage(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="px-4 py-2 bg-gray-500 text-white rounded-full disabled:bg-gray-300"
+          >
+            Previous
+          </button>
+          <span className="px-4 py-2 text-lg">
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            onClick={() => goToPage(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="px-4 py-2 bg-gray-500 text-white rounded-full disabled:bg-gray-300"
+          >
+            Next
+          </button>
         </div>
       </div>
     </div>

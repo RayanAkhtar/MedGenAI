@@ -12,7 +12,7 @@ import Link from "next/link";
 interface Dot {
   x: number;
   y: number;
-  message: string;
+  msg: string;
 }
 
 export default function IndividualFeedbackPage() {
@@ -20,6 +20,7 @@ export default function IndividualFeedbackPage() {
   const [showDots, setShowDots] = useState(true);
   const [imageData, setImageData] = useState<any>(null);
   const [imageSrc, setImageSrc] = useState<string | null>(null);
+  const [feedbackDots, setFeedbackDots] = useState<Dot[]>([]);
 
   const searchParams = useSearchParams();
   const imageId = searchParams?.get("imageid");
@@ -28,40 +29,47 @@ export default function IndividualFeedbackPage() {
     const fetchImageData = async () => {
       try {
         if (!imageId) return;
-
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getImageById/${imageId}`);
-        const metadata = await response.json();
-
+  
+        const imageResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getImageById/${imageId}`);
+        const metadata = await imageResponse.json();
+  
         if (metadata && metadata.image_path) {
-          const cleanedPath = metadata.image_path.split('/').slice(4).join('/');
-          const apiUrl = `${process.env.NEXT_PUBLIC_API_IMAGE_URL}/fetchImageByPath/${encodeURIComponent(cleanedPath)}`;
-
-          const imageResponse = await fetch(apiUrl);
-          if (!imageResponse.ok) {
+          const apiUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/images/view/${encodeURIComponent(metadata.image_path)}`;
+  
+          const imageBlobResponse = await fetch(apiUrl);
+          if (!imageBlobResponse.ok) {
             throw new Error("Failed to fetch the image");
           }
-
-          const imageBlob = await imageResponse.blob();
+  
+          const imageBlob = await imageBlobResponse.blob();
           const imageUrl = URL.createObjectURL(imageBlob);
-
+  
           setImageSrc(imageUrl);
-
           setImageData({
             imageWidth: 600,
             imageHeight: 400,
-            dots: metadata.dots || [
-              { x: 150, y: 220, message: "This part is too dark, real CT scans are brighter." },
-              { x: 300, y: 180, message: "Focus on this brighter area for better clarity." },
-            ],
           });
+  
+          // Fetch dynamic feedback dots for this image
+          const feedbackResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getMatchingFeedbackForImage/${imageId}`);
+          let feedbackData = await feedbackResponse.json();
+          console.log("feedback data", feedbackData)
+  
+          // Ensure the data is an array before setting it
+          if (!Array.isArray(feedbackData)) {
+            feedbackData = []; // Fallback to empty array
+          }
+  
+          setFeedbackDots(feedbackData);
         }
       } catch (error) {
         console.error("Error fetching images:", error);
       }
     };
-
+  
     fetchImageData();
   }, [imageId]);
+  
 
   const toggleImageExpansion = () => {
     setIsImageExpanded(!isImageExpanded);
@@ -87,7 +95,7 @@ export default function IndividualFeedbackPage() {
         </Link>
       </div>
 
-      <div className="min-h-screen flex justify-center items-center  p-8">
+      <div className="min-h-screen flex justify-center items-center p-8">
         <div className="w-full max-w-3xl">
           <div className="bg-white shadow-md rounded-2xl p-6">
             <h1 className="border-b pb-2 mb-4 text-xl font-bold text-black">Individual Feedback</h1>
@@ -102,7 +110,7 @@ export default function IndividualFeedbackPage() {
                 onClick={toggleImageExpansion}
               />
               {showDots &&
-                imageData.dots.map((dot, index) => (
+                feedbackDots.map((dot, index) => (
                   <div
                     key={index}
                     className="absolute bg-red-500 w-6 h-6 rounded-full border-2 border-white flex items-center justify-center text-white text-xs"
@@ -127,9 +135,9 @@ export default function IndividualFeedbackPage() {
             </div>
 
             <div className="mt-4">
-              {imageData.dots.map((dot, index) => (
+              {feedbackDots.map((dot, index) => (
                 <p key={index} className="text-black">
-                  <strong>Dot {index + 1}:</strong> {dot.message}
+                  <strong>Dot {index + 1}:</strong> {dot.msg}
                 </p>
               ))}
             </div>
@@ -149,7 +157,7 @@ export default function IndividualFeedbackPage() {
                   className="rounded-lg"
                 />
                 {showDots &&
-                  imageData.dots.map((dot, index) => (
+                  feedbackDots.map((dot, index) => (
                     <div
                       key={index}
                       className="absolute bg-red-500 w-6 h-6 rounded-full border-2 border-white flex items-center justify-center text-white text-xs"

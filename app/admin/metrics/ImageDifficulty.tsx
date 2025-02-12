@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 
 interface ImageDifficultyProps {
-  sampleDifficulty: { image_id: string; difficulty_score: number; image_path: string; total_guesses: number; incorrect_guesses: number}[];
+  sampleDifficulty: { image_id: string; difficulty_score: string; image_path: string; total_guesses: number; incorrect_guesses: number}[];
 }
 
 const SampleDifficulty = ({ sampleDifficulty }: ImageDifficultyProps) => {
@@ -13,9 +13,8 @@ const SampleDifficulty = ({ sampleDifficulty }: ImageDifficultyProps) => {
 
   const fetchImage = async (imagePath: string) => {
     try {
-      const cleanedPath = imagePath.split('/').slice(4).join('/');
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_IMAGE_URL}/fetchImageByPath/${encodeURIComponent(cleanedPath)}`
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/images/view/${encodeURIComponent(imagePath)}`
       );
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
@@ -41,6 +40,8 @@ const SampleDifficulty = ({ sampleDifficulty }: ImageDifficultyProps) => {
     };
 
     loadImages();
+
+    console.log("sample difficulty:", sampleDifficulty)
   }, [sampleDifficulty]);
 
   return (
@@ -68,7 +69,7 @@ const SampleDifficulty = ({ sampleDifficulty }: ImageDifficultyProps) => {
                   )}
                 </td>
                 <td className="px-4 py-2 text-sm">{sample.image_id}</td>
-                <td className="px-4 py-2 text-sm">{sample.difficulty_score.toFixed(2)}</td>
+                <td className="px-4 py-2 text-sm">{parseFloat(sample.difficulty_score).toFixed(2)}</td>
                 <td className="px-4 py-2 text-sm">{sample.total_guesses}</td>
                 <td className="px-4 py-2 text-sm">{sample.incorrect_guesses}</td>
               </tr>
