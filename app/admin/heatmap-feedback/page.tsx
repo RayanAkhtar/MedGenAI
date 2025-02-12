@@ -192,11 +192,10 @@ export default function HeatmapFeedbackPage() {
                     onClick={() => handleHeatmapRegionClick(data.x, data.y)}
                     style={{
                       top: `${data.y}px`,
-                      left: `${data.x}px`,
+                      left: `${data.x+60}px`,
                       width: "50px",
                       height: "50px",
                       backgroundColor: getHeatmapColor(data.frequency, maxFrequency),
-                      transform: "translate(-50%, -50%)",
                       transition: "background-color 0.3s ease-in-out",
                     }}
                   />
@@ -230,15 +229,14 @@ export default function HeatmapFeedbackPage() {
                   heatmapFrequencyData.map((data, index) => (
                     <div
                       key={index}
-                      className="absolute cursor-pointer rounded-md"
+                      className="absolute cursor-pointer"
                       onClick={() => handleHeatmapRegionClick(data.x, data.y)}
                       style={{
-                        top: `${data.y}px`,
-                        left: `${data.x}px`,
+                        top: `${data.y+25}px`,
+                        left: `${data.x+25}px`,
                         width: "50px",
                         height: "50px",
                         backgroundColor: getHeatmapColor(data.frequency, maxFrequency),
-                        borderRadius: "12px",
                         transform: "translate(-50%, -50%)",
                         transition: "background-color 0.3s ease-in-out",
                       }}
