@@ -29,7 +29,7 @@ const MLMetrics = ({ accuracy, precision, recall, f1Score, confusionMatrix }: ML
   return (
     <div className="mb-12">
       <h3 className="text-2xl font-semibold text-center mb-6">Machine Learning Metrics</h3>
-      <p>Please note that since only one row of the confusion matrix will ever be non-zero, we have adjusted the definitions of the metris provide necessary non-zero output.</p>
+      <p>Please note that since only one row of the confusion matrix will ever be non-zero, we have adjusted the definitions of the metrics provided to ensure non-zero output unless it is actually the case.</p>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-8 text-center">
         <div className="bg-gray-100 p-6 rounded-lg shadow-md">
           <h4 className="font-semibold text-gray-700">Accuracy</h4>
@@ -156,11 +156,11 @@ export default function HeatmapFeedbackPage() {
   } | null>(null);
 
   const [mlMetrics, setMlMetrics] = useState({
-    accuracy: 0.925, 
-    precision: 0.893, 
-    recall: 0.878, 
-    f1Score: 0.885, 
-    confusionMatrix: { truepositive: 80, falsepositive: 10, truenegative: 75, falsenegative: 15 }
+    accuracy: 0, 
+    precision: 0, 
+    recall: 0, 
+    f1Score: 0, 
+    confusionMatrix: { truepositive: 0, falsepositive: 0, truenegative: 0, falsenegative: 0 }
   });
 
   const searchParams = useSearchParams();
