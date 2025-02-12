@@ -32,8 +32,7 @@ const FeedbackPage = () => {
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getFeedbacks?image_type=${imageType}&resolved=${resolved}&sort_by=${sortBy}&page=${page}&limit=20`
     )
     const data: FeedbackData = await response.json()
-    console.log('Fetched feedback data:', data)
-    setFeedbacks(data.feedback)
+    setFeedbacks(data)
   }
 
   const fetchFeedbackCount = async (): Promise<void> => {
