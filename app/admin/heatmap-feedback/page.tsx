@@ -9,139 +9,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import Link from "next/link";
 
-interface HeatmapPoint {
-  x: number;
-  y: number;
-  msg: string;
-}
-
-interface MLMetricsProps {
-  accuracy: number;
-  precision: number;
-  recall: number;
-  f1Score: number;
-  confusionMatrix: {
-    [key: string]: number;
-  };
-}
-
-const MLMetrics = ({ accuracy, precision, recall, f1Score, confusionMatrix }: MLMetricsProps) => {
-  return (
-    <div className="mb-12">
-      <h3 className="text-2xl font-semibold text-center mb-6">Machine Learning Metrics</h3>
-      <p>Please note that since only one row of the confusion matrix will ever be non-zero, we have adjusted the definitions of the metrics provided to ensure non-zero output unless it is actually the case.</p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-8 text-center">
-        <div className="bg-gray-100 p-6 rounded-lg shadow-md">
-          <h4 className="font-semibold text-gray-700">Accuracy</h4>
-          <p className="text-xl font-semibold">{(accuracy * 100).toFixed(2)}%</p>
-        </div>
-        <div className="bg-gray-100 p-6 rounded-lg shadow-md">
-          <h4 className="font-semibold text-gray-700">Precision</h4>
-          <p className="text-xl font-semibold">{(precision * 100).toFixed(2)}%</p>
-        </div>
-        <div className="bg-gray-100 p-6 rounded-lg shadow-md">
-          <h4 className="font-semibold text-gray-700">Recall</h4>
-          <p className="text-xl font-semibold">{(recall * 100).toFixed(2)}%</p>
-        </div>
-        <div className="bg-gray-100 p-6 rounded-lg shadow-md">
-          <h4 className="font-semibold text-gray-700">F1-Score</h4>
-          <p className="text-xl font-semibold">{(f1Score * 100).toFixed(2)}%</p>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const ConfusionMatrix = ({ confusionMatrix }: { confusionMatrix: { [key: string]: number } }) => (
-  <div className="mb-12">
-    <h4 className="text-2xl font-semibold text-center mb-6">Confusion Matrix</h4>
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-8 text-center">
-      <div className="bg-gray-100 p-6 rounded-lg shadow-md">
-        <h5 className="font-semibold text-gray-700">True Positive (TP)</h5>
-        <p className="text-xl font-semibold">{confusionMatrix.truepositive}</p>
-      </div>
-      <div className="bg-gray-100 p-6 rounded-lg shadow-md">
-        <h5 className="font-semibold text-gray-700">False Positive (FP)</h5>
-        <p className="text-xl font-semibold">{confusionMatrix.falsepositive}</p>
-      </div>
-      <div className="bg-gray-100 p-6 rounded-lg shadow-md">
-        <h5 className="font-semibold text-gray-700">True Negative (TN)</h5>
-        <p className="text-xl font-semibold">{confusionMatrix.truenegative}</p>
-      </div>
-      <div className="bg-gray-100 p-6 rounded-lg shadow-md">
-        <h5 className="font-semibold text-gray-700">False Negative (FN)</h5>
-        <p className="text-xl font-semibold">{confusionMatrix.falsenegative}</p>
-      </div>
-    </div>
-  </div>
-);
-
-const fetchImageData = async (imageId: string) => {
-  try {
-    if (!imageId) return null;
-
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getImageById/${imageId}`);
-    const metadata = await response.json();
-
-    if (metadata && metadata.image_path) {
-      const apiUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/images/view/${encodeURIComponent(metadata.image_path)}`;
-
-      const imageResponse = await fetch(apiUrl);
-      if (!imageResponse.ok) {
-        throw new Error("Failed to fetch the image");
-      }
-
-      const imageBlob = await imageResponse.blob();
-      const imageUrl = URL.createObjectURL(imageBlob);
-
-      return {
-        imageUrl,
-        imageWidth: 600,
-        imageHeight: 400,
-        feedbackDots: [],
-      };
-    }
-    return null;
-  } catch (error) {
-    console.error("Error fetching image data:", error);
-    return null;
-  }
-};
-
-const fetchFeedbackData = async (imageId: string): Promise<HeatmapPoint[]> => {
-  try {
-    const feedbackResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getMatchingFeedbackForImage/${imageId}`);
-    let feedbackData = await feedbackResponse.json();
-    console.log("feedback data", feedbackData);
-
-    if (!Array.isArray(feedbackData)) {
-      feedbackData = [];
-    }
-
-    return feedbackData;
-  } catch (error) {
-    console.error("Error fetching feedback data:", error);
-    return [];
-  }
-};
-
-const fetchMlMetrics = async (imageId: string) => {
-  try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getImageMlMetrics/${imageId}`);
-    const data = await response.json();
-
-    if (response.ok) {
-      return data;
-    } else {
-      console.error("Failed to fetch ML metrics:", data.error);
-      return null;
-    }
-  } catch (error) {
-    console.error("Error fetching ML metrics:", error);
-    return null;
-  }
-};
-
+import { 
+  fetchFeedbackData,
+  fetchMlMetrics,
+  fetchImageData,
+  HeatmapPoint     
+} from "./api";
+import { MLMetrics } from "./MLMetrics";
+import { ConfusionMatrix } from "./ConfusionMatrix";
 
 export default function HeatmapFeedbackPage() {
   const [isImageExpanded, setIsImageExpanded] = useState(false);
