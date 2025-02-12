@@ -15,6 +15,66 @@ interface HeatmapPoint {
   msg: string;
 }
 
+interface MLMetricsProps {
+  accuracy: number;
+  precision: number;
+  recall: number;
+  f1Score: number;
+  confusionMatrix: {
+    [key: string]: number;
+  };
+}
+
+const MLMetrics = ({ accuracy, precision, recall, f1Score, confusionMatrix }: MLMetricsProps) => {
+  return (
+    <div className="mb-12">
+      <h3 className="text-2xl font-semibold text-center mb-6">Machine Learning Metrics</h3>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-8 text-center">
+        <div className="bg-gray-100 p-6 rounded-lg shadow-md">
+          <h4 className="font-semibold text-gray-700">Accuracy</h4>
+          <p className="text-xl font-semibold">{(accuracy * 100).toFixed(2)}%</p>
+        </div>
+        <div className="bg-gray-100 p-6 rounded-lg shadow-md">
+          <h4 className="font-semibold text-gray-700">Precision</h4>
+          <p className="text-xl font-semibold">{(precision * 100).toFixed(2)}%</p>
+        </div>
+        <div className="bg-gray-100 p-6 rounded-lg shadow-md">
+          <h4 className="font-semibold text-gray-700">Recall</h4>
+          <p className="text-xl font-semibold">{(recall * 100).toFixed(2)}%</p>
+        </div>
+        <div className="bg-gray-100 p-6 rounded-lg shadow-md">
+          <h4 className="font-semibold text-gray-700">F1-Score</h4>
+          <p className="text-xl font-semibold">{(f1Score * 100).toFixed(2)}%</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const ConfusionMatrix = ({ confusionMatrix }: { confusionMatrix: { [key: string]: number } }) => (
+  <div className="mb-12">
+    <h4 className="text-2xl font-semibold text-center mb-6">Confusion Matrix</h4>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-8 text-center">
+      <div className="bg-gray-100 p-6 rounded-lg shadow-md">
+        <h5 className="font-semibold text-gray-700">True Positive (TP)</h5>
+        <p className="text-xl font-semibold">{confusionMatrix.TP}</p>
+      </div>
+      <div className="bg-gray-100 p-6 rounded-lg shadow-md">
+        <h5 className="font-semibold text-gray-700">False Positive (FP)</h5>
+        <p className="text-xl font-semibold">{confusionMatrix.FP}</p>
+      </div>
+      <div className="bg-gray-100 p-6 rounded-lg shadow-md">
+        <h5 className="font-semibold text-gray-700">True Negative (TN)</h5>
+        <p className="text-xl font-semibold">{confusionMatrix.TN}</p>
+      </div>
+      <div className="bg-gray-100 p-6 rounded-lg shadow-md">
+        <h5 className="font-semibold text-gray-700">False Negative (FN)</h5>
+        <p className="text-xl font-semibold">{confusionMatrix.FN}</p>
+      </div>
+    </div>
+  </div>
+);
+
 const fetchImageData = async (imageId: string) => {
   try {
     if (!imageId) return null;
@@ -75,6 +135,14 @@ export default function HeatmapFeedbackPage() {
     imageHeight: number;
     feedbackDots: HeatmapPoint[];
   } | null>(null);
+
+  const [mlMetrics, setMlMetrics] = useState({
+    accuracy: 0.925, 
+    precision: 0.893, 
+    recall: 0.878, 
+    f1Score: 0.885, 
+    confusionMatrix: { TP: 80, FP: 10, TN: 75, FN: 15 }
+  });
 
   const searchParams = useSearchParams();
   const imageId = searchParams?.get("imageid");
@@ -155,7 +223,6 @@ export default function HeatmapFeedbackPage() {
     setShowFeedbackOverlay(false);
   };
 
-  
   return (
     <main className="h-screen bg-white text-[var(--foreground)] overflow-y-auto">
       <Navbar />
@@ -168,7 +235,7 @@ export default function HeatmapFeedbackPage() {
         </Link>
       </div>
 
-      <div className="min-h-screen flex justify-center items-center  p-8">
+      <div className="min-h-screen flex justify-center items-center p-8">
         <div className="w-full max-w-3xl">
           <div className="bg-white shadow-md rounded-2xl p-6">
             <h1 className="border-b pb-2 mb-4 text-xl font-bold text-black">
@@ -212,74 +279,83 @@ export default function HeatmapFeedbackPage() {
             </div>
           </div>
         </div>
-
-        <Dialog open={isImageExpanded} onClose={toggleImageExpansion} className="relative z-50">
-          <div className="fixed inset-0 bg-black bg-opacity-70" aria-hidden="true" />
-          <div className="fixed inset-0 flex items-center justify-center p-4">
-            <Dialog.Panel className="relative">
-              <div className="relative">
-                <Image
-                  src={imageUrl}
-                  alt="Expanded Feedback Image"
-                  width={imageWidth}
-                  height={imageHeight}
-                  className="rounded-lg"
-                />
-                {showHeatmap &&
-                  heatmapFrequencyData.map((data, index) => (
-                    <div
-                      key={index}
-                      className="absolute cursor-pointer"
-                      onClick={() => handleHeatmapRegionClick(data.x, data.y)}
-                      style={{
-                        top: `${data.y+25}px`,
-                        left: `${data.x+25}px`,
-                        width: "50px",
-                        height: "50px",
-                        backgroundColor: getHeatmapColor(data.frequency, maxFrequency),
-                        transform: "translate(-50%, -50%)",
-                        transition: "background-color 0.3s ease-in-out",
-                      }}
-                    />
-                  ))}
-                {showFeedbackOverlay && selectedPoints.length > 0 && (
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="bg-white p-4 rounded-lg shadow-md max-w-sm">
-                      {selectedPoints.map((point, i) => (
-                        <p key={i} className="text-black">
-                          {point.msg}
-                        </p>
-                      ))}
-                      <button
-                        onClick={closeOverlay}
-                        className="mt-2 px-4 py-2 text-sm font-semibold rounded-full bg-red-600 text-white"
-                      >
-                        Close
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                <button
-                  onClick={toggleImageExpansion}
-                  className="absolute top-2 right-2 bg-white rounded-full p-1"
-                >
-                  <FontAwesomeIcon icon={faTimes} className="w-5 h-5 text-black" />
-                </button>
-
-                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2">
-                  <button
-                    onClick={toggleHeatmapVisibility}
-                    className={`px-4 py-2 text-sm font-semibold rounded-full ${showHeatmap ? "bg-blue-600 text-white" : "bg-gray-300 text-black"}`}
-                  >
-                    {showHeatmap ? "Hide Heatmap" : "Show Heatmap"}
-                  </button>
-                </div>
-              </div>
-            </Dialog.Panel>
-          </div>
-        </Dialog>
       </div>
+
+      <div className="mt-8 w-full max-w-3xl mx-auto flex flex-col lg:flex-row gap-8 text-black">
+        <div className="w-full lg:w-1/2">
+          <MLMetrics {...mlMetrics} />
+        </div>
+        <div className="w-full lg:w-1/2">
+          <ConfusionMatrix confusionMatrix={mlMetrics.confusionMatrix} />
+        </div>
+      </div>
+
+      <Dialog open={isImageExpanded} onClose={toggleImageExpansion} className="relative z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-70" aria-hidden="true" />
+        <div className="fixed inset-0 flex items-center justify-center p-4">
+          <Dialog.Panel className="relative">
+            <div className="relative">
+              <Image
+                src={imageUrl}
+                alt="Expanded Feedback Image"
+                width={imageWidth}
+                height={imageHeight}
+                className="rounded-lg"
+              />
+              {showHeatmap &&
+                heatmapFrequencyData.map((data, index) => (
+                  <div
+                    key={index}
+                    className="absolute cursor-pointer"
+                    onClick={() => handleHeatmapRegionClick(data.x, data.y)}
+                    style={{
+                      top: `${data.y+25}px`,
+                      left: `${data.x+25}px`,
+                      width: "50px",
+                      height: "50px",
+                      backgroundColor: getHeatmapColor(data.frequency, maxFrequency),
+                      transform: "translate(-50%, -50%)",
+                      transition: "background-color 0.3s ease-in-out",
+                    }}
+                  />
+                ))}
+              {showFeedbackOverlay && selectedPoints.length > 0 && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="bg-white p-4 rounded-lg shadow-md max-w-sm">
+                    {selectedPoints.map((point, i) => (
+                      <p key={i} className="text-black">
+                        {point.msg}
+                      </p>
+                    ))}
+                    <button
+                      onClick={closeOverlay}
+                      className="mt-2 px-4 py-2 text-sm font-semibold rounded-full bg-red-600 text-white"
+                    >
+                      Close
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              <button
+                onClick={toggleImageExpansion}
+                className="absolute top-2 right-2 bg-white rounded-full p-1"
+              >
+                <FontAwesomeIcon icon={faTimes} className="w-5 h-5 text-black" />
+              </button>
+
+              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2">
+                <button
+                  onClick={toggleHeatmapVisibility}
+                  className={`px-4 py-2 text-sm font-semibold rounded-full ${showHeatmap ? "bg-blue-600 text-white" : "bg-gray-300 text-black"}`}
+                >
+                  {showHeatmap ? "Hide Heatmap" : "Show Heatmap"}
+                </button>
+              </div>
+            </div>
+          </Dialog.Panel>
+        </div>
+      </Dialog>
     </main>
   );
 }
