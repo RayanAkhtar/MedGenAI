@@ -23,16 +23,18 @@ const FeedbackPage = () => {
   const [imageType, setImageType] = useState<string>('all')
   const [resolved, setResolved] = useState<boolean | null>(null)
   const [sortBy, setSortBy] = useState<string>('last_feedback_time') 
+  const [sortOrder, setSortOrder] = useState<string>('asc')
   const [images, setImages] = useState<{ [key: string]: string }>({})
   const [currentPage, setCurrentPage] = useState<number>(1)
   const [totalPages, setTotalPages] = useState<number>(1)
 
   const fetchFeedbacks = async (page = 1): Promise<void> => {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getFeedbacks?image_type=${imageType}&resolved=${resolved}&sort_by=${sortBy}&page=${page}&limit=20`
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getFeedbacks?image_type=${imageType}&resolved=${resolved}&sort_by=${sortBy}&sort_order=${sortOrder}&page=${page}&limit=20` // Added sort_order
     )
     const data: FeedbackData = await response.json()
     setFeedbacks(data)
+    console.log("data is", data)
   }
 
   const fetchFeedbackCount = async (): Promise<void> => {
@@ -62,7 +64,7 @@ const FeedbackPage = () => {
   useEffect(() => {
     fetchFeedbacks(currentPage)
     fetchFeedbackCount()
-  }, [imageType, resolved, sortBy, currentPage])
+  }, [imageType, resolved, sortBy, sortOrder, currentPage]) // Added sortOrder as dependency
 
   useEffect(() => {
     const loadImages = async (): Promise<void> => {
@@ -138,13 +140,25 @@ const FeedbackPage = () => {
             <select
               onChange={e => setSortBy(e.target.value)}
               value={sortBy}
-              className='px-6 py-3 bg-[var(--heartflow-blue)] text-white rounded-3xl focus:outline-none focus:ring-2 focus:ring-[var(--heartflow-blue)]'>
+              className='px-6 py-3 bg-[var(--heartflow-blue)] text-white rounded-3xl focus:outline-none focus:ring-2 focus:ring-[var(--heartflow-blue)]'
+            >
               <option value='last_feedback_time'>Time of Last Feedback</option>
               <option value='unresolved_count'>
                 Amount of Unresolved Feedback
               </option>
               <option value='upload_time'>Time of Image Upload</option>
               <option value='image_id'>Image ID</option>
+            </select>
+          </div>
+          <div className='flex flex-col gap-4 w-full md:w-1/3'>
+            <label className='font-bold text-lg'>Sort Order:</label>
+            <select
+              onChange={e => setSortOrder(e.target.value)}
+              value={sortOrder}
+              className='px-6 py-3 bg-[var(--heartflow-blue)] text-white rounded-3xl focus:outline-none focus:ring-2 focus:ring-[var(--heartflow-blue)]'
+            >
+              <option value='asc'>Ascending</option>
+              <option value='desc'>Descending</option>
             </select>
           </div>
         </div>
