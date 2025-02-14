@@ -34,7 +34,6 @@ const FeedbackPage = () => {
     )
     const data: FeedbackData = await response.json()
     setFeedbacks(data)
-    console.log("data is", data)
   }
 
   const fetchFeedbackCount = async (): Promise<void> => {
@@ -42,7 +41,6 @@ const FeedbackPage = () => {
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getFeedbackCount?image_type=${imageType}&resolved=${resolved}`
     )
     const data: { total_count: number } = await response.json()
-    console.log('Total feedback count:', data.total_count)
 
     setTotalPages(Math.ceil(data.total_count / 20))
   }

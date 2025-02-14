@@ -15,7 +15,6 @@ interface ConfusionMatrixProps {
 }
 
 const ConfusionMatrix = ({ confusionMatrix }: ConfusionMatrixProps) => {
-  console.log("confusion matrix", confusionMatrix)
 
   const chartData = {
     labels: ['True Positive', 'False Positive', 'True Negative', 'False Negative'],
