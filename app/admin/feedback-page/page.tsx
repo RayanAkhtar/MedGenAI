@@ -3,6 +3,8 @@
 import Navbar from '@/app/components/Navbar'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
+
 
 interface Feedback {
   image_id: string;
@@ -15,9 +17,11 @@ interface Feedback {
 
 
 const FeedbackPage = () => {
+  const filter = useSearchParams()?.get("filter");
+
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([])
-  const [imageType, setImageType] = useState<string>('all')
-  const [resolved, setResolved] = useState<boolean | null>(null)
+  const [imageType, setImageType] = useState<string>(filter == "real" ? "real" : filter == "ai" ? "ai" : "all")
+  const [resolved, setResolved] = useState<boolean | null>(filter == "complete" ? true : filter == "false" ? false : null)
   const [sortBy, setSortBy] = useState<string>('last_feedback_time') 
   const [sortOrder, setSortOrder] = useState<string>('asc')
   const [images, setImages] = useState<{ [key: string]: string }>({})
