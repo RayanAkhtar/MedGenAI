@@ -3,6 +3,8 @@
 import Navbar from '@/app/components/Navbar'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
+
 
 interface Feedback {
   image_id: string;
@@ -13,25 +15,24 @@ interface Feedback {
   image_path: string;
 }
 
-interface FeedbackData {
-  feedback: Feedback[];
-  total_count: number;
-}
 
 const FeedbackPage = () => {
+  const filter = useSearchParams()?.get("filter");
+
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([])
-  const [imageType, setImageType] = useState<string>('all')
-  const [resolved, setResolved] = useState<boolean | null>(null)
+  const [imageType, setImageType] = useState<string>(filter == "real" ? "real" : filter == "ai" ? "ai" : "all")
+  const [resolved, setResolved] = useState<boolean | null>(filter == "complete" ? true : filter == "false" ? false : null)
   const [sortBy, setSortBy] = useState<string>('last_feedback_time') 
+  const [sortOrder, setSortOrder] = useState<string>('asc')
   const [images, setImages] = useState<{ [key: string]: string }>({})
   const [currentPage, setCurrentPage] = useState<number>(1)
   const [totalPages, setTotalPages] = useState<number>(1)
 
   const fetchFeedbacks = async (page = 1): Promise<void> => {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getFeedbacks?image_type=${imageType}&resolved=${resolved}&sort_by=${sortBy}&page=${page}&limit=20`
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getFeedbacks?image_type=${imageType}&resolved=${resolved}&sort_by=${sortBy}&sort_order=${sortOrder}&page=${page}&limit=20` // Added sort_order
     )
-    const data: FeedbackData = await response.json()
+    const data = await response.json()
     setFeedbacks(data)
   }
 
@@ -40,7 +41,6 @@ const FeedbackPage = () => {
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getFeedbackCount?image_type=${imageType}&resolved=${resolved}`
     )
     const data: { total_count: number } = await response.json()
-    console.log('Total feedback count:', data.total_count)
 
     setTotalPages(Math.ceil(data.total_count / 20))
   }
@@ -59,10 +59,37 @@ const FeedbackPage = () => {
     }
   }
 
+  const resolveFeedback = async (feedbackId: string): Promise<void> => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/resolveAllFeedbackByImage/${feedbackId}`,
+        {
+          method: 'POST',
+        }
+      )
+  
+      if (response.ok) {
+        setFeedbacks(prevFeedbacks =>
+          prevFeedbacks.map(feedback =>
+            feedback.image_id === feedbackId
+              ? { ...feedback, unresolved_count: 0 }
+              : feedback
+          )
+        )
+      } else {
+        console.error('Failed to resolve feedback');
+        console.log("response is", response)
+      }
+    } catch (error) {
+      console.error('Error resolving feedback:', error);
+    }
+  }
+  
+
   useEffect(() => {
     fetchFeedbacks(currentPage)
     fetchFeedbackCount()
-  }, [imageType, resolved, sortBy, currentPage])
+  }, [imageType, resolved, sortBy, sortOrder, currentPage])
 
   useEffect(() => {
     const loadImages = async (): Promise<void> => {
@@ -138,13 +165,25 @@ const FeedbackPage = () => {
             <select
               onChange={e => setSortBy(e.target.value)}
               value={sortBy}
-              className='px-6 py-3 bg-[var(--heartflow-blue)] text-white rounded-3xl focus:outline-none focus:ring-2 focus:ring-[var(--heartflow-blue)]'>
+              className='px-6 py-3 bg-[var(--heartflow-blue)] text-white rounded-3xl focus:outline-none focus:ring-2 focus:ring-[var(--heartflow-blue)]'
+            >
               <option value='last_feedback_time'>Time of Last Feedback</option>
               <option value='unresolved_count'>
                 Amount of Unresolved Feedback
               </option>
               <option value='upload_time'>Time of Image Upload</option>
               <option value='image_id'>Image ID</option>
+            </select>
+          </div>
+          <div className='flex flex-col gap-4 w-full md:w-1/3'>
+            <label className='font-bold text-lg'>Sort Order:</label>
+            <select
+              onChange={e => setSortOrder(e.target.value)}
+              value={sortOrder}
+              className='px-6 py-3 bg-[var(--heartflow-blue)] text-white rounded-3xl focus:outline-none focus:ring-2 focus:ring-[var(--heartflow-blue)]'
+            >
+              <option value='asc'>Ascending</option>
+              <option value='desc'>Descending</option>
             </select>
           </div>
         </div>
@@ -189,19 +228,18 @@ const FeedbackPage = () => {
                   </td>
                   <td className='px-6 py-4 flex gap-4'>
                     <Link
-                      href={`/admin/individual-feedback?imageid=${feedback.image_id}`}
-                    >
-                      <button className='px-4 py-2 bg-[var(--heartflow-blue)] text-white rounded-full hover:bg-blue-700 focus:outline-none'>
-                        View Individual Feedback
-                      </button>
-                    </Link>
-                    <Link
                       href={`/admin/heatmap-feedback?imageid=${feedback.image_id}`}
                     >
                       <button className='px-4 py-2 bg-[var(--heartflow-blue)] text-white rounded-full hover:bg-blue-700 focus:outline-none'>
                         View Heatmap Feedback
                       </button>
                     </Link>
+                    <button
+                      onClick={() => resolveFeedback(feedback.image_id)}
+                      className='px-4 py-2 bg-[var(--heartflow-blue)] text-white rounded-full hover:bg-blue-700 focus:outline-none'
+                    >
+                      Mark Feedback as Complete
+                    </button>
                   </td>
                 </tr>
               ))}

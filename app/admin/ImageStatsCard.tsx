@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 
 export default function ImageStatsCard({
@@ -11,13 +11,18 @@ export default function ImageStatsCard({
   uploadEndpoint,
 }: {
   title: string;
-  imageData: { total: number, percentage: number };
+  imageData: { total: number; percentage: number };
   uploadType: string;
   feedbackLink: string;
   uploadEndpoint: string;
 }) {
   const [file, setFile] = useState<File | null>(null);
   const [buttonState, setButtonState] = useState("select"); // 'select' | 'upload'
+  const [imageCount, setImageCount] = useState(imageData.total);
+
+  useEffect(() => {
+    setImageCount(imageData.total);
+  }, [imageData.total]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0] || null;
@@ -43,6 +48,7 @@ export default function ImageStatsCard({
         alert(`${title} uploaded successfully.`);
         setFile(null);
         setButtonState("select");
+        setImageCount((prevCount) => prevCount + 1);
       } else {
         alert("Failed to upload image.");
       }
@@ -55,8 +61,8 @@ export default function ImageStatsCard({
   return (
     <div className="bg-white p-6 shadow-md rounded-2xl text-black">
       <h2 className="text-xl font-bold mb-4">{title}</h2>
-      <p>Total images: {imageData.total}</p>
-      <p>Percentage detected: {imageData.percentage.toFixed(2)}%</p>
+      <p>Total images: {imageCount}</p>
+      <p>Percentage detected as {title.split(" ")[0]}: {imageData.percentage.toFixed(2)}%</p>
       <div className="flex flex-wrap gap-4 mt-6">
         <Link href={feedbackLink} className="flex-1 min-w-[150px] px-6 py-3 bg-[var(--heartflow-blue)] text-white rounded-3xl hover:bg-[var(--heartflow-blue)]/90 transition-transform transform hover:scale-105">
           View Feedback
