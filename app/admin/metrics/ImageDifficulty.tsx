@@ -7,7 +7,6 @@ interface ImageDifficultyProps {
 }
 
 const SampleDifficulty = ({ sampleDifficulty }: ImageDifficultyProps) => {
-  console.log("passed in", sampleDifficulty)
 
   const [images, setImages] = useState<{ [key: string]: string }>({});
 
@@ -41,7 +40,6 @@ const SampleDifficulty = ({ sampleDifficulty }: ImageDifficultyProps) => {
 
     loadImages();
 
-    console.log("sample difficulty:", sampleDifficulty)
   }, [sampleDifficulty]);
 
   return (

@@ -24,14 +24,14 @@ export default function Admin() {
         const realImagesResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getTotalRealImages`);
         const aiImagesResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getTotalAIImages`);
 
-        const realImages = (await realImagesResponse.json())[0];
-        const aiImages = (await aiImagesResponse.json())[0];
+        const realImages = (await realImagesResponse.json());
+        const aiImages = (await aiImagesResponse.json());
 
         setTotalImagesData({
-          realImages: realImages.totalreal || 0,
-          aiImages: aiImages.totalai || 0,
-          realImagesPercent: (realImages.percentagedetected || 0) * 100,
-          aiImagesPercent: (aiImages.percentagedetected || 0) * 100,
+          realImages: realImages.totalReal || 0,
+          aiImages: aiImages.totalAI || 0,
+          realImagesPercent: (realImages.percentageDetected || 0) * 100,
+          aiImagesPercent: (aiImages.percentageDetected || 0) * 100,
         });
       } catch (error) {
         console.error("Error fetching data:", error);
