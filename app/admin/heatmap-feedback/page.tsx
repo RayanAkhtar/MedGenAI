@@ -1,4 +1,4 @@
-'use client';
+'use client'
 
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation"; 
@@ -38,6 +38,7 @@ export default function HeatmapFeedbackPage() {
     confusionMatrix: { truepositive: 0, falsepositive: 0, truenegative: 0, falsenegative: 0 }
   });
 
+  const [isResolved, setIsResolved] = useState(false);
   const searchParams = useSearchParams();
   const imageId = searchParams?.get("imageid");
 
@@ -122,19 +123,44 @@ export default function HeatmapFeedbackPage() {
     setShowFeedbackOverlay(false);
   };
 
+  const resolveAllFeedback = async () => {
+    setIsResolved(true);
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/resolveAllFeedbackByImage/${imageId}`,
+        { method: 'POST' }
+      );
+      if (response.ok) {
+        alert("All feedback has been resolved!");
+      } else {
+        console.error("Failed to resolve feedback");
+      }
+    } catch (error) {
+      console.error("Error resolving feedback:", error);
+    }
+  };
+
   return (
     <main className="h-screen bg-white text-[var(--foreground)] overflow-y-auto">
       <Navbar />
 
-      <div className="mt-10">
+      <div className="mt-10 flex justify-between items-center px-5">
         <Link href="/admin/feedback-page">
-          <button className="ml-5 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-all duration-300 ease-in-out">
+          <button className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-all duration-300 ease-in-out">
             Back to Feedback
           </button>
         </Link>
+        <button
+          onClick={resolveAllFeedback}
+          className={`px-6 py-2 text-white rounded-lg transition-all duration-300 ease-in-out ${
+            isResolved ? 'bg-green-500 hover:bg-green-400' : 'bg-red-500 hover:bg-red-400'
+          }`}
+        >
+          Resolve All Feedback
+        </button>
       </div>
 
-      <div className="min-h-screen flex justify-center items-center p-8">
+      <div className="mt-20 mb-20 flex justify-center items-center p-8">
         <div className="w-full max-w-3xl">
           <div className="bg-white shadow-md rounded-2xl p-6">
             <h1 className="border-b pb-2 mb-4 text-xl font-bold text-black">
@@ -158,7 +184,7 @@ export default function HeatmapFeedbackPage() {
                     onClick={() => handleHeatmapRegionClick(data.x, data.y)}
                     style={{
                       top: `${data.y}px`,
-                      left: `${data.x+60}px`,
+                      left: `${data.x + 60}px`,
                       width: "50px",
                       height: "50px",
                       backgroundColor: getHeatmapColor(data.frequency, maxFrequency),
@@ -208,8 +234,8 @@ export default function HeatmapFeedbackPage() {
                     className="absolute cursor-pointer"
                     onClick={() => handleHeatmapRegionClick(data.x, data.y)}
                     style={{
-                      top: `${data.y+25}px`,
-                      left: `${data.x+25}px`,
+                      top: `${data.y + 25}px`,
+                      left: `${data.x + 25}px`,
                       width: "50px",
                       height: "50px",
                       backgroundColor: getHeatmapColor(data.frequency, maxFrequency),

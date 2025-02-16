@@ -13,10 +13,6 @@ interface Feedback {
   image_path: string;
 }
 
-interface FeedbackData {
-  feedback: Feedback[];
-  total_count: number;
-}
 
 const FeedbackPage = () => {
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([])
@@ -32,7 +28,7 @@ const FeedbackPage = () => {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getFeedbacks?image_type=${imageType}&resolved=${resolved}&sort_by=${sortBy}&sort_order=${sortOrder}&page=${page}&limit=20` // Added sort_order
     )
-    const data: FeedbackData = await response.json()
+    const data = await response.json()
     setFeedbacks(data)
   }
 
@@ -59,10 +55,37 @@ const FeedbackPage = () => {
     }
   }
 
+  const resolveFeedback = async (feedbackId: string): Promise<void> => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/resolveAllFeedbackByImage/${feedbackId}`,
+        {
+          method: 'POST',
+        }
+      )
+  
+      if (response.ok) {
+        setFeedbacks(prevFeedbacks =>
+          prevFeedbacks.map(feedback =>
+            feedback.image_id === feedbackId
+              ? { ...feedback, unresolved_count: 0 }
+              : feedback
+          )
+        )
+      } else {
+        console.error('Failed to resolve feedback');
+        console.log("response is", response)
+      }
+    } catch (error) {
+      console.error('Error resolving feedback:', error);
+    }
+  }
+  
+
   useEffect(() => {
     fetchFeedbacks(currentPage)
     fetchFeedbackCount()
-  }, [imageType, resolved, sortBy, sortOrder, currentPage]) // Added sortOrder as dependency
+  }, [imageType, resolved, sortBy, sortOrder, currentPage])
 
   useEffect(() => {
     const loadImages = async (): Promise<void> => {
@@ -201,19 +224,18 @@ const FeedbackPage = () => {
                   </td>
                   <td className='px-6 py-4 flex gap-4'>
                     <Link
-                      href={`/admin/individual-feedback?imageid=${feedback.image_id}`}
-                    >
-                      <button className='px-4 py-2 bg-[var(--heartflow-blue)] text-white rounded-full hover:bg-blue-700 focus:outline-none'>
-                        View Individual Feedback
-                      </button>
-                    </Link>
-                    <Link
                       href={`/admin/heatmap-feedback?imageid=${feedback.image_id}`}
                     >
                       <button className='px-4 py-2 bg-[var(--heartflow-blue)] text-white rounded-full hover:bg-blue-700 focus:outline-none'>
                         View Heatmap Feedback
                       </button>
                     </Link>
+                    <button
+                      onClick={() => resolveFeedback(feedback.image_id)}
+                      className='px-4 py-2 bg-[var(--heartflow-blue)] text-white rounded-full hover:bg-blue-700 focus:outline-none'
+                    >
+                      Mark Feedback as Complete
+                    </button>
                   </td>
                 </tr>
               ))}
