@@ -11,16 +11,19 @@ export const login = async (email: string, password: string) => {
         // Get the ID token
         const idToken = await userCredential.user.getIdToken();
         
-        // Send ID token to your backend to create a session
-        const response = await fetch('/api/auth/session', {
+        // Create session directly with Flask backend
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/session`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${idToken}`
             },
             body: JSON.stringify({ idToken })
         });
 
-        if (!response.ok) throw new Error('Failed to create session');
+        if (!response.ok) {
+            throw new Error('Failed to create session');
+        }
         
         return userCredential;
     } catch (error) {
