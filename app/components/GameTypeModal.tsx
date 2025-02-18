@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faGamepad, faTrophy, faStar, faChevronRight } from '@fortawesome/free-solid-svg-icons'
 import { useRouter } from 'next/navigation'
 import { auth } from '@/app/firebase/firebase'
+import { useGame } from '@/app/context/GameContext'
 
 interface GameTypeModalProps {
     isOpen: boolean
@@ -20,6 +21,7 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
     const [showDetails, setShowDetails] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
+    const { setGameData } = useGame()
 
     const gameTypes = [
         {
@@ -71,17 +73,16 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
                     }
 
                     const idToken = await user.getIdToken(true)
-                    const response = await fetch('/api/game/initialize', {
+                    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/game/initialize-classic-game`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${idToken}`
                         },
                         body: JSON.stringify({
-                            gameType: 'classic',
-                            imageCount: imageCount,
-                            idToken: idToken
+                            imageCount: imageCount
                         })
-                    })
+                    });
 
                     if (!response.ok) {
                         const errorData = await response.json()
@@ -89,9 +90,21 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
                     }
 
                     const data = await response.json()
-                    console.log("Received game data:", data)
+                    console.log("Raw API response:", data)
+                    
+                    // Format images with the correct URL field - no more pairs, just single images
+                    const formattedImages = data.images.map((img: any, index: number) => ({
+                        id: index + 1,
+                        path: img.url,  // Use the url field from the API
+                        type: img.type
+                    }));
+
+                    console.log("Formatted images:", formattedImages)
+                    
+                    setGameData(data.gameId, imageCount, formattedImages)
+                    
                     closeModal()
-                    router.push(`/game/classic?gameId=${data.gameId}&count=${imageCount}`)
+                    router.push(`/game/classic`)
                 } catch (error: any) {
                     console.error('Failed to start game:', error)
                     setError(error.message)
