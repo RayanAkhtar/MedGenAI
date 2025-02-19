@@ -12,6 +12,7 @@
 
 # testing
 /coverage
+/app/test
 
 # next.js
 /.next/
@@ -44,3 +45,15 @@ __pycache__/
 .pytest_cache/
 backend/instance
 instance
+
+testscript.py
+
+# Python evnv
+venv/
+
+# Environment Variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
