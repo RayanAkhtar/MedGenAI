@@ -4,6 +4,14 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Navbar from '@/app/components/Navbar';
 
+// Import our new components
+
+import { ProgressBar } from './components/ProgressBar';
+import { GameStats } from './components/GameStats';
+import { ScoreBox } from './components/ScoreBox';
+import { Tags } from './components/Tags';
+import { BasicInformation } from './components/BasicInformation';
+
 // Updated type for all profile data fields
 interface UserProfileData {
   user_id: string;
@@ -33,12 +41,12 @@ export default function UserProfile() {
           throw new Error('Failed to fetch profile');
         }
         const data: UserProfileData = await response.json();
+        // If data is an array, use the first object
         if (Array.isArray(data)) {
-          setProfile(data[0]); // Extract the first object from the array
+          setProfile(data[0]);
         } else {
-          setProfile(data); // Set directly if not an array
-        }        console.log("Data", data)
-        console.log("Profile",profile); // Debugging purposes
+          setProfile(data);
+        }
       } catch (err) {
         setError((err as Error).message);
       } finally {
@@ -52,19 +60,31 @@ export default function UserProfile() {
   return (
     <div>
       <Navbar />
-      <div className="p-6">
-        <h1 className="text-2xl font-bold">User Profile</h1>
-        {loading && <p>Loading...</p>}
-        {error && <p className="text-red-500">Error: {error}</p>}
+      <div className="m-20 p-10">
+        <h1 className="text-5xl font-bold mb-10">User Profile</h1>
+        
+        {loading && <p className="text-2xl">Loading...</p>}
+        {error && <p className="text-red-500 text-2xl">Error: {error}</p>}
+        
         {profile && (
-          <div className="mt-4 p-4 border rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold">{profile.username}</h2>
-            <p className="text-gray-600">User ID: {profile.user_id}</p>
-            <p className="text-gray-600">Level: {profile.level}</p>
-            <p className="text-gray-600">Experience: {profile.exp}</p>
-            <p className="text-gray-600">Games Started: {profile.games_started}</p>
-            <p className="text-gray-600">Games Won: {profile.games_won}</p>
-            <p className="text-gray-600">Score: {profile.score}</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+            {/* Basic Info */}
+            <BasicInformation username={profile.username} userId={profile.user_id} />
+            
+            {/* Level and XP */}
+            <ProgressBar level={profile.level} exp={profile.exp} />
+
+            {/* Game Stats */}
+            <GameStats
+              gamesStarted={profile.games_started}
+              gamesWon={profile.games_won}
+            />
+
+            {/* Score Box */}
+            <ScoreBox score={profile.score} />
+
+            {/* Tags */}
+            <Tags />
           </div>
         )}
       </div>
