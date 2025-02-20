@@ -20,7 +20,7 @@ const UserFilters: React.FC<UserFiltersProps> = ({ filters, setFilters }) => {
   // Build an array of filter definitions
   const items: SelectFilterItemProps[] = [
     {
-      label: 'tags:',
+      label: 'Tags:',
       value: filters.tags,
       onChange: (newValue) => setFilters((prev) => ({ ...prev, tags: newValue })),
       options: [
