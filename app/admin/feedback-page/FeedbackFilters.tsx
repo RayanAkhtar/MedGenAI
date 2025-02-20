@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import Filters from '@/app/admin/feedback-page/Filters';
-import { SelectFilterItemProps } from '@/app/admin/feedback-page/SelectFilterItem';
+import Filters from '@/app/admin/Filters';
+import { SelectFilterItemProps } from '@/app/admin/SelectFilterItem';
 
 interface FiltersState {
   type: string;

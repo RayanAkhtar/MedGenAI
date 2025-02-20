@@ -3,19 +3,10 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Navbar from '@/app/components/Navbar';
-import Filters from '@/app/admin/feedback-page/Filters';
+import { Feedback } from '@/app/types/Feedback';
 import FeedbackTable from '@/app/admin/feedback-page/FeedbackTable';
-import Pagination from '@/app/admin/feedback-page/Pagination';
-import FeedbackFilters from './FeedbackFilters';
-
-interface Feedback {
-  image_id: string;
-  image_type: string;
-  unresolved_count: number;
-  last_feedback_time: string;
-  upload_time: string;
-  image_path: string;
-}
+import Pagination from '@/app/admin/Pagination';
+import FeedbackFilters from '@/app/admin/feedback-page/FeedbackFilters';
 
 const FeedbackPage = () => {
   const filterParam = useSearchParams()?.get('filter');
@@ -48,14 +39,17 @@ const FeedbackPage = () => {
   // 2. Main data fetch: once we get the raw data, convert image paths to local blob URLs
   const fetchData = async (page = 1) => {
     try {
+      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getFeedbacks?image_type=${filters.type}&resolved=${filters.resolved}&sort_by=${filters.sortBy}&sort_order=${filters.sortOrder}&page=${page}&limit=20`;
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getFeedbacks?image_type=${filters.type}&resolved=${filters.resolved}&sort_by=${filters.sortBy}&sort_order=${filters.sortOrder}&page=${page}&limit=20`
+        url
       );
+      console.log(url);
       const result = await response.json();
-
+      console.log("result: ", result);
       const itemsWithUrl = await Promise.all(
         result.map(async (item: Feedback) => {
           const localUrl = await fetchImage(item.image_path);
+          console.log(item.image_id);
           return {
             ...item,
             image_path: localUrl, // store the blob URL here
@@ -87,6 +81,7 @@ const FeedbackPage = () => {
 
   // Re-fetch data whenever filters or current page change
   useEffect(() => {
+    console.log("filters:", filters);
     fetchData(currentPage);
   }, [filters, currentPage]);
 

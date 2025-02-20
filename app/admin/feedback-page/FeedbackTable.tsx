@@ -1,16 +1,8 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Table from '@/app/admin/feedback-page/Table';
-
-interface Feedback {
-  image_id: string;
-  image_type: string;
-  unresolved_count: number;
-  last_feedback_time: string;
-  upload_time: string;
-  image_path: string;
-}
+import { Feedback } from '@/app/types/Feedback';
+import Table from '@/app/admin/Table';
 
 interface FeedbackTableProps {
   data: Feedback[];
@@ -20,6 +12,10 @@ const FeedbackTable: React.FC<FeedbackTableProps> = ({ data }) => {
   const [feedbacks, setFeedbacks] = useState<Feedback[]>(data);
   console.log("Data passed to FeedbackTable:", data);
 
+  useEffect(() => {
+    setFeedbacks(data);
+  }, [data]);  
+  
   const resolveFeedback = async (feedbackId: string) => {
     try {
       const response = await fetch(
@@ -88,7 +84,7 @@ const FeedbackTable: React.FC<FeedbackTableProps> = ({ data }) => {
   return (
     <Table
       columns={columns}
-      data={data}
+      data={feedbacks}
       renderRow={renderRow}
       getRowKey={getRowKey}
     />

@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import SelectFilterItem, { SelectFilterItemProps } from './SelectFilterItem';
+import SelectFilterItem, { SelectFilterItemProps } from '@/app/admin/SelectFilterItem';
 
 interface FiltersProps {
   items: SelectFilterItemProps[];

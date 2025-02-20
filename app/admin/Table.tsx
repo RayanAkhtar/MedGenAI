@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
-import TableHead from '@/app/admin/feedback-page/TableHead';
-import TableBody from '@/app/admin/feedback-page/TableBody';
+import TableHead from '@/app/admin/TableHead';
+import TableBody from '@/app/admin/TableBody';
 
 interface GenericTableProps<T> {
   columns: string[];
