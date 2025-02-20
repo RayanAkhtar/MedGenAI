@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Table from '@/app/admin/feedback-page/Table';
 
@@ -20,6 +20,10 @@ const FeedbackTable: React.FC<FeedbackTableProps> = ({ data }) => {
   const [feedbacks, setFeedbacks] = useState<Feedback[]>(data);
   console.log("Data passed to FeedbackTable:", data);
 
+  useEffect(() => {
+    setFeedbacks(data);
+  }, [data]);  
+  
   const resolveFeedback = async (feedbackId: string) => {
     try {
       const response = await fetch(
@@ -88,7 +92,7 @@ const FeedbackTable: React.FC<FeedbackTableProps> = ({ data }) => {
   return (
     <Table
       columns={columns}
-      data={data}
+      data={feedbacks}
       renderRow={renderRow}
       getRowKey={getRowKey}
     />
