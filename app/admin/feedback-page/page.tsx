@@ -3,18 +3,10 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Navbar from '@/app/components/Navbar';
+import { Feedback } from '@/app/types/Feedback';
 import FeedbackTable from '@/app/admin/feedback-page/FeedbackTable';
-import Pagination from '@/app/admin/feedback-page/Pagination';
+import Pagination from '@/app/admin/Pagination';
 import FeedbackFilters from '@/app/admin/feedback-page/FeedbackFilters';
-
-interface Feedback {
-  image_id: string;
-  image_type: string;
-  unresolved_count: number;
-  last_feedback_time: string;
-  upload_time: string;
-  image_path: string;
-}
 
 const FeedbackPage = () => {
   const filterParam = useSearchParams()?.get('filter');

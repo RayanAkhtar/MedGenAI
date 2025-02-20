@@ -1,16 +1,8 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Table from '@/app/admin/feedback-page/Table';
-
-interface Feedback {
-  image_id: string;
-  image_type: string;
-  unresolved_count: number;
-  last_feedback_time: string;
-  upload_time: string;
-  image_path: string;
-}
+import { Feedback } from '@/app/types/Feedback';
+import Table from '@/app/admin/Table';
 
 interface FeedbackTableProps {
   data: Feedback[];
