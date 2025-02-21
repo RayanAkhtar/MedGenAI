@@ -3,10 +3,18 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/app/context/AuthContext';
 import { useGame } from '@/app/context/GameContext';
+
+interface UserGuess {
+    imageId: number;
+    userGuessType: 'real' | 'ai';
+    correct: boolean;
+}
 
 export default function ClassicGame() {
     const router = useRouter();
+    const { user } = useAuth();
     const { gameId, imageCount, images, clearGameData } = useGame();
     
     const [score, setScore] = useState(0);
@@ -14,6 +22,8 @@ export default function ClassicGame() {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [showFeedback, setShowFeedback] = useState(false);
     const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
+    const [userGuesses, setUserGuesses] = useState<UserGuess[]>([]);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
         // Redirect if no game data is present
@@ -22,7 +32,7 @@ export default function ClassicGame() {
         }
     }, [gameId, imageCount, images, router]);
 
-    const handleGuess = (guess: 'real' | 'ai') => {
+    const handleGuess = async (guess: 'real' | 'ai') => {
         const currentImage = images[currentIndex];
         const correct = guess === currentImage.type;
         
@@ -30,6 +40,13 @@ export default function ClassicGame() {
         if (correct) {
             setScore(prev => prev + 1);
         }
+
+        // Store the guess
+        setUserGuesses(prev => [...prev, {
+            imageId: currentImage.id,
+            userGuessType: guess,
+            correct: correct
+        }]);
         
         setShowFeedback(true);
         
@@ -39,12 +56,44 @@ export default function ClassicGame() {
         }, 1500);
     };
 
+    const finishGame = async () => {
+        try {
+            setIsSubmitting(true);
+            const idToken = await user?.getIdToken(true);
+            
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/game/finish-classic-game`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${idToken}`
+                },
+                body: JSON.stringify({
+                    gameId: gameId,
+                    userGuesses: userGuesses
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to submit game results');
+            }
+
+            // Clear game data and redirect to dashboard
+            clearGameData();
+            router.push('/dashboard');
+        } catch (error) {
+            console.error('Error submitting game results:', error);
+            // You might want to show an error message to the user here
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
     // Show game completion
     const isGameComplete = currentIndex >= images.length;
 
     if (isGameComplete) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-100">
+            <div className="min-h-screen flex items-center justify-center bg-white dark:bg-white">
                 <div className="bg-white p-8 rounded-xl shadow-lg text-center max-w-md w-full">
                     <h2 className="text-3xl font-bold mb-6">Game Complete!</h2>
                     <p className="text-2xl mb-4">Final Score: {score}/{images.length}</p>
@@ -52,13 +101,16 @@ export default function ClassicGame() {
                         Accuracy: {Math.round((score / images.length) * 100)}%
                     </p>
                     <button 
-                        onClick={() => {
-                            clearGameData();
-                            router.push('/dashboard');
-                        }}
-                        className="w-full py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                        onClick={finishGame}
+                        disabled={isSubmitting}
+                        className="w-full py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 
+                                 transition-colors disabled:bg-blue-300 disabled:cursor-not-allowed"
                     >
-                        Return to Dashboard
+                        {isSubmitting ? (
+                            <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white mx-auto"></div>
+                        ) : (
+                            'Return to Dashboard'
+                        )}
                     </button>
                 </div>
             </div>
