@@ -1,8 +1,21 @@
 'use client'
 
+import { useRouter } from 'next/router'
 import Sidebar from '../components/Sidebar'
+import { useAuth } from '../context/AuthContext'
+import { useEffect, useState } from 'react'
 
 const competitions = [
+    {
+        name: 'Hello',
+        type: 'Dual',
+        link: '/game/dual/AL19JQ82TR',
+        totalPlayers: 0,
+        start: '2025-02-21',
+        deadline: '2025-02-28',
+        topPlayer: 'N/A',
+        topScore: 0
+    },
     {
         name: 'Global Coding Challenge',
         type: 'Dual',
@@ -36,6 +49,8 @@ const competitions = [
 ]
 
 export default function Competitions() {
+
+
     return (
         <div className="flex min-h-screen bg-white">
             <Sidebar />

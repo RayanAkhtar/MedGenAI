@@ -84,8 +84,7 @@ export default function Admin() {
               className="w-full border rounded p-2"
             >
               <option value="Single">Single</option>
-              <option value="Binary">Binary</option>
-              <option value="Endless">Endless</option>
+              <option value="Binary">Dual</option>
             </select>
           </div>
 
