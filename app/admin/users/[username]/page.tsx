@@ -25,7 +25,7 @@ interface UserProfileData {
 
 export default function UserProfile() {
   const params = useParams();
-  const userId = params?.user_id as string; // Explicitly cast userId as string
+  const username = params?.username as string; // Explicitly cast userId as string
 
   const [profile, setProfile] = useState<UserProfileData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -33,10 +33,10 @@ export default function UserProfile() {
 
   useEffect(() => {
     const fetchProfile = async () => {
-      if (!userId) return;
+      if (!username) return;
 
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getUsers/${userId}`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getUsers/${username}`);
         if (!response.ok) {
           throw new Error('Failed to fetch profile');
         }
@@ -55,7 +55,7 @@ export default function UserProfile() {
     };
 
     fetchProfile();
-  }, [userId]);
+  }, [username]);
 
   return (
     <div>
