@@ -53,9 +53,9 @@ export default function Login() {
     if (loading) return null;
 
     return (
-        <div className="flex min-h-screen">
+        <div className="flex min-h-screen bg-white dark:bg-white">
             {/* Left side - Login Form */}
-            <div className="w-1/2 flex flex-col items-center justify-center px-8 lg:px-16 border-r border-gray-200">
+            <div className="w-1/2 flex flex-col items-center jsamustify-center px-8 lg:px-16 border-r border-gray-200 bg-white dark:bg-white">
                 <div className="w-full max-w-md space-y-8">
                     {/* Logo */}
                     <div className="flex justify-center">
@@ -70,11 +70,11 @@ export default function Login() {
 
                     {/* Login Form */}
                     <div className="mt-10 space-y-6">
-                        <h2 className="text-center text-2xl font-semibold text-gray-900">
+                        <h2 className="text-center text-2xl font-semibold text-gray-900 dark:text-gray-900">
                             Sign in
                         </h2>
                         
-                        <p className="text-center text-sm text-gray-600">
+                        <p className="text-center text-sm text-gray-600 dark:text-gray-600">
                             or{' '}
                             <Link href="/signup" className="text-[var(--heartflow-blue)] hover:underline">
                                 create an account
@@ -82,14 +82,14 @@ export default function Login() {
                         </p>
 
                         {error && (
-                            <div className="p-3 text-sm text-red-500 bg-red-50 border border-red-200 rounded-md">
+                            <div className="p-3 text-sm text-red-500 bg-red-50 border border-red-200 rounded-md dark:bg-red-50 dark:border-red-200">
                                 {error}
                             </div>
                         )}
 
                         <form onSubmit={handleSubmit} className="mt-8 space-y-4">
                             <div>
-                                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                                <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-700">
                                     Email
                                 </label>
                                 <input
@@ -99,13 +99,15 @@ export default function Login() {
                                     required
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[var(--heartflow-blue)] focus:border-[var(--heartflow-blue)]"
+                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 
+                                             focus:outline-none focus:ring-[var(--heartflow-blue)] focus:border-[var(--heartflow-blue)] 
+                                             bg-white dark:bg-white dark:text-gray-900 dark:border-gray-300"
                                     placeholder="Email address"
                                 />
                             </div>
 
                             <div>
-                                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                                <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-700">
                                     Password
                                 </label>
                                 <input
@@ -115,7 +117,9 @@ export default function Login() {
                                     required
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[var(--heartflow-blue)] focus:border-[var(--heartflow-blue)]"
+                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 
+                                             focus:outline-none focus:ring-[var(--heartflow-blue)] focus:border-[var(--heartflow-blue)] 
+                                             bg-white dark:bg-white dark:text-gray-900 dark:border-gray-300"
                                     placeholder="Enter your password"
                                 />
                             </div>
@@ -123,10 +127,11 @@ export default function Login() {
                             <button
                                 type="submit"
                                 disabled={!isValidEmail || !password || isLoading}
-                                className={`w-full py-3 px-4 border border-transparent rounded-md shadow-sm text-white transition-all duration-200 flex items-center justify-center ${
+                                className={`w-full py-3 px-4 border border-transparent rounded-md shadow-sm text-white transition-all duration-200 
+                                          flex items-center justify-center ${
                                     isValidEmail && password && !isLoading
-                                    ? 'bg-[var(--heartflow-blue)] hover:bg-[var(--heartflow-blue)]/90 cursor-pointer' 
-                                    : 'bg-[#8DACC3] cursor-not-allowed'
+                                    ? 'bg-[var(--heartflow-blue)] hover:bg-[var(--heartflow-blue)]/90 cursor-pointer dark:bg-[var(--heartflow-blue)]' 
+                                    : 'bg-[#8DACC3] cursor-not-allowed dark:bg-[#8DACC3]'
                                 }`}
                             >
                                 {isLoading ? (
@@ -135,16 +140,15 @@ export default function Login() {
                                     'Sign in'
                                 )}
                             </button>
-
                         </form>
                     </div>
                 </div>
             </div>
 
-            {/* Right side - Image with padding and rounded corners */}
-            <div className="hidden md:block w-1/2 bg-white p-12">
-                <div className="h-full w-full relative bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-200">
-                    <div className="">
+            {/* Right side - Image */}
+            <div className="hidden md:block w-1/2 p-12">
+                <div className="h-full w-full relative bg-white dark:bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-200">
+                    <div className="bg-white dark:bg-white">
                         <Image
                             src="/images/heartblueimage.webp"
                             alt="Login Background"
