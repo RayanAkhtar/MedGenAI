@@ -59,11 +59,11 @@ const Sidebar = () => {
                         Dashboard
                     </Link>
                     
-                    <Link href="/challenges" 
+                    <Link href="/competitions" 
                         className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg"
                     >
                         <FontAwesomeIcon icon={faGamepad} className="w-5 h-5 mr-3" />
-                        Challenges
+                        Competitions
                     </Link>
 
                     <Link href="/leaderboard" 
