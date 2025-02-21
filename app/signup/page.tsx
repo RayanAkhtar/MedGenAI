@@ -87,6 +87,7 @@ export default function Signup() {
                     {/* Signup Form */}
                     <div className="mt-10 space-y-6">
                         <h2 className="text-center text-2xl font-semibold text-gray-900">
+
                             Signup to join COD
                         </h2>
 
@@ -109,7 +110,9 @@ export default function Signup() {
                                         required
                                         value={firstName}
                                         onChange={(e) => setFirstName(e.target.value)}
-                                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[var(--heartflow-blue)] focus:border-[var(--heartflow-blue)]"
+                                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
+                                                 placeholder-gray-400 text-gray-900
+                                                 focus:outline-none focus:ring-[var(--heartflow-blue)] focus:border-[var(--heartflow-blue)]"
                                         placeholder="John"
                                         disabled={showPassword}
                                     />
@@ -125,7 +128,9 @@ export default function Signup() {
                                         required
                                         value={lastName}
                                         onChange={(e) => setLastName(e.target.value)}
-                                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[var(--heartflow-blue)] focus:border-[var(--heartflow-blue)]"
+                                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
+                                                 placeholder-gray-400 text-gray-900
+                                                 focus:outline-none focus:ring-[var(--heartflow-blue)] focus:border-[var(--heartflow-blue)]"
                                         placeholder="Doe"
                                         disabled={showPassword}
                                     />
@@ -143,7 +148,9 @@ export default function Signup() {
                                     required
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[var(--heartflow-blue)] focus:border-[var(--heartflow-blue)]"
+                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
+                                             placeholder-gray-400 text-gray-900
+                                             focus:outline-none focus:ring-[var(--heartflow-blue)] focus:border-[var(--heartflow-blue)]"
                                     placeholder="name@company.com"
                                     disabled={showPassword}
                                 />
@@ -161,7 +168,9 @@ export default function Signup() {
                                         required
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
-                                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[var(--heartflow-blue)] focus:border-[var(--heartflow-blue)]"
+                                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
+                                                 placeholder-gray-400 text-gray-900
+                                                 focus:outline-none focus:ring-[var(--heartflow-blue)] focus:border-[var(--heartflow-blue)]"
                                         placeholder="Enter your password"
                                     />
                                 </div>
@@ -174,7 +183,7 @@ export default function Signup() {
                                     (isValidEmail && (!showPassword || password) && firstName && lastName && !isLoading)
                                     ? 'bg-[var(--heartflow-blue)] hover:bg-[var(--heartflow-blue)]/90 cursor-pointer' 
                                     : 'bg-[#8DACC3] cursor-not-allowed'
-                                    }`}
+                                }`}
                             >
                                 {isLoading ? (
                                     <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>
