@@ -14,7 +14,7 @@ export function ProgressBar({ level, exp, maxExp = 1000 }: ProgressBarProps) {
 
   return (
     <div className="p-10 border rounded-lg shadow-md text-2xl">
-      <h2 className="text-3xl font-semibold">Progress</h2>
+      <h2 className="text-3xl font-semibold text-center">Progress</h2>
       <p className="text-gray-600">Level: {level}</p>
 
       <div className="w-full bg-gray-200 rounded-full h-6 mt-2 relative overflow-hidden">
