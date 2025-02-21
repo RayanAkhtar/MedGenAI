@@ -19,15 +19,23 @@ interface User {
 const UserPage = () => {
   const [data, setData] = useState<User[]>([]);
   const [filters, setFilters] = useState({
-    tags: 'Lung Legend',
-    all: false,
+    tags: [],
+    all: 'any',
     sortBy: 'level',
     sortOrder: 'desc',
   });
 
   const fetchData = async () => {
     try {
-      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/filter-users?tags=${filters.tags}&all=${filters.all}&sort_by=${filters.sortBy}&desc=${filters.sortOrder === 'desc'}`;
+      if (filters.tags.length === 0) {
+        setData([])
+        return;
+      }
+      const tagsParam = filters.tags
+        .map((tag) => `tags=${encodeURIComponent(tag)}`)
+        .join('&');
+      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/filter-users?${tagsParam}&all=${filters.all == 'all'}&sort_by=${filters.sortBy}&desc=${filters.sortOrder === 'desc'}`;
+      console.log(url);
       const response = await fetch(url);
       const result = await response.json();
       setData(result);
