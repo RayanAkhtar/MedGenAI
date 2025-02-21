@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import Navbar from '@/app/components/Navbar';
 import { Feedback } from '@/app/types/Feedback';
 import FeedbackTable from '@/app/admin/feedback-page/FeedbackTable';
@@ -89,9 +90,11 @@ const FeedbackPage = () => {
     <div className="bg-white">
       <Navbar />
       <div className="mt-10">
-        <button className="ml-5 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-all">
-          Back to Admin
-        </button>
+        <Link href="/admin">
+          <button className="ml-5 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-all">
+            Back to Admin
+          </button>
+        </Link>
       </div>
       <div className="h-screen bg-white text-black overflow-y-auto">
         <h1 className="text-3xl font-bold text-center py-8">Feedback Page</h1>
