@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import Filters from '@/app/admin/Filters';
 import { SelectFilterItemProps } from '@/app/admin/SelectFilterItem';
 
-interface FiltersState {
+export interface FiltersState {
   tags: string[];
   all: string;
   sortBy: string;

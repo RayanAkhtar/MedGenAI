@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import Navbar from '@/app/components/Navbar';
 import UserTable from '@/app/admin/user-page/UserTable';
 import Pagination from '@/app/admin/Pagination';
-import UserFilters from '@/app/admin/user-page/UserFilters';
+import UserFilters, { FiltersState } from '@/app/admin/user-page/UserFilters';
 
 interface User {
   username: string;
@@ -18,7 +18,7 @@ interface User {
 
 const UserPage = () => {
   const [data, setData] = useState<User[]>([]);
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState<FiltersState>({
     tags: [],
     all: 'any',
     sortBy: 'level',
