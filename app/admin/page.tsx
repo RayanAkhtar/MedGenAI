@@ -28,10 +28,10 @@ export default function Admin() {
         const aiImages = (await aiImagesResponse.json());
 
         setTotalImagesData({
-          realImages: realImages[0].totalreal || 0,
-          aiImages: aiImages[0].totalai || 0,
-          realImagesPercent: (realImages[0].percentagedetected || 0) * 100,
-          aiImagesPercent: (aiImages[0].percentagedetected || 0) * 100,
+          realImages: realImages.totalReal || 0,
+          aiImages: aiImages.totalAI || 0,
+          realImagesPercent: (realImages.percentageDetected || 0) * 100,
+          aiImagesPercent: (aiImages.percentageDetected || 0) * 100,
         });
 
         console.log("Real images", realImages)
