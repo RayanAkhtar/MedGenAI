@@ -53,19 +53,22 @@ export default function Login() {
     if (loading) return null;
 
     return (
+
         <div className="flex min-h-screen bg-white dark:bg-white">
             {/* Left side - Login Form */}
             <div className="w-1/2 flex flex-col items-center jsamustify-center px-8 lg:px-16 border-r border-gray-200 bg-white dark:bg-white">
                 <div className="w-full max-w-md space-y-8">
                     {/* Logo */}
                     <div className="flex justify-center">
-                        <Image
-                            src="/images/heartflow-logo-blue.svg"
-                            alt="HeartFlow Logo"
-                            width={200}
-                            height={50}
-                            priority
-                        />
+                        <Link href="/">
+                            <Image
+                                src="/images/cod_logo_full.png"
+                                alt="HeartFlow Logo"
+                                width={350}
+                                height={50}
+                                priority
+                                />
+                        </Link>
                     </div>
 
                     {/* Login Form */}

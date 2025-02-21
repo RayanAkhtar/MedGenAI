@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/app/context/AuthContext'
 import { signup } from '@/app/firebase/signup'
+import Navbar from '../components/Navbar'
 
 export default function Signup() {
     const [firstName, setFirstName] = useState('')
@@ -35,12 +36,11 @@ export default function Signup() {
         e.preventDefault()
         if (isValidEmail && password) {
             setIsLoading(true)
-            setError('')  // Clear any previous errors
+            setError('')
             try {
                 await signup(email, password, `${firstName} ${lastName}`)
                 router.push('/dashboard')
             } catch (error: any) {
-                // Handle specific Firebase error messages
                 if (error.code === 'auth/email-already-in-use') {
                     setError('An account with this email already exists')
                 } else if (error.code === 'auth/weak-password') {
@@ -54,7 +54,6 @@ export default function Signup() {
         }
     }
 
-    // Update validation whenever email changes
     useEffect(() => {
         setIsValidEmail(validateEmail(email))
     }, [email])
@@ -70,15 +69,16 @@ export default function Signup() {
 
 
     return (
-        <div className="flex min-h-screen bg-white dark:bg-white">
-            <div className="flex flex-col items-center justify-center px-8 lg:px-16 w-full">
+        <div>
+            <Navbar />
+            <div className="bg-white flex flex-col items-center justify-center min-h-screen py-12 px-4 sm:px-6 lg:px-8">
                 <div className="w-full max-w-md space-y-8">
                     {/* Logo */}
                     <div className="flex justify-center">
                         <Image
-                            src="/images/heartflow-logo-blue.svg"
-                            alt="HeartFlow Logo"
-                            width={200}
+                            src="/images/cod_logo_full.png"
+                            alt="Call of Diagnosis Logo"
+                            width={350}
                             height={50}
                             priority
                         />
@@ -87,7 +87,8 @@ export default function Signup() {
                     {/* Signup Form */}
                     <div className="mt-10 space-y-6">
                         <h2 className="text-center text-2xl font-semibold text-gray-900">
-                            Signup to join Medical GenAI
+
+                            Signup to join COD
                         </h2>
 
                         {error && (
@@ -213,6 +214,6 @@ export default function Signup() {
                     </div>
                 </div>
             </div>
-        </div>
+        </ div>
     )
 }

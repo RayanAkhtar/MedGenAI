@@ -6,19 +6,18 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import { faLock } from '@fortawesome/free-solid-svg-icons'
 import '@fortawesome/fontawesome-svg-core/styles.css'
 
-// Add icons to library
 library.add(faLock)
 
 const Navbar = () => {
     return (
         <nav className="flex items-center justify-between px-8 py-5 bg-white shadow-sm">
-            <Link href="/" className="ml-4 sm:ml-6 md:ml-8 lg:ml-10">
+            <Link href="/" className="ml-2 sm:ml-2 md:ml-2 lg:ml-2">
                 <Image 
-                    src="images/heartflow-logo-blue.svg" 
+                    src="/images/cod_logo_full.png" 
                     alt="Logo" 
-                    width={140}
+                    width={200}
                     height={8}
-                    className="w-[120px] sm:w-[140px] md:w-[160px] lg:w-[180px] h-auto my-auto"
+                    className=""
                     priority
                 />
             </Link>
