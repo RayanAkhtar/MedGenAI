@@ -72,64 +72,69 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
 
   const handleGameSelect = async (route: string) => {
     if (route === "/game/classic") {
-      if (imageCount && selectedBoard) {
-      try {
-        setIsLoading(true);
-        const user = auth.currentUser;
-        if (!user) {
-        throw new Error("No user logged in");
-        }
-
-        const idToken = await user.getIdToken(true);
-        const apiUrl =
-        selectedBoard === "Single"
-          ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/game/initialize-classic-game`
-          : `${process.env.NEXT_PUBLIC_API_BASE_URL}/game/initialize-classic-${selectedBoard.toLowerCase()}-game`;
-
-        const response = await fetch(apiUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${idToken}`,
-        },
-        body: JSON.stringify({
-          imageCount: imageCount,
-        }),
-        });
-
-        if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to initialize game");
-        }
-
-        const data = await response.json();
-        console.log("Raw API response:", data);
-
-        const formattedImages = data.images.map(
-        (img: any, index: number) => ({
-          id: index + 1,
-          path: img.url,
-          type: img.type,
-        })
-        );
-
-        console.log("Formatted images:", formattedImages);
-
-        setGameData(data.gameId, imageCount, formattedImages);
-
+      if (selectedBoard === "Dual" && imageCount === 10) {
         closeModal();
-        router.push(`${route}/${selectedBoard}`);
-      } catch (error: any) {
-        console.error("Failed to start game:", error);
-        setError(error.message);
-      } finally {
-        setIsLoading(false);
-      }
+        router.push(`${route}/${selectedBoard.toLowerCase()}/AL19JQ82TR`);
+      } else if (imageCount && selectedBoard) {
+        try {
+          setIsLoading(true);
+          const user = auth.currentUser;
+          if (!user) {
+            throw new Error("No user logged in");
+          }
+
+          const idToken = await user.getIdToken(true);
+          const apiUrl =
+            selectedBoard === "Single"
+              ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/game/initialize-classic-game`
+              : `${
+                  process.env.NEXT_PUBLIC_API_BASE_URL
+                }/game/initialize-classic-${selectedBoard.toLowerCase()}-game`;
+
+          const response = await fetch(apiUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${idToken}`,
+            },
+            body: JSON.stringify({
+              imageCount: imageCount,
+            }),
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || "Failed to initialize game");
+          }
+
+          const data = await response.json();
+          console.log("Raw API response:", data);
+
+          const formattedImages = data.images.map(
+            (img: any, index: number) => ({
+              id: index + 1,
+              path: img.url,
+              type: img.type,
+            })
+          );
+
+          console.log("Formatted images:", formattedImages);
+
+          setGameData(data.gameId, imageCount, formattedImages);
+
+          closeModal();
+          router.push(`${route}/${selectedBoard.toLowerCase()}`);
+        } catch (error: any) {
+          console.error("Failed to start game:", error);
+          setError(error.message);
+        } finally {
+          setIsLoading(false);
+        }
       }
     } else if (route === "/game/custom") {
       if (selectedBoard && customCode) {
         closeModal();
-        router.push(`${route}/${selectedBoard}/${customCode}`);
+        router.push(`${route}/${selectedBoard.toLowerCase()}/${customCode}`);
       }
     } else if (route === "/game/competition") {
       closeModal();
@@ -157,7 +162,7 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
             <Dialog.Panel className="w-full max-w-4xl transform rounded-2xl bg-white shadow-xl transition-all overflow-hidden">
               <div className="flex h-[500px]">
                 <div className="w-1/2 p-6 border-r border-gray-200 overflow-y-auto">
-                  <Dialog.Title className="text-lg font-medium text-gray-900 mb-4">
+                  <Dialog.Title className="text-lg font-medium text-black mb-4">
                     Select Game Mode
                   </Dialog.Title>
 
@@ -184,10 +189,10 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
                             />
                           </div>
                           <div className="ml-4 text-left">
-                            <h4 className="text-base font-medium text-gray-900">
+                            <h4 className="text-base font-medium text-black">
                               {mode.name}
                             </h4>
-                            <p className="text-sm text-gray-500">
+                            <p className="text-sm text-black">
                               {mode.description}
                             </p>
                           </div>
@@ -211,14 +216,14 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
                       <div className="p-6">
                         {selectedGameMode ? (
                           <div className="flex flex-col h-full">
-                            <h3 className="text-lg font-medium text-gray-900 mb-4">
+                            <h3 className="text-lg font-medium text-black mb-4">
                               {selectedGameMode.name} Mode
                             </h3>
 
                             <div className="flex-1 min-h-0">
                               {selectedGameMode.name !== "Competition" && (
                                 <div className="mt-6">
-                                  <h4 className="text-sm font-medium text-gray-700 mb-3">
+                                  <h4 className="text-sm font-medium text-black mb-3">
                                     Select Game Board
                                   </h4>
                                   <div className="grid grid-cols-2 gap-2">
@@ -246,7 +251,7 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
                               {selectedGameMode.name === "Classic" &&
                                 selectedBoard && (
                                   <div className="mt-6">
-                                    <h4 className="text-sm font-medium text-gray-700 mb-3">
+                                    <h4 className="text-sm font-medium text-black mb-3">
                                       Number of Images
                                     </h4>
                                     <div className="grid grid-cols-4 gap-2">
@@ -274,7 +279,7 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
                               {selectedGameMode.name === "Custom" &&
                                 selectedBoard && (
                                   <div className="mt-6">
-                                    <h4 className="text-sm font-medium text-gray-700 mb-3">
+                                    <h4 className="text-sm font-medium text-black mb-3">
                                       Enter Custom Code
                                     </h4>
                                     <input
@@ -313,7 +318,7 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
                             </button>
                           </div>
                         ) : (
-                          <div className="h-full flex items-center justify-center text-gray-500">
+                          <div className="h-full flex items-center justify-center text-black">
                             Select a game type to see details
                           </div>
                         )}
