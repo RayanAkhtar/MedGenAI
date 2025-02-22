@@ -33,6 +33,8 @@ export default function Admin() {
           realImagesPercent: (realImages.percentageDetected || 0) * 100,
           aiImagesPercent: (aiImages.percentageDetected || 0) * 100,
         });
+
+        console.log("Real images", realImages)
       } catch (error) {
         console.error("Error fetching data:", error);
       }

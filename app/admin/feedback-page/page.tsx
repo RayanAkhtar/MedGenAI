@@ -1,10 +1,10 @@
 'use client'
 
 import Navbar from '@/app/components/Navbar'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
-
+import Image from 'next/image'
 
 interface Feedback {
   image_id: string;
@@ -28,22 +28,21 @@ const FeedbackPage = () => {
   const [currentPage, setCurrentPage] = useState<number>(1)
   const [totalPages, setTotalPages] = useState<number>(1)
 
-  const fetchFeedbacks = async (page = 1): Promise<void> => {
+  const fetchFeedbacks = useCallback(async (page = 1): Promise<void> => {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getFeedbacks?image_type=${imageType}&resolved=${resolved}&sort_by=${sortBy}&sort_order=${sortOrder}&page=${page}&limit=20` // Added sort_order
-    )
-    const data = await response.json()
-    setFeedbacks(data)
-  }
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getFeedbacks?image_type=${imageType}&resolved=${resolved}&sort_by=${sortBy}&sort_order=${sortOrder}&page=${page}&limit=20`
+    );
+    const data = await response.json();
+    setFeedbacks(data);
+  }, [imageType, resolved, sortBy, sortOrder]);
 
-  const fetchFeedbackCount = async (): Promise<void> => {
+  const fetchFeedbackCount = useCallback(async (): Promise<void> => {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getFeedbackCount?image_type=${imageType}&resolved=${resolved}`
-    )
-    const data: { total_count: number } = await response.json()
-
-    setTotalPages(Math.ceil(data.total_count / 20))
-  }
+    );
+    const data: { total_count: number } = await response.json();
+    setTotalPages(Math.ceil(data.total_count / 20));
+  }, [imageType, resolved]);
 
   const fetchImage = async (imagePath: string): Promise<string | null> => {
     try {
@@ -87,9 +86,9 @@ const FeedbackPage = () => {
   
 
   useEffect(() => {
-    fetchFeedbacks(currentPage)
-    fetchFeedbackCount()
-  }, [imageType, resolved, sortBy, sortOrder, currentPage])
+    fetchFeedbacks(currentPage);
+    fetchFeedbackCount();
+  }, [fetchFeedbacks, fetchFeedbackCount, currentPage]);
 
   useEffect(() => {
     const loadImages = async (): Promise<void> => {
@@ -209,10 +208,12 @@ const FeedbackPage = () => {
                 >
                   <td className='px-6 py-4'>
                     {images[feedback.image_id] ? (
-                      <img
+                      <Image
                         src={images[feedback.image_id]}
                         alt={feedback.image_id}
                         width={100}
+                        height={100}
+                        layout="intrinsic"
                       />
                     ) : (
                       <span>Loading...</span>

@@ -80,10 +80,10 @@ export default function ClassicGame() {
                         onClick={e => e.stopPropagation()}
                     >
                         <h2 className="text-2xl font-bold mb-4">Game #{gameId}</h2>
-                        <p className="mb-6">Analyze {imageCount} images and determine if they're real or AI-generated.</p>
+                        <p className="mb-6">Analyze {imageCount} images and determine if they&apos;re real or AI-generated.</p>
                         <ul className="mb-6 space-y-2">
                             <li>• Each correct guess earns you a point</li>
-                            <li>• You'll get immediate feedback after each guess</li>
+                            <li>• You&apos;ll get immediate feedback after each guess</li>
                             <li>• Try to get the highest score possible!</li>
                         </ul>
                         <button 
