@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '@/app/context/AuthContext'
 import { signup } from '@/app/firebase/signup'
 import Navbar from '../components/Navbar'
+import { FirebaseError } from 'firebase/app'
 
 export default function Signup() {
     const [firstName, setFirstName] = useState('')
@@ -40,13 +41,17 @@ export default function Signup() {
             try {
                 await signup(email, password, `${firstName} ${lastName}`)
                 router.push('/dashboard')
-            } catch (error: any) {
-                if (error.code === 'auth/email-already-in-use') {
-                    setError('An account with this email already exists')
-                } else if (error.code === 'auth/weak-password') {
-                    setError('Password should be at least 6 characters')
+            } catch (error) {
+                if (error instanceof FirebaseError) {
+                    if (error.code === 'auth/email-already-in-use') {
+                        setError('An account with this email already exists')
+                    } else if (error.code === 'auth/weak-password') {
+                        setError('Password should be at least 6 characters')
+                    } else {
+                        setError('Failed to create account. Please try again.')
+                    }
                 } else {
-                    setError('Failed to create account. Please try again.')
+                    setError('An unknown error occurred.')
                 }
             } finally {
                 setIsLoading(false)

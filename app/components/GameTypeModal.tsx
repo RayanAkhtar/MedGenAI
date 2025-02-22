@@ -7,7 +7,6 @@ import {
   faGamepad,
   faTrophy,
   faStar,
-  faChevronRight,
 } from "@fortawesome/free-solid-svg-icons";
 import { useRouter } from "next/navigation";
 import { auth } from "@/app/firebase/firebase";
@@ -18,15 +17,24 @@ interface GameTypeModalProps {
   closeModal: () => void;
 }
 
+interface ImageData {
+  url: string;
+  type: string;
+}
+
+interface GameResponse {
+  images: ImageData[];
+  gameId: string;
+}
+
 const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
   const router = useRouter();
   const [hoveredType, setHoveredType] = useState<string | null>(null);
-  const [selectedType, setSelectedType] = useState<string | null>(null);
   const [selectedMode, setSelectedMode] = useState<string | null>(null);
   const [imageCount, setImageCount] = useState<number | null>(null);
   const [showDetails, setShowDetails] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [errorState, setError] = useState<string | null>(null);
   const { setGameData } = useGame();
 
   const gameModes = [
@@ -53,20 +61,20 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
     },
   ];
 
-  const gameBoards = [
-    {
-      name: "Single",
-      description: "One image at a time",
-      icon: faGamepad,
-      color: "bg-green-500",
-    },
-    {
-      name: "Dual",
-      description: "Choose counter factual from a pair of images",
-      icon: faTrophy,
-      color: "bg-red-500",
-    },
-  ];
+  // const gameBoards = [
+  //   {
+  //     name: "Single",
+  //     description: "One image at a time",
+  //     icon: faGamepad,
+  //     color: "bg-green-500",
+  //   },
+  //   {
+  //     name: "Dual",
+  //     description: "Choose counter factual from a pair of images",
+  //     icon: faTrophy,
+  //     color: "bg-red-500",
+  //   },
+  // ];
 
   // const gameTypes = [
   //     {
@@ -136,13 +144,13 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
             const errorData = await response.json();
             throw new Error(errorData.error || "Failed to initialize game");
           }
-
-          const data = await response.json();
+  
+          const data: GameResponse = await response.json();
           console.log("Raw API response:", data);
 
           // Format images with the correct URL field - no more pairs, just single images
           const formattedImages = data.images.map(
-            (img: any, index: number) => ({
+            (img: ImageData, index: number) => ({
               id: index + 1,
               path: img.url, // Use the url field from the API
               type: img.type,
@@ -155,21 +163,24 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
 
           closeModal();
           router.push(`/game/classic`);
-        } catch (error: any) {
-          console.error("Failed to start game:", error);
-          setError(error.message);
+        } catch (error: unknown) {
+          if (error instanceof Error) {
+            console.error("Failed to start game:", error);
+            setError(error.message);
+          } else {
+            setError("An unknown error occured");
+          }
+          console.log(errorState);
         } finally {
           setIsLoading(false);
         }
       }
-    } else if (route === "/game/competition") {
-      closeModal();
-      router.push(route);
     } else {
       closeModal();
       router.push(route);
     }
   };
+  
 
   const handleMouseEnter = (name: string) => {
     setHoveredType(name);

@@ -9,8 +9,38 @@ import SampleDifficulty from './ImageDifficulty';
 import Navbar from '@/app/components/Navbar';
 import Link from 'next/link';
 
+
+interface MetricsData {
+  accuracyData: {
+    accuracy: number;
+    month: string;
+  }[];
+  confusionMatrix: {
+    truepositive: number;
+    falsepositive: number;
+    truenegative: number;
+    falsenegative: number;
+  };
+  accuracy: number;
+  precision: number;
+  recall: number;
+  f1Score: number;
+  leaderboardData: {
+    accuracy: number;
+    user_id: number;
+    username: string;
+  }[];
+  sampleDifficulty: {
+    difficulty_score: string;
+    image_id: string;
+    image_path: string;
+    incorrect_guesses: number;
+    total_guesses: number;
+  }[];
+}
+
 const MetricsPage = () => {
-  const [metricsData, setMetricsData] = useState<any>(null);
+  const [metricsData, setMetricsData] = useState<MetricsData | null>(null);
 
   const fetchData = async () => {
     try {
@@ -19,8 +49,8 @@ const MetricsPage = () => {
 
       const confusionMatrixResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getConfusionMatrix`);
       const confusionMatrixData = await confusionMatrixResponse.json();
-      confusionMatrixData.truepositive = 1
-      confusionMatrixData.falsepositive = 1
+      confusionMatrixData.truepositive = 1;
+      confusionMatrixData.falsepositive = 1;
 
       const mlMetricsResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getMLMetrics`);
       const mlMetricsData = await mlMetricsResponse.json();
@@ -28,23 +58,23 @@ const MetricsPage = () => {
       const leaderboardResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getLeaderboard`);
       const leaderboardData = await leaderboardResponse.json();
 
-
       const sampleDifficultyResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getImageDifficulty`);
       const sampleDifficultyData = await sampleDifficultyResponse.json();
+      console.log("sample difficulty data", sampleDifficultyData)
 
       setMetricsData({
-        accuracyData: accuracyData,
+        accuracyData,
         confusionMatrix: confusionMatrixData,
         accuracy: mlMetricsData.accuracy,
         precision: mlMetricsData.precision,
         recall: mlMetricsData.recall,
         f1Score: mlMetricsData.f1Score,
-        leaderboardData: leaderboardData,
+        leaderboardData,
         sampleDifficulty: sampleDifficultyData,
       });
       
     } catch (error) {
-      console.error("Error fetching metrics data:", error);
+      console.error('Error fetching metrics data:', error);
     }
   };
 
