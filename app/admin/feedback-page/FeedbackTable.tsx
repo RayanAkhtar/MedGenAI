@@ -40,7 +40,11 @@ const FeedbackTable: React.FC<FeedbackTableProps> = ({ data }) => {
 
   const columns = [
     'Image',
-    'Image Type',
+    'Type',
+    'Gender',
+    'Race',
+    'Age',
+    'Disease',
     'Unresolved Feedback',
     'Last Feedback Time',
     'Upload Time',
@@ -63,6 +67,10 @@ const FeedbackTable: React.FC<FeedbackTableProps> = ({ data }) => {
         )}
       </td>
       <td className="px-6 py-4">{item.image_type}</td>
+      <td className="px-6 py-4">{item.gender}</td>
+      <td className="px-6 py-4">{item.race}</td>
+      <td className="px-6 py-4">{item.age}</td>
+      <td className="px-6 py-4">{item.disease}</td>
       <td className="px-6 py-4">{item.unresolved_count}</td>
       <td className="px-6 py-4">
         {new Date(item.last_feedback_time).toLocaleString()}
