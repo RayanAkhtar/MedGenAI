@@ -8,7 +8,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { 
     faMedal, 
     faFire, 
-    faTrophy,
     faGamepad,
     faBullseye,
     faChartLine

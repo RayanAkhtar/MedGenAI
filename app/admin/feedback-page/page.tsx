@@ -1,4 +1,20 @@
-'use client';
+'use client'
+
+import Navbar from '@/app/components/Navbar'
+import { useState, useEffect, useCallback } from 'react'
+import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
+import Image from 'next/image'
+
+interface Feedback {
+  image_id: string;
+  image_type: string;
+  unresolved_count: number;
+  last_feedback_time: string;
+  upload_time: string;
+  image_path: string;
+}
+
 
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
@@ -22,6 +38,21 @@ const FeedbackPage = () => {
 
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
+  const fetchFeedbacks = useCallback(async (page = 1): Promise<void> => {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getFeedbacks?image_type=${imageType}&resolved=${resolved}&sort_by=${sortBy}&sort_order=${sortOrder}&page=${page}&limit=20`
+    );
+    const data = await response.json();
+    setFeedbacks(data);
+  }, [imageType, resolved, sortBy, sortOrder]);
+
+  const fetchFeedbackCount = useCallback(async (): Promise<void> => {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getFeedbackCount?image_type=${imageType}&resolved=${resolved}`
+    );
+    const data: { total_count: number } = await response.json();
+    setTotalPages(Math.ceil(data.total_count / 20));
+  }, [imageType, resolved]);
 
   // 1. Helper function to fetch the actual image and create a local blob URL
   const fetchImage = async (imagePath: string): Promise<string | null> => {

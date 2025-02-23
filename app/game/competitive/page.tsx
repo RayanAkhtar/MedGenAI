@@ -28,7 +28,7 @@ export default function CompetitiveGame() {
       }, 1000);
       return () => clearInterval(timer);
     }
-  }, [showRules]);
+  }, [showRules, timeLeft]);
 
   const loadNextImages = () => {
     // TODO: Replace with real image loading
