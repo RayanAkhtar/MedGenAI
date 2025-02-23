@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Image from 'next/image';
 
 interface ImageDifficultyProps {
   sampleDifficulty: { image_id: string; difficulty_score: string; image_path: string; total_guesses: number; incorrect_guesses: number}[];
@@ -61,7 +62,13 @@ const SampleDifficulty = ({ sampleDifficulty }: ImageDifficultyProps) => {
               <tr key={index} className="border-b">
                 <td className="px-4 py-2 text-sm">
                   {images[sample.image_id] ? (
-                    <img src={images[sample.image_id]} alt={sample.image_id} width={50} />
+                    <Image
+                      src={images[sample.image_id]}
+                      alt={sample.image_id}
+                      width={50}
+                      height={50}
+                      layout="intrinsic"
+                    />
                   ) : (
                     <span>Loading...</span>
                   )}

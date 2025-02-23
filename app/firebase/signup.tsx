@@ -17,14 +17,14 @@ export const signup = async (email: string, password: string, fullName: string) 
         const idToken = await userCredential.user.getIdToken();
         
         // 4. Register user in backend database
-        const registerResponse = await fetch('http://localhost:5328/auth/register', {
+        const registerResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/register`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${idToken}`
             },
             body: JSON.stringify({
-                username: fullName // or you could generate a username from the email/name
+                username: fullName
             })
         });
 
@@ -34,11 +34,12 @@ export const signup = async (email: string, password: string, fullName: string) 
             throw new Error('Failed to register user in backend');
         }
 
-        // 5. Create session
-        const sessionResponse = await fetch('/api/auth/session', {
+        // 5. Create session directly with Flask backend instead of going through Next.js API
+        const sessionResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/session`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${idToken}`
             },
             body: JSON.stringify({ idToken })
         });

@@ -3,12 +3,9 @@ export interface MLMetricsProps {
     precision: number;
     recall: number;
     f1Score: number;
-    confusionMatrix: {
-      [key: string]: number;
-    };
   }
 
-export const MLMetrics = ({ accuracy, precision, recall, f1Score, confusionMatrix }: MLMetricsProps) => {
+export const MLMetrics = ({ accuracy, precision, recall, f1Score}: MLMetricsProps) => {
     return (
       <div className="mb-12">
         <h3 className="text-2xl font-semibold text-center mb-6">Machine Learning Metrics</h3>
