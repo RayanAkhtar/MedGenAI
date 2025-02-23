@@ -1,11 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Navbar from '@/app/components/Navbar';
 import UserTable from '@/app/admin/user-page/UserTable';
-import Pagination from '@/app/admin/Pagination';
 import UserFilters, { FiltersState } from '@/app/admin/user-page/UserFilters';
 
 interface User {

@@ -1,6 +1,8 @@
 'use client';
+
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Feedback } from '@/app/types/Feedback';
 import Table from '@/app/admin/Table';
 
@@ -14,8 +16,8 @@ const FeedbackTable: React.FC<FeedbackTableProps> = ({ data }) => {
 
   useEffect(() => {
     setFeedbacks(data);
-  }, [data]);  
-  
+  }, [data]);
+
   const resolveFeedback = async (feedbackId: string) => {
     try {
       const response = await fetch(
@@ -50,7 +52,12 @@ const FeedbackTable: React.FC<FeedbackTableProps> = ({ data }) => {
     <tr key={item.image_id} className="hover:bg-blue-100 transition-all">
       <td className="px-6 py-4">
         {item.image_path ? (
-          <img src={item.image_path} alt={item.image_id} width={100} />
+          <Image
+            src={item.image_path}
+            alt={item.image_id}
+            width={100}
+            height={100}
+          />
         ) : (
           <span>Loading...</span>
         )}

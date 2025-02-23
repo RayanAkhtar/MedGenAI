@@ -1,22 +1,6 @@
 'use client'
 
-import Navbar from '@/app/components/Navbar'
-import { useState, useEffect, useCallback } from 'react'
-import Link from 'next/link'
-import { useSearchParams } from 'next/navigation'
-import Image from 'next/image'
-
-interface Feedback {
-  image_id: string;
-  image_type: string;
-  unresolved_count: number;
-  last_feedback_time: string;
-  upload_time: string;
-  image_path: string;
-}
-
-
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Navbar from '@/app/components/Navbar';
@@ -38,21 +22,6 @@ const FeedbackPage = () => {
 
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
-  const fetchFeedbacks = useCallback(async (page = 1): Promise<void> => {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getFeedbacks?image_type=${imageType}&resolved=${resolved}&sort_by=${sortBy}&sort_order=${sortOrder}&page=${page}&limit=20`
-    );
-    const data = await response.json();
-    setFeedbacks(data);
-  }, [imageType, resolved, sortBy, sortOrder]);
-
-  const fetchFeedbackCount = useCallback(async (): Promise<void> => {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getFeedbackCount?image_type=${imageType}&resolved=${resolved}`
-    );
-    const data: { total_count: number } = await response.json();
-    setTotalPages(Math.ceil(data.total_count / 20));
-  }, [imageType, resolved]);
 
   // 1. Helper function to fetch the actual image and create a local blob URL
   const fetchImage = async (imagePath: string): Promise<string | null> => {
@@ -68,38 +37,32 @@ const FeedbackPage = () => {
     }
   };
 
-  // 2. Main data fetch: once we get the raw data, convert image paths to local blob URLs
-  const fetchData = async (page = 1) => {
+  // 2. Main data fetch function (memoized using useCallback)
+  const fetchData = useCallback(async (page = 1) => {
     try {
       const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getFeedbacks?image_type=${filters.type}&resolved=${filters.resolved}&sort_by=${filters.sortBy}&sort_order=${filters.sortOrder}&page=${page}&limit=20`;
-      const response = await fetch(
-        url
-      );
       console.log(url);
+      
+      const response = await fetch(url);
       const result = await response.json();
       console.log("result: ", result);
+      
       const itemsWithUrl = await Promise.all(
         result.map(async (item: Feedback) => {
           const localUrl = await fetchImage(item.image_path);
-          console.log(item.image_id);
-          return {
-            ...item,
-            image_path: localUrl, // store the blob URL here
-          };
+          return { ...item, image_path: localUrl };
         })
       );
 
       setData(itemsWithUrl);
-
-      // Optionally, you can fetch the total count for pagination:
-      await fetchFeedbackCount();
+      await fetchFeedbackCount(); // Fetch total count for pagination
     } catch (err) {
       console.error('Error fetching data:', err);
     }
-  };
+  }, [filters]); // Memoizing based on `filters` so it updates when filters change
 
-  // 3. Fetch the total feedback count (for pagination)
-  const fetchFeedbackCount = async (): Promise<void> => {
+  // 3. Fetch total feedback count (memoized using useCallback)
+  const fetchFeedbackCount = useCallback(async () => {
     try {
       const countRes = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getFeedbackCount?image_type=${filters.type}&resolved=${filters.resolved}`
@@ -109,13 +72,13 @@ const FeedbackPage = () => {
     } catch (error) {
       console.error('Error fetching feedback count:', error);
     }
-  };
+  }, [filters]);
 
-  // Re-fetch data whenever filters or current page change
+  // 4. Re-fetch data when filters or current page change
   useEffect(() => {
     console.log("filters:", filters);
     fetchData(currentPage);
-  }, [filters, currentPage]);
+  }, [filters, currentPage, fetchData]); // Now fetchData is included safely
 
   return (
     <div className="bg-white">

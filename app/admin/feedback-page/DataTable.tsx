@@ -1,7 +1,8 @@
 'use client';
-import React from 'react';
+
+import React, { useState } from 'react';
 import Link from 'next/link';
-import { useState } from 'react';
+import Image from 'next/image';
 
 interface Feedback {
   image_id: string;
@@ -17,7 +18,8 @@ interface DataTableProps {
 }
 
 const DataTable: React.FC<DataTableProps> = ({ data }) => {
-  const [feedbacks, setFeedbacks] = useState<Feedback[]>([])
+  const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
+  console.log("Feedbacks is", feedbacks);
 
   const resolveFeedback = async (feedbackId: string): Promise<void> => {
     try {
@@ -26,23 +28,24 @@ const DataTable: React.FC<DataTableProps> = ({ data }) => {
         {
           method: 'POST',
         }
-      )
+      );
       if (response.ok) {
-        setFeedbacks((prevFeedbacks) => {
-          return prevFeedbacks.map((feedback) =>
+        setFeedbacks((prevFeedbacks) =>
+          prevFeedbacks.map((feedback) =>
             feedback.image_id === feedbackId
               ? { ...feedback, unresolved_count: 0 }
               : feedback
-          );
-        });        
+          )
+        );
       } else {
         console.error('Failed to resolve feedback');
-        console.log("response is", response)
+        console.log("response is", response);
       }
     } catch (error) {
       console.error('Error resolving feedback:', error);
     }
-  }
+  };
+
   return (
     <div className='overflow-x-auto p-8 bg-white rounded-2xl shadow-lg'>
       <table className='min-w-full table-auto'>
@@ -61,7 +64,12 @@ const DataTable: React.FC<DataTableProps> = ({ data }) => {
             <tr key={item.image_id} className='hover:bg-blue-100 transition-all'>
               <td className='px-6 py-4'>
                 {item.image_path ? (
-                  <img src={item.image_path} alt={item.image_id} width={100} />
+                  <Image
+                    src={item.image_path}
+                    alt={item.image_id}
+                    width={100}
+                    height={100}
+                  />
                 ) : (
                   <span>Loading...</span>
                 )}
@@ -80,7 +88,10 @@ const DataTable: React.FC<DataTableProps> = ({ data }) => {
                     View
                   </button>
                 </Link>
-                <button onClick={() => resolveFeedback(item.image_id)} className='px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-700'>
+                <button
+                  onClick={() => resolveFeedback(item.image_id)}
+                  className='px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-700'
+                >
                   Mark Complete
                 </button>
               </td>
