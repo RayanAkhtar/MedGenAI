@@ -7,9 +7,9 @@ import { useEffect, useState } from 'react'
 
 const competitions = [
     {
-        name: 'Hello',
+        name: 'Lung Cancer',
         type: 'Dual',
-        link: '/game/dual/AL19JQ82TR',
+        link: '/game/competition/dual/AL19JQ82TR',
         totalPlayers: 0,
         start: '2025-02-21',
         deadline: '2025-02-28',
