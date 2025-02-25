@@ -71,45 +71,43 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
   ];
 
   const handleGameSelect = async (route: string) => {
-    if (route === "/game/classic") {
-      if (selectedBoard === "Dual" && imageCount === 10) {
-        closeModal();
-        router.push(`${route}/${selectedBoard.toLowerCase()}/AL19JQ82TR`);
-      } else if (imageCount && selectedBoard) {
-        try {
-          setIsLoading(true);
-          const user = auth.currentUser;
-          if (!user) {
-            throw new Error("No user logged in");
-          }
+    if (route === "/game/classic" && imageCount && selectedBoard) {
+      try {
+        setIsLoading(true);
+        const user = auth.currentUser;
+        if (!user) {
+          throw new Error("No user logged in");
+        }
 
-          const idToken = await user.getIdToken(true);
-          const apiUrl =
-            selectedBoard === "Single"
-              ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/game/initialize-classic-game`
-              : `${
-                  process.env.NEXT_PUBLIC_API_BASE_URL
-                }/game/initialize-classic-${selectedBoard.toLowerCase()}-game`;
+        const idToken = await user.getIdToken(true);
+        const apiUrl =
+          selectedBoard === "Single"
+            ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/game/initialize-classic-game`
+            : `${
+                process.env.NEXT_PUBLIC_API_BASE_URL
+              }/game/initialize-classic-${selectedBoard.toLowerCase()}-game`;
 
-          const response = await fetch(apiUrl, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${idToken}`,
-            },
-            body: JSON.stringify({
-              imageCount: imageCount,
-            }),
-          });
+        const response = await fetch(apiUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${idToken}`,
+          },
+          body: JSON.stringify({
+            imageCount: imageCount,
+          }),
+        });
 
-          if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || "Failed to initialize game");
-          }
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || "Failed to initialize game");
+        }
 
-          const data = await response.json();
-          console.log("Raw API response:", data);
+        const data = await response.json();
+        console.log("Raw API response:", data);
+        const gameCode = "AL19JQ82TR"; // TODO: data.gameCode;
 
+        if (selectedBoard === "Single") {
           const formattedImages = data.images.map(
             (img: any, index: number) => ({
               id: index + 1,
@@ -121,15 +119,19 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
           console.log("Formatted images:", formattedImages);
 
           setGameData(data.gameId, imageCount, formattedImages);
-
-          closeModal();
-          router.push(`${route}/${selectedBoard.toLowerCase()}`);
-        } catch (error: any) {
-          console.error("Failed to start game:", error);
-          setError(error.message);
-        } finally {
-          setIsLoading(false);
         }
+
+        closeModal();
+        if (selectedBoard == "Single") {
+          router.push(`${route}`); // TODO: Sharif needs to update backend
+        } else {
+          router.push(`${route}/${selectedBoard.toLowerCase()}/${gameCode}`); // TODO: Sharif needs to update backend
+        }
+      } catch (error: any) {
+        console.error("Failed to start game:", error);
+        setError(error.message);
+      } finally {
+        setIsLoading(false);
       }
     } else if (route === "/game/custom") {
       if (selectedBoard && customCode) {
@@ -140,6 +142,7 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
       closeModal();
       router.push(route);
     } else {
+      console.error("Invalid game route:", route);
       closeModal();
       router.push(route);
     }
@@ -316,6 +319,11 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
                                 "Start Game"
                               )}
                             </button>
+                            {error && (
+                              <div className="text-red-500 text-sm mt-2">
+                                {error}
+                              </div>
+                            )}
                           </div>
                         ) : (
                           <div className="h-full flex items-center justify-center text-black">
