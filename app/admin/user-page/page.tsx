@@ -45,7 +45,7 @@ const UserPage = () => {
 
   useEffect(() => {
     fetchData();
-  }, [filters])
+  }, [filters, fetchData])
 
   return (
     <div className="bg-white">
