@@ -35,7 +35,7 @@ export default function HeatmapFeedbackPage() {
     precision: 0, 
     recall: 0, 
     f1Score: 0, 
-    confusionMatrix: { truepositive: 0, falsepositive: 0, truenegative: 0, falsenegative: 0 }
+    confusionMatrix: { truePositive: 0, falsePositive: 0, trueNegative: 0, falseNegative: 0 }
   });
 
   const [isResolved, setIsResolved] = useState(false);
