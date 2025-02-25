@@ -37,6 +37,19 @@ const FeedbackPage = () => {
     }
   };
 
+  // 3. Fetch total feedback count (memoized using useCallback)
+  const fetchFeedbackCount = useCallback(async () => {
+    try {
+      const countRes = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getFeedbackCount?image_type=${filters.type}&resolved=${filters.resolved}`
+      );
+      const { total_count } = await countRes.json();
+      setTotalPages(Math.ceil(total_count / 20));
+    } catch (error) {
+      console.error('Error fetching feedback count:', error);
+    }
+  }, [filters]); // Memoizing based on `filters`
+
   // 2. Main data fetch function (memoized using useCallback)
   const fetchData = useCallback(async (page = 1) => {
     try {
@@ -59,20 +72,7 @@ const FeedbackPage = () => {
     } catch (err) {
       console.error('Error fetching data:', err);
     }
-  }, [filters]); // Memoizing based on `filters` so it updates when filters change
-
-  // 3. Fetch total feedback count (memoized using useCallback)
-  const fetchFeedbackCount = useCallback(async () => {
-    try {
-      const countRes = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getFeedbackCount?image_type=${filters.type}&resolved=${filters.resolved}`
-      );
-      const { total_count } = await countRes.json();
-      setTotalPages(Math.ceil(total_count / 20));
-    } catch (error) {
-      console.error('Error fetching feedback count:', error);
-    }
-  }, [filters]);
+  }, [filters, fetchFeedbackCount]); // Memoizing based on `filters` and including fetchFeedbackCount
 
   // 4. Re-fetch data when filters or current page change
   useEffect(() => {

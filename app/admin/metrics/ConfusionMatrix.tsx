@@ -7,10 +7,10 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 
 interface ConfusionMatrixProps {
   confusionMatrix: {
-    truepositive: number;
-    falsepositive: number;
-    truenegative: number;
-    falsenegative: number;
+    truePositive: number;
+    falsePositive: number;
+    trueNegative: number;
+    falseNegative: number;
   };
 }
 
@@ -21,10 +21,10 @@ const ConfusionMatrix = ({ confusionMatrix }: ConfusionMatrixProps) => {
     datasets: [
       {
         data: [
-          confusionMatrix.truepositive,
-          confusionMatrix.falsepositive,
-          confusionMatrix.truenegative,
-          confusionMatrix.falsenegative,
+          confusionMatrix.truePositive,
+          confusionMatrix.falsePositive,
+          confusionMatrix.trueNegative,
+          confusionMatrix.falseNegative,
         ],
         backgroundColor: [
           'rgba(54, 162, 235, 0.6)',
@@ -48,19 +48,19 @@ const ConfusionMatrix = ({ confusionMatrix }: ConfusionMatrixProps) => {
         <div className="grid grid-cols-2 gap-4 text-center">
           <div className="flex flex-col items-center bg-gray-100 p-4 rounded-lg">
             <span className="font-semibold text-gray-700">True Positive</span>
-            <span>{confusionMatrix.truepositive}</span>
+            <span>{confusionMatrix.truePositive}</span>
           </div>
           <div className="flex flex-col items-center bg-gray-100 p-4 rounded-lg">
             <span className="font-semibold text-gray-700">False Positive</span>
-            <span>{confusionMatrix.falsepositive}</span>
+            <span>{confusionMatrix.falsePositive}</span>
           </div>
           <div className="flex flex-col items-center bg-gray-100 p-4 rounded-lg">
             <span className="font-semibold text-gray-700">True Negative</span>
-            <span>{confusionMatrix.truenegative}</span>
+            <span>{confusionMatrix.trueNegative}</span>
           </div>
           <div className="flex flex-col items-center bg-gray-100 p-4 rounded-lg">
             <span className="font-semibold text-gray-700">False Negative</span>
-            <span>{confusionMatrix.falsenegative}</span>
+            <span>{confusionMatrix.falseNegative}</span>
           </div>
         </div>
       </div>
