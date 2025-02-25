@@ -16,10 +16,10 @@ interface MetricsData {
     month: string;
   }[];
   confusionMatrix: {
-    truepositive: number;
-    falsepositive: number;
-    truenegative: number;
-    falsenegative: number;
+    truePositive: number;
+    falsePositive: number;
+    trueNegative: number;
+    falseNegative: number;
   };
   accuracy: number;
   precision: number;
@@ -49,8 +49,8 @@ const MetricsPage = () => {
 
       const confusionMatrixResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getConfusionMatrix`);
       const confusionMatrixData = await confusionMatrixResponse.json();
-      confusionMatrixData.truepositive = 1;
-      confusionMatrixData.falsepositive = 1;
+      confusionMatrixData.truePositive = 1;
+      confusionMatrixData.falsePositive = 1;
 
       const mlMetricsResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getMLMetrics`);
       const mlMetricsData = await mlMetricsResponse.json();
