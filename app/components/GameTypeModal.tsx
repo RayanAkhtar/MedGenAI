@@ -73,6 +73,8 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
                     }
 
                     const idToken = await user.getIdToken(true)
+                    console.log("Starting game initialization...")
+
                     const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/game/initialize-classic-game`, {
                         method: 'POST',
                         headers: {
@@ -90,21 +92,24 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
                     }
 
                     const data = await response.json()
-                    console.log("Raw API response:", data)
+                    console.log("Game initialization response:", data)
                     
-                    // Format images with the correct URL field - no more pairs, just single images
+                    // Format images with the correct URL field
                     const formattedImages = data.images.map((img: any, index: number) => ({
                         id: index + 1,
-                        path: img.url,  // Use the url field from the API
+                        path: img.url,
                         type: img.type
                     }));
 
                     console.log("Formatted images:", formattedImages)
                     
+                    // Set game data in context
                     setGameData(data.gameId, imageCount, formattedImages)
+                    console.log("Game data set in context")
                     
                     closeModal()
-                    router.push(`/game/classic`)
+                    console.log("Redirecting to:", route)
+                    router.push(route)
                 } catch (error: any) {
                     console.error('Failed to start game:', error)
                     setError(error.message)

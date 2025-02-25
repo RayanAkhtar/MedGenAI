@@ -7,9 +7,8 @@ import { useAuth } from '@/app/context/AuthContext';
 import { useGame } from '@/app/context/GameContext';
 
 interface UserGuess {
-    imageId: number;
-    userGuessType: 'real' | 'ai';
-    correct: boolean;
+    url: string;
+    guess: 'real' | 'ai';
 }
 
 export default function ClassicGame() {
@@ -27,7 +26,9 @@ export default function ClassicGame() {
 
     useEffect(() => {
         // Redirect if no game data is present
+        console.log("Game data check:", { gameId, imageCount, images }) // Debug log
         if (!gameId || !imageCount || images.length === 0) {
+            console.log("Missing game data, redirecting to dashboard") // Debug log
             router.push('/dashboard');
         }
     }, [gameId, imageCount, images, router]);
@@ -41,11 +42,10 @@ export default function ClassicGame() {
             setScore(prev => prev + 1);
         }
 
-        // Store the guess
+        // Store the guess with the format expected by the backend
         setUserGuesses(prev => [...prev, {
-            imageId: currentImage.id,
-            userGuessType: guess,
-            correct: correct
+            url: currentImage.path,
+            guess: guess
         }]);
         
         setShowFeedback(true);
@@ -61,6 +61,11 @@ export default function ClassicGame() {
             setIsSubmitting(true);
             const idToken = await user?.getIdToken(true);
             
+            console.log("Submitting game results:", {
+                gameId,
+                userGuesses
+            });
+            
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/game/finish-classic-game`, {
                 method: 'POST',
                 headers: {
@@ -74,8 +79,12 @@ export default function ClassicGame() {
             });
 
             if (!response.ok) {
-                throw new Error('Failed to submit game results');
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to submit game results');
             }
+
+            const result = await response.json();
+            console.log("Game submission result:", result);
 
             // Clear game data and redirect to dashboard
             clearGameData();
@@ -120,7 +129,7 @@ export default function ClassicGame() {
     const currentImage = images[currentIndex];
 
     return (
-        <div className="min-h-screen bg-gray-100 p-8">
+        <div className="min-h-screen bg-white dark:bg-white p-8">
             {/* Rules Modal */}
             {showRules && (
                 <div 
