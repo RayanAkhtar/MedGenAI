@@ -1,6 +1,8 @@
 'use client';
+
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Feedback } from '@/app/types/Feedback';
 import Table from '@/app/admin/Table';
 
@@ -14,8 +16,8 @@ const FeedbackTable: React.FC<FeedbackTableProps> = ({ data }) => {
 
   useEffect(() => {
     setFeedbacks(data);
-  }, [data]);  
-  
+  }, [data]);
+
   const resolveFeedback = async (feedbackId: string) => {
     try {
       const response = await fetch(
@@ -38,7 +40,11 @@ const FeedbackTable: React.FC<FeedbackTableProps> = ({ data }) => {
 
   const columns = [
     'Image',
-    'Image Type',
+    'Type',
+    'Gender',
+    'Race',
+    'Age',
+    'Disease',
     'Unresolved Feedback',
     'Last Feedback Time',
     'Upload Time',
@@ -50,12 +56,21 @@ const FeedbackTable: React.FC<FeedbackTableProps> = ({ data }) => {
     <tr key={item.image_id} className="hover:bg-blue-100 transition-all">
       <td className="px-6 py-4">
         {item.image_path ? (
-          <img src={item.image_path} alt={item.image_id} width={100} />
+          <Image
+            src={item.image_path}
+            alt={item.image_id}
+            width={100}
+            height={100}
+          />
         ) : (
           <span>Loading...</span>
         )}
       </td>
       <td className="px-6 py-4">{item.image_type}</td>
+      <td className="px-6 py-4">{item.gender}</td>
+      <td className="px-6 py-4">{item.race}</td>
+      <td className="px-6 py-4">{item.age}</td>
+      <td className="px-6 py-4">{item.disease}</td>
       <td className="px-6 py-4">{item.unresolved_count}</td>
       <td className="px-6 py-4">
         {new Date(item.last_feedback_time).toLocaleString()}
