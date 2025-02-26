@@ -1,53 +1,66 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-export default function FeedbackBox() {
-  const [feedback, setFeedback] = useState("");
-  const [submitted, setSubmitted] = useState(false);
+interface FeedbackBoxProps {
+  initialValue?: string;
+  onSubmit: (feedback: string) => void;
+  onSkip: () => void;
+  showMarker?: boolean;
+  isLastQuestion?: boolean;
+}
 
-  const handleSubmit = async () => {
-    if (feedback.trim() === "") return;
+export default function FeedbackBox({ 
+  initialValue = "", 
+  onSubmit, 
+  onSkip, 
+  showMarker = false,
+  isLastQuestion = false
+}: FeedbackBoxProps) {
+  const [feedback, setFeedback] = useState(initialValue);
 
-    try {
-      // Dummy values used for now
-      await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/user-response`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          imageID: "img123",
-          userID: "user456",
-          user_guess_type: "right",
-          x: 150,
-          y: 250,
-          feedback: feedback 
-        }),
-      });
+  useEffect(() => {
+    setFeedback(initialValue);
+  }, [initialValue]);
 
-      setSubmitted(true);
-      setFeedback("");
-    } catch (error) {
-      console.error("Error submitting feedback", error);
-    }
+  const handleSubmit = () => {
+    onSubmit(feedback);
   };
 
   return (
     <div className="p-4 max-w-md mx-auto bg-white shadow-lg rounded-2xl">
       <div>
-        <h2 className="text-xl font-bold mb-2 text-black">Submit Feedback</h2>
-        {submitted ? (
-          <p className="text-green-600">Thank you for your feedback!</p>
+        <h2 className="text-xl font-bold mb-2 text-black">AI Feature Feedback</h2>
+        {showMarker ? (
+          <p className="text-sm text-gray-600 mb-4">
+            Thanks for identifying the AI feature! Please share any additional thoughts about this image.
+            {isLastQuestion && " This is the last question."}
+          </p>
         ) : (
-          <>
-            <textarea
-              className="w-full p-2 border rounded-md text-black"
-              placeholder="Enter your feedback here..."
-              value={feedback}
-              onChange={(e) => setFeedback(e.target.value)}
-            />
-            <button className="mt-2 w-full bg-blue-500 text-white p-2 rounded-md" onClick={handleSubmit}>
-              Submit
-            </button>
-          </>
+          <p className="text-sm text-gray-600 mb-4">
+            Please share your thoughts about this AI-generated image.
+            {isLastQuestion && " This is the last question."}
+          </p>
         )}
+        <textarea
+          className="w-full p-2 border rounded-md text-black"
+          placeholder="Enter your feedback here..."
+          value={feedback}
+          onChange={(e) => setFeedback(e.target.value)}
+          rows={4}
+        />
+        <div className="flex gap-2 mt-4">
+          <button 
+            className="flex-1 bg-gray-200 text-gray-800 p-2 rounded-md hover:bg-gray-300 transition-colors" 
+            onClick={onSkip}
+          >
+            {showMarker ? "Continue Without Comment" : "Skip"}
+          </button>
+          <button 
+            className="flex-1 bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 transition-colors" 
+            onClick={handleSubmit}
+          >
+            {isLastQuestion ? "Submit & Finish" : "Submit"}
+          </button>
+        </div>
       </div>
     </div>
   );
