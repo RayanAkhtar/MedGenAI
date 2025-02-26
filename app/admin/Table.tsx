@@ -16,7 +16,6 @@ function Table<T>({
   renderRow,
   getRowKey,
 }: GenericTableProps<T>) {
-  console.log("Data in GenericTableBody:", data);
   return (
     <div className="overflow-x-auto p-8 bg-white rounded-2xl shadow-lg">
       <table className="min-w-full table-auto">
