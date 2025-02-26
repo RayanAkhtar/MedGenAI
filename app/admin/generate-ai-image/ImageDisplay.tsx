@@ -12,7 +12,7 @@ const ImageDisplay: FC<Props> = ({ imagePath }) => {
       <div className="w-64 h-64 bg-gray-200 flex items-center justify-center rounded-lg shadow-md">
         {imagePath ? (
           <Image
-            src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/${imagePath}`}
+            src={imagePath}
             alt="Generated Image"
             width={256}
             height={256}
