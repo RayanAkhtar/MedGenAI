@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '@/app/context/AuthContext'
 import { signup } from '@/app/firebase/signup'
 import Navbar from '../components/Navbar'
+import { FirebaseError } from 'firebase/app'
 
 export default function Signup() {
     const [firstName, setFirstName] = useState('')
@@ -40,13 +41,17 @@ export default function Signup() {
             try {
                 await signup(email, password, `${firstName} ${lastName}`)
                 router.push('/dashboard')
-            } catch (error: any) {
-                if (error.code === 'auth/email-already-in-use') {
-                    setError('An account with this email already exists')
-                } else if (error.code === 'auth/weak-password') {
-                    setError('Password should be at least 6 characters')
+            } catch (error) {
+                if (error instanceof FirebaseError) {
+                    if (error.code === 'auth/email-already-in-use') {
+                        setError('An account with this email already exists')
+                    } else if (error.code === 'auth/weak-password') {
+                        setError('Password should be at least 6 characters')
+                    } else {
+                        setError('Failed to create account. Please try again.')
+                    }
                 } else {
-                    setError('Failed to create account. Please try again.')
+                    setError('An unknown error occurred.')
                 }
             } finally {
                 setIsLoading(false)
@@ -87,6 +92,7 @@ export default function Signup() {
                     {/* Signup Form */}
                     <div className="mt-10 space-y-6">
                         <h2 className="text-center text-2xl font-semibold text-gray-900">
+
                             Signup to join COD
                         </h2>
 
@@ -110,6 +116,7 @@ export default function Signup() {
                                         value={firstName}
                                         onChange={(e) => setFirstName(e.target.value)}
                                         className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[var(--heartflow-blue)] focus:border-[var(--heartflow-blue)] text-gray-900"
+
                                         placeholder="John"
                                         disabled={showPassword}
                                     />
@@ -126,6 +133,7 @@ export default function Signup() {
                                         value={lastName}
                                         onChange={(e) => setLastName(e.target.value)}
                                         className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[var(--heartflow-blue)] focus:border-[var(--heartflow-blue)] text-gray-900"
+
                                         placeholder="Doe"
                                         disabled={showPassword}
                                     />
@@ -144,6 +152,7 @@ export default function Signup() {
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[var(--heartflow-blue)] focus:border-[var(--heartflow-blue)] text-gray-900"
+
                                     placeholder="name@company.com"
                                     disabled={showPassword}
                                 />
@@ -162,6 +171,7 @@ export default function Signup() {
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
                                         className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[var(--heartflow-blue)] focus:border-[var(--heartflow-blue)] text-gray-900"
+
                                         placeholder="Enter your password"
                                     />
                                 </div>
@@ -174,7 +184,7 @@ export default function Signup() {
                                     (isValidEmail && (!showPassword || password) && firstName && lastName && !isLoading)
                                     ? 'bg-[var(--heartflow-blue)] hover:bg-[var(--heartflow-blue)]/90 cursor-pointer' 
                                     : 'bg-[#8DACC3] cursor-not-allowed'
-                                    }`}
+                                }`}
                             >
                                 {isLoading ? (
                                     <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>
