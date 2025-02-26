@@ -1,7 +1,7 @@
 'use client';
 
 import { Pie } from "react-chartjs-2";
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import { Chart as ChartJS, ArcElement, Tooltip, Legend, ChartEvent, ActiveElement, ChartOptions } from "chart.js";
 import Link from "next/link";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
@@ -26,10 +26,10 @@ export default function FeedbackPieChart({
     ],
   };
 
-  const chartOptions = {
+  const chartOptions: ChartOptions<'pie'> = {
     responsive: true,
     maintainAspectRatio: false,
-    onClick: (_, elements) => {
+    onClick: (_: ChartEvent, elements: ActiveElement[]) => {
       if (elements.length > 0) {
         const index = elements[0].index;
         onClick(index === 0 ? "complete" : "incomplete");

@@ -11,6 +11,7 @@ import {
   Title,
   Tooltip,
   Legend,
+  ChartOptions,
 } from 'chart.js';
 import { useRouter } from 'next/navigation';
 
@@ -100,7 +101,7 @@ export default function AdminStats() {
     ],
   };
 
-  const chartOptionsEngagement = {
+  const chartOptionsEngagement: ChartOptions<'line'> = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
@@ -115,7 +116,7 @@ export default function AdminStats() {
     },
   };
 
-  const chartOptionsAccuracy = {
+  const chartOptionsAccuracy: ChartOptions<'line'> = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {

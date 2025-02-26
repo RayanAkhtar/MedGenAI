@@ -20,6 +20,7 @@ export default function Sitemap() {
         <li>
           <Link href="/admin/competitions" className="block px-4 py-2 bg-[var(--heartflow-red)] text-white rounded-lg hover:bg-[var(--heartflow-blue)] transition-colors duration-300">
             Create Competition
+
           </Link>
         </li>
       </ul>

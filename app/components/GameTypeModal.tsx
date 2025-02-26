@@ -7,7 +7,6 @@ import {
   faGamepad,
   faTrophy,
   faStar,
-  faChevronRight,
 } from "@fortawesome/free-solid-svg-icons";
 import { useRouter } from "next/navigation";
 import { auth } from "@/app/firebase/firebase";
@@ -18,17 +17,26 @@ interface GameTypeModalProps {
   closeModal: () => void;
 }
 
+interface ImageData {
+  url: string;
+  type: string;
+}
+
+interface GameResponse {
+  images: ImageData[];
+  gameId: string;
+}
+
 const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
   const router = useRouter();
   const [hoveredType, setHoveredType] = useState<string | null>(null);
-  const [selectedType, setSelectedType] = useState<string | null>(null);
   const [selectedMode, setSelectedMode] = useState<string | null>(null);
   const [selectedBoard, setSelectedBoard] = useState<string | null>(null);
   const [imageCount, setImageCount] = useState<number | null>(null);
   const [customCode, setCustomCode] = useState<string>("");
   const [showDetails, setShowDetails] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [errorState, setError] = useState<string | null>(null);
   const { setGameData } = useGame();
 
   const gameModes = [
@@ -55,20 +63,20 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
     },
   ];
 
-  const gameBoards = [
-    {
-      name: "Single",
-      description: "One image at a time",
-      icon: faGamepad,
-      color: "bg-green-500",
-    },
-    {
-      name: "Dual",
-      description: "Choose counter factual from a pair of images",
-      icon: faTrophy,
-      color: "bg-red-500",
-    },
-  ];
+  // const gameBoards = [
+  //   {
+  //     name: "Single",
+  //     description: "One image at a time",
+  //     icon: faGamepad,
+  //     color: "bg-green-500",
+  //   },
+  //   {
+  //     name: "Dual",
+  //     description: "Choose counter factual from a pair of images",
+  //     icon: faTrophy,
+  //     color: "bg-red-500",
+  //   },
+  // ];
 
   const handleGameSelect = async (route: string) => {
     if (route === "/game/classic" && imageCount && selectedBoard) {
@@ -107,9 +115,10 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
         console.log("Raw API response:", data);
         const gameCode = "AL19JQ82TR"; // TODO: data.gameCode;
 
+
         if (selectedBoard === "Single") {
           const formattedImages = data.images.map(
-            (img: any, index: number) => ({
+            (img: ImageData, index: number) => ({
               id: index + 1,
               path: img.url,
               type: img.type,
@@ -138,15 +147,13 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
         closeModal();
         router.push(`${route}/${selectedBoard.toLowerCase()}/${customCode}`);
       }
-    } else if (route === "/game/competition") {
-      closeModal();
-      router.push(route);
     } else {
       console.error("Invalid game route:", route);
       closeModal();
       router.push(route);
     }
   };
+  
 
   const handleMouseEnter = (name: string) => {
     setHoveredType(name);
