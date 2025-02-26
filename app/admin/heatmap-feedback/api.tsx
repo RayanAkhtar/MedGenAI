@@ -13,7 +13,6 @@ export const fetchImageData = async (imageId: string) => {
 
     if (metadata && metadata.image_path) {
       const apiUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/images/view/${encodeURIComponent(metadata.image_path)}`;
-
       const imageResponse = await fetch(apiUrl);
       if (!imageResponse.ok) {
         throw new Error("Failed to fetch the image");
@@ -40,7 +39,6 @@ export const fetchFeedbackData = async (imageId: string): Promise<HeatmapPoint[]
   try {
     const feedbackResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getMatchingFeedbackForImage/${imageId}`);
     let feedbackData = await feedbackResponse.json();
-    console.log("feedback data", feedbackData);
 
     if (!Array.isArray(feedbackData)) {
       feedbackData = [];

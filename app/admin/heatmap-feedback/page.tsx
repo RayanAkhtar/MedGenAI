@@ -53,9 +53,9 @@ export default function HeatmapFeedbackPage() {
             feedbackDots: feedbackData,
           });
 
+
           const metrics = await fetchMlMetrics(imageId);
           if (metrics) {
-            console.log("metrics is", metrics)
             setMlMetrics(metrics);
           }
         }
