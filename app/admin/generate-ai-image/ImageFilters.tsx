@@ -11,7 +11,7 @@ type Props = {
 
 const ageOptions = ["", "18-25", "26-35", "36-45", "46-60", "60+"];
 const sexOptions = ["", "Male", "Female", "Other"];
-const diseaseOptions = ["", "Pleural Effusion"];
+const diseaseOptions = ["", "Pleural_Effusion"];
 
 const ImageFilters: FC<Props> = ({ ageRange, setAgeRange, sex, setSex, disease, setDisease }) => {
   return (
