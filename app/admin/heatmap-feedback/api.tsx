@@ -35,6 +35,41 @@ export const fetchImageData = async (imageId: string) => {
   }
 };
 
+export const fetchImageDetails = async (imageId: string) => {
+  try {
+    if (!imageId) return null;
+
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getImageData/${imageId}`);
+    
+    if (!response.ok) {
+      console.error(`Failed to fetch image data: ${response.statusText}`);
+      return null;
+    }
+    
+    const data = await response.json();
+
+    if (data && !data.error) {
+      return {
+        age: data.age || null,
+        gender: data.gender || null,
+        disease: data.disease || null,
+        uploadTime: data.upload_time || null,
+        imagePath: data.image_path || null,
+        imageType: data.image_type || null,
+        imageId: data.image_id || null,
+      };
+    } else {
+      console.error("Error: Image data not found or API response contains error:", data.error);
+      return null;
+    }
+  } catch (error) {
+    console.error("Error fetching image data:", error);
+    return null;
+  }
+};
+
+
+
 export const fetchFeedbackData = async (imageId: string): Promise<HeatmapPoint[]> => {
   try {
     const feedbackResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getMatchingFeedbackForImage/${imageId}`);

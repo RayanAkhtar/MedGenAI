@@ -13,10 +13,12 @@ import {
   fetchFeedbackData,
   fetchMlMetrics,
   fetchImageData,
-  HeatmapPoint     
+  HeatmapPoint,
+  fetchImageDetails
 } from "./api";
 import { MLMetrics } from "./MLMetrics";
 import { ConfusionMatrix } from "./ConfusionMatrix";
+import ImageDetails from "./ImageDetails";
 
 export default function HeatmapFeedbackPage() {
   const [isImageExpanded, setIsImageExpanded] = useState(false);
@@ -38,6 +40,16 @@ export default function HeatmapFeedbackPage() {
     confusionMatrix: { truePositive: 0, falsePositive: 0, trueNegative: 0, falseNegative: 0 }
   });
 
+  const [imageDetails, setImageDetails] = useState<{
+    age: number | null;
+    gender: string | null;
+    disease: string | null;
+    uploadTime: string | null;
+    imagePath: string | null;
+    imageType: string | null;
+    imageId: string | null;
+  } | null>(null);
+
   const [isResolved, setIsResolved] = useState(false);
   const searchParams = useSearchParams();
   const imageId = searchParams?.get("imageid");
@@ -45,6 +57,9 @@ export default function HeatmapFeedbackPage() {
   useEffect(() => {
     const loadData = async () => {
       if (imageId) {
+        const details = await fetchImageDetails(imageId);
+        setImageDetails(details);
+
         const imageData = await fetchImageData(imageId);
         if (imageData) {
           const feedbackData = await fetchFeedbackData(imageId);
@@ -52,12 +67,11 @@ export default function HeatmapFeedbackPage() {
             ...imageData,
             feedbackDots: feedbackData,
           });
+        }
 
-
-          const metrics = await fetchMlMetrics(imageId);
-          if (metrics) {
-            setMlMetrics(metrics);
-          }
+        const metrics = await fetchMlMetrics(imageId);
+        if (metrics) {
+          setMlMetrics(metrics);
         }
       }
     };
@@ -160,7 +174,9 @@ export default function HeatmapFeedbackPage() {
         </button>
       </div>
 
-      <div className="mt-20 mb-20 flex justify-center items-center p-8">
+      {imageDetails && <ImageDetails {...imageDetails} />}
+
+      <div className="mt-10 mb-20 flex justify-center items-center p-8">
         <div className="w-full max-w-3xl">
           <div className="bg-white shadow-md rounded-2xl p-6">
             <h1 className="border-b pb-2 mb-4 text-xl font-bold text-black">
