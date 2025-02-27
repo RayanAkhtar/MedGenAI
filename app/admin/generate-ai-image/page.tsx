@@ -26,13 +26,14 @@ const GenerateImagePage = () => {
 
       if (!response.ok) throw new Error("Failed to generate image");
 
-      const imageBlob = await response.blob();
+      const { imagePath } = await response.json();
       
-      const imageUrl = URL.createObjectURL(imageBlob);
+      console.log("Image path received from backend:", imagePath);  // TODO: make sure this is piped to where we store images and make sure backend is returning a unique generated path, not the path it gets the image from
+      
+      setGeneratedImagePath(imagePath);
 
-      setGeneratedImagePath(imageUrl);
     } catch (error) {
-      console.error("Error generating image:", error);
+      console.error("❌ Error generating image:", error);
       alert("Error generating image. Please try again.");
     } finally {
       setLoading(false);
@@ -45,20 +46,25 @@ const GenerateImagePage = () => {
     setSaving(true);
 
     try {
+      const imageBlob = await fetch(generatedImagePath).then(res => res.blob());
+
+      const formData = new FormData();
+      formData.append("image", imageBlob, "generated_image.png");
+
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/uploadAIImage`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/saveImage`, 
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ imagePath: generatedImagePath }),
+          body: formData,
         }
       );
 
       if (!response.ok) throw new Error("Failed to save image");
 
       alert("Image saved successfully!");
+
     } catch (error) {
-      console.error("Error saving image:", error);
+      console.error("❌ Error saving image:", error);
       alert("Error saving image. Please try again.");
     } finally {
       setSaving(false);

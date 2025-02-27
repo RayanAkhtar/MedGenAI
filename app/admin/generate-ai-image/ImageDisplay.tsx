@@ -17,6 +17,7 @@ const ImageDisplay: FC<Props> = ({ imagePath }) => {
             width={256}
             height={256}
             className="rounded-lg"
+            unoptimized
           />
         ) : (
           <span className="text-gray-500">Image will appear here</span>
