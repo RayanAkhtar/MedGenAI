@@ -54,11 +54,9 @@ const FeedbackPage = () => {
   const fetchData = useCallback(async (page = 1) => {
     try {
       const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getFeedbacks?image_type=${filters.type}&resolved=${filters.resolved}&sort_by=${filters.sortBy}&sort_order=${filters.sortOrder}&page=${page}&limit=20`;
-      console.log(url);
       
       const response = await fetch(url);
       const result = await response.json();
-      console.log("result: ", result);
       
       const itemsWithUrl = await Promise.all(
         result.map(async (item: Feedback) => {
@@ -76,7 +74,6 @@ const FeedbackPage = () => {
 
   // 4. Re-fetch data when filters or current page change
   useEffect(() => {
-    console.log("filters:", filters);
     fetchData(currentPage);
   }, [filters, currentPage, fetchData]); // Now fetchData is included safely
 

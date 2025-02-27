@@ -40,8 +40,7 @@ const FeedbackTable: React.FC<FeedbackTableProps> = ({ data }) => {
   const columns = [
     'Image',
     'Type',
-    'Gender',
-    'Race',
+    'Sex',
     'Age',
     'Disease',
     'Unresolved Feedback',
@@ -67,7 +66,6 @@ const FeedbackTable: React.FC<FeedbackTableProps> = ({ data }) => {
       </td>
       <td className="px-6 py-4">{item.image_type}</td>
       <td className="px-6 py-4">{item.gender}</td>
-      <td className="px-6 py-4">{item.race}</td>
       <td className="px-6 py-4">{item.age}</td>
       <td className="px-6 py-4">{item.disease}</td>
       <td className="px-6 py-4">{item.unresolved_count}</td>

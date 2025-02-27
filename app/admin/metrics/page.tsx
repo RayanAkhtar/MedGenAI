@@ -60,7 +60,6 @@ const MetricsPage = () => {
 
       const sampleDifficultyResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getImageDifficulty`);
       const sampleDifficultyData = await sampleDifficultyResponse.json();
-      console.log("sample difficulty data", sampleDifficultyData)
 
       setMetricsData({
         accuracyData,
