@@ -24,28 +24,27 @@ const UserPage = () => {
     sortOrder: 'desc',
   });
 
-  const fetchData = async () => {
-    try {
-      if (filters.tags.length === 0) {
-        setData([])
-        return;
-      }
-      const tagsParam = filters.tags
-        .map((tag) => `tags=${encodeURIComponent(tag)}`)
-        .join('&');
-      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/filter-users?${tagsParam}&all=${filters.all == 'all'}&sort_by=${filters.sortBy}&desc=${filters.sortOrder === 'desc'}`;
-      console.log(url);
-      const response = await fetch(url);
-      const result = await response.json();
-      setData(result);
-    } catch (err) {
-      console.error('Error fetching data:', err);
-    }
-  };
-
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        if (filters.tags.length === 0) {
+          setData([])
+          return;
+        }
+        const tagsParam = filters.tags
+          .map((tag) => `tags=${encodeURIComponent(tag)}`)
+          .join('&');
+        const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/filter-users?${tagsParam}&all=${filters.all == 'all'}&sort_by=${filters.sortBy}&desc=${filters.sortOrder === 'desc'}`;
+        const response = await fetch(url);
+        const result = await response.json();
+        setData(result);
+      } catch (err) {
+        console.error('Error fetching data:', err);
+      }
+    };
+
     fetchData();
-  }, [filters, fetchData])
+  }, [filters])
 
   return (
     <div className="bg-white">
