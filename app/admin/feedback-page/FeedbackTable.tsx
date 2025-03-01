@@ -12,7 +12,6 @@ interface FeedbackTableProps {
 
 const FeedbackTable: React.FC<FeedbackTableProps> = ({ data }) => {
   const [feedbacks, setFeedbacks] = useState<Feedback[]>(data);
-  console.log("Data passed to FeedbackTable:", data);
 
   useEffect(() => {
     setFeedbacks(data);
@@ -41,8 +40,7 @@ const FeedbackTable: React.FC<FeedbackTableProps> = ({ data }) => {
   const columns = [
     'Image',
     'Type',
-    'Gender',
-    'Race',
+    'Sex',
     'Age',
     'Disease',
     'Unresolved Feedback',
@@ -68,7 +66,6 @@ const FeedbackTable: React.FC<FeedbackTableProps> = ({ data }) => {
       </td>
       <td className="px-6 py-4">{item.image_type}</td>
       <td className="px-6 py-4">{item.gender}</td>
-      <td className="px-6 py-4">{item.race}</td>
       <td className="px-6 py-4">{item.age}</td>
       <td className="px-6 py-4">{item.disease}</td>
       <td className="px-6 py-4">{item.unresolved_count}</td>
@@ -95,7 +92,6 @@ const FeedbackTable: React.FC<FeedbackTableProps> = ({ data }) => {
   );
 
   const getRowKey = (item: Feedback) => item.image_id;
-  console.log('feedbacks in parent:', feedbacks);
   return (
     <Table
       columns={columns}

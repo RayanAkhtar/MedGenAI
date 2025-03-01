@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import Navbar from '@/app/components/Navbar';
 import UserTable from '@/app/admin/user-page/UserTable';
@@ -24,10 +24,10 @@ const UserPage = () => {
     sortOrder: 'desc',
   });
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       if (filters.tags.length === 0) {
-        setData([])
+        setData([]);
         return;
       }
       const tagsParam = filters.tags
@@ -41,24 +41,24 @@ const UserPage = () => {
     } catch (err) {
       console.error('Error fetching data:', err);
     }
-  };
+  }, [filters]);
 
   useEffect(() => {
     fetchData();
-  }, [filters, fetchData])
+  }, [fetchData])
 
   return (
     <div className="bg-white">
       <Navbar />
       <div className="mt-10">
         <Link href="/admin">
-          <button className="ml-5 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-all">
+          <button className="ml-5 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-all mb-10">
             Back to Admin
           </button>
         </Link>
         
       </div>
-      <div className="h-screen bg-white text-black overflow-y-auto">
+      <div className="h-screen bg-white text-black">
         <h1 className="text-3xl font-bold text-center py-8">User Page</h1>
 
         <UserFilters filters={filters} setFilters={setFilters} />
