@@ -7,16 +7,15 @@ interface TableBodyProps<T> {
   getRowKey: (item: T, index: number) => string | number; 
 }
 
-function TableBody<T>({
-  data,
-  renderRow,
-  getRowKey,
-}: TableBodyProps<T>) {
-  return <tbody>{data.map((item, index) => {
-      const key = getRowKey(item, index);
-      return <React.Fragment key={key}>{renderRow(item)}</React.Fragment>;
-    })}
-  </tbody>;
+function TableBody<T>({ data, renderRow, getRowKey }: TableBodyProps<T>) {
+  return (
+    <tbody className="relative z-10 bg-white"> {/* Ensure it doesn't overlap the header */}
+      {data.map((item, index) => {
+        const key = getRowKey(item, index);
+        return <React.Fragment key={key}>{renderRow(item)}</React.Fragment>;
+      })}
+    </tbody>
+  );
 }
 
 export default TableBody;
