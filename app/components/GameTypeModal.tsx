@@ -31,7 +31,9 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
   const router = useRouter();
   const [hoveredType, setHoveredType] = useState<string | null>(null);
   const [selectedMode, setSelectedMode] = useState<string | null>(null);
+  const [selectedBoard, setSelectedBoard] = useState<string | null>(null);
   const [imageCount, setImageCount] = useState<number | null>(null);
+  const [customCode, setCustomCode] = useState<string>("");
   const [showDetails, setShowDetails] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorState, setError] = useState<string | null>(null);
@@ -76,83 +78,49 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
   //   },
   // ];
 
-  // const gameTypes = [
-  //     {
-  //         name: 'Classic',
-  //         description: 'Practice at your own pace',
-  //         details: [
-  //             'Take your time analyzing images',
-  //             'No time pressure',
-  //             'Track your progress'
-  //         ],
-  //         icon: faGamepad,
-  //         color: 'bg-blue-500',
-  //         route: '/game/classic'
-  //     },
-  //     {
-  //         name: 'Competitive',
-  //         description: 'Compete against others',
-  //         details: [
-  //             'Race against the clock',
-  //             'Score points quickly',
-  //             'Compete for leaderboard'
-  //         ],
-  //         icon: faTrophy,
-  //         color: 'bg-[var(--heartflow-red)]',
-  //         route: '/game/competitive'
-  //     },
-  //     {
-  //         name: 'Special',
-  //         description: 'Limited time challenges',
-  //         details: [
-  //             'Daily challenges',
-  //             'Streak bonuses',
-  //             'Earn badges'
-  //         ],
-  //         icon: faStar,
-  //         color: 'bg-purple-500',
-  //         route: '/game/special'
-  //     },
-  // ]
-
   const handleGameSelect = async (route: string) => {
-    if (route === "/game/classic") {
-      if (imageCount) {
-        try {
-          setIsLoading(true);
-          const user = auth.currentUser;
-          if (!user) {
-            throw new Error("No user logged in");
-          }
+    if (route === "/game/classic" && imageCount && selectedBoard) {
+      try {
+        setIsLoading(true);
+        const user = auth.currentUser;
+        if (!user) {
+          throw new Error("No user logged in");
+        }
 
-          const idToken = await user.getIdToken(true);
-          const response = await fetch(
-            `${process.env.NEXT_PUBLIC_API_BASE_URL}/game/initialize-classic-game`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${idToken}`,
-              },
-              body: JSON.stringify({
-                imageCount: imageCount,
-              }),
-            }
-          );
+        const idToken = await user.getIdToken(true);
+        const apiUrl =
+          selectedBoard === "Single"
+            ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/game/initialize-classic-game`
+            : `${
+                process.env.NEXT_PUBLIC_API_BASE_URL
+              }/game/initialize-classic-${selectedBoard.toLowerCase()}-game`;
 
-          if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || "Failed to initialize game");
-          }
-  
-          const data: GameResponse = await response.json();
-          console.log("Raw API response:", data);
+        const response = await fetch(apiUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${idToken}`,
+          },
+          body: JSON.stringify({
+            imageCount: imageCount,
+          }),
+        });
 
-          // Format images with the correct URL field - no more pairs, just single images
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || "Failed to initialize game");
+        }
+
+        const data = await response.json();
+        console.log("Raw API response:", data);
+        const gameCode = "AL19JQ82TR"; // TODO: data.gameCode;
+
+
+        if (selectedBoard === "Single") {
           const formattedImages = data.images.map(
             (img: ImageData, index: number) => ({
               id: index + 1,
-              path: img.url, // Use the url field from the API
+              path: img.url,
               type: img.type,
             })
           );
@@ -160,22 +128,27 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
           console.log("Formatted images:", formattedImages);
 
           setGameData(data.gameId, imageCount, formattedImages);
-
-          closeModal();
-          router.push(`/game/classic`);
-        } catch (error: unknown) {
-          if (error instanceof Error) {
-            console.error("Failed to start game:", error);
-            setError(error.message);
-          } else {
-            setError("An unknown error occured");
-          }
-          console.log(errorState);
-        } finally {
-          setIsLoading(false);
         }
+
+        closeModal();
+        if (selectedBoard == "Single") {
+          router.push(`${route}`); // TODO: Sharif needs to update backend
+        } else {
+          router.push(`${route}/${selectedBoard.toLowerCase()}/${gameCode}`); // TODO: Sharif needs to update backend
+        }
+      } catch (error: any) {
+        console.error("Failed to start game:", error);
+        setError(error.message);
+      } finally {
+        setIsLoading(false);
+      }
+    } else if (route === "/game/custom") {
+      if (selectedBoard && customCode) {
+        closeModal();
+        router.push(`${route}/${selectedBoard.toLowerCase()}/${customCode}`);
       }
     } else {
+      console.error("Invalid game route:", route);
       closeModal();
       router.push(route);
     }
@@ -199,7 +172,7 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
             <Dialog.Panel className="w-full max-w-4xl transform rounded-2xl bg-white shadow-xl transition-all overflow-hidden">
               <div className="flex h-[500px]">
                 <div className="w-1/2 p-6 border-r border-gray-200 overflow-y-auto">
-                  <Dialog.Title className="text-lg font-medium text-gray-900 mb-4">
+                  <Dialog.Title className="text-lg font-medium text-black mb-4">
                     Select Game Mode
                   </Dialog.Title>
 
@@ -226,10 +199,10 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
                             />
                           </div>
                           <div className="ml-4 text-left">
-                            <h4 className="text-base font-medium text-gray-900">
+                            <h4 className="text-base font-medium text-black">
                               {mode.name}
                             </h4>
-                            <p className="text-sm text-gray-500">
+                            <p className="text-sm text-black">
                               {mode.description}
                             </p>
                           </div>
@@ -253,35 +226,82 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
                       <div className="p-6">
                         {selectedGameMode ? (
                           <div className="flex flex-col h-full">
-                            <h3 className="text-lg font-medium text-gray-900 mb-4">
+                            <h3 className="text-lg font-medium text-black mb-4">
                               {selectedGameMode.name} Mode
                             </h3>
 
                             <div className="flex-1 min-h-0">
-                              {selectedGameMode.name === "Classic" && (
+                              {selectedGameMode.name !== "Competition" && (
                                 <div className="mt-6">
-                                  <h4 className="text-sm font-medium text-gray-700 mb-3">
-                                    Number of Images
+                                  <h4 className="text-sm font-medium text-black mb-3">
+                                    Select Game Board
                                   </h4>
-                                  <div className="grid grid-cols-4 gap-2">
-                                    {[5, 10, 15, 20, 30, 40, 50].map((num) => (
+                                  <div className="grid grid-cols-2 gap-2">
+                                    {gameBoards.map((board) => (
                                       <button
-                                        key={num}
-                                        onClick={() => setImageCount(num)}
+                                        key={board.name}
+                                        onClick={() =>
+                                          setSelectedBoard(board.name)
+                                        }
                                         className={`py-2 px-3 rounded border text-sm font-medium transition-colors
+                                                                                    ${
+                                                                                      selectedBoard ===
+                                                                                      board.name
+                                                                                        ? "bg-blue-500 text-white border-blue-500"
+                                                                                        : "border-gray-300 hover:border-blue-500"
+                                                                                    }`}
+                                      >
+                                        {board.name}
+                                      </button>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+
+                              {selectedGameMode.name === "Classic" &&
+                                selectedBoard && (
+                                  <div className="mt-6">
+                                    <h4 className="text-sm font-medium text-black mb-3">
+                                      Number of Images
+                                    </h4>
+                                    <div className="grid grid-cols-4 gap-2">
+                                      {[5, 10, 15, 20, 30, 40, 50].map(
+                                        (num) => (
+                                          <button
+                                            key={num}
+                                            onClick={() => setImageCount(num)}
+                                            className={`py-2 px-3 rounded border text-sm font-medium transition-colors
                                                                                     ${
                                                                                       imageCount ===
                                                                                       num
                                                                                         ? "bg-blue-500 text-white border-blue-500"
                                                                                         : "border-gray-300 hover:border-blue-500"
                                                                                     }`}
-                                      >
-                                        {num}
-                                      </button>
-                                    ))}
+                                          >
+                                            {num}
+                                          </button>
+                                        )
+                                      )}
+                                    </div>
                                   </div>
-                                </div>
-                              )}
+                                )}
+
+                              {selectedGameMode.name === "Custom" &&
+                                selectedBoard && (
+                                  <div className="mt-6">
+                                    <h4 className="text-sm font-medium text-black mb-3">
+                                      Enter Custom Code
+                                    </h4>
+                                    <input
+                                      type="text"
+                                      value={customCode}
+                                      onChange={(e) =>
+                                        setCustomCode(e.target.value)
+                                      }
+                                      className="w-full p-2 border rounded"
+                                    />
+                                  </div>
+                                )}
                             </div>
 
                             <button
@@ -289,8 +309,10 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
                                 handleGameSelect(selectedGameMode.route)
                               }
                               disabled={
-                                selectedGameMode.name === "Classic" &&
-                                (!imageCount || isLoading)
+                                (selectedGameMode.name === "Classic" &&
+                                  (!imageCount || isLoading)) ||
+                                (selectedGameMode.name === "Custom" &&
+                                  (!customCode || isLoading))
                               }
                               className="w-full mt-4 py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600 
                                                                  disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
@@ -304,9 +326,14 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
                                 "Start Game"
                               )}
                             </button>
+                            {error && (
+                              <div className="text-red-500 text-sm mt-2">
+                                {error}
+                              </div>
+                            )}
                           </div>
                         ) : (
-                          <div className="h-full flex items-center justify-center text-gray-500">
+                          <div className="h-full flex items-center justify-center text-black">
                             Select a game type to see details
                           </div>
                         )}
