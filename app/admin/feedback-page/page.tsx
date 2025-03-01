@@ -82,12 +82,12 @@ const FeedbackPage = () => {
       <Navbar />
       <div className="mt-10">
         <Link href="/admin">
-          <button className="ml-5 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-all">
+          <button className="ml-5 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-all mb-10">
             Back to Admin
           </button>
         </Link>
       </div>
-      <div className="h-screen bg-white text-black overflow-y-auto">
+      <div className="h-screen bg-white text-black">
         <h1 className="text-3xl font-bold text-center py-8">Feedback Page</h1>
 
         <FeedbackFilters filters={filters} setFilters={setFilters} />
