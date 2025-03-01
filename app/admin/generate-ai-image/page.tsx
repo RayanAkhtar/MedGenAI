@@ -49,7 +49,7 @@ const GenerateImagePage = () => {
       const imageBlob = await fetch(generatedImagePath).then(res => res.blob());
 
       const formData = new FormData();
-      formData.append("image", imageBlob, "generated_image.png");
+      formData.append("image", imageBlob, "/" + generatedImagePath.split("/")[generatedImagePath.length - 1]);
 
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/saveImage`, 
