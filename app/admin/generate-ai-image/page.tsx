@@ -28,8 +28,6 @@ const GenerateImagePage = () => {
 
       const { imagePath } = await response.json();
       
-      console.log("Image path received from backend:", imagePath);  // TODO: make sure this is piped to where we store images and make sure backend is returning a unique generated path, not the path it gets the image from
-      
       setGeneratedImagePath(imagePath);
 
     } catch (error) {
@@ -48,11 +46,26 @@ const GenerateImagePage = () => {
     try {
       const imageBlob = await fetch(generatedImagePath).then(res => res.blob());
 
+      let ageToUse = -1;
+
+      if (ageRange == "any") {
+        ageToUse = Math.floor(Math.random() * (80 - 18 + 1)) + 18;
+      } else {
+        const rangeList = ageRange.split("-");
+        const minAge = parseInt(rangeList[0]);
+        const maxAge = parseInt(rangeList[1]);
+        
+        ageToUse = Math.floor(Math.random() * (maxAge - minAge + 1)) + minAge;
+      }
+
       const formData = new FormData();
-      formData.append("image", imageBlob, "/" + generatedImagePath.split("/")[generatedImagePath.length - 1]);
+      formData.append("image", imageBlob, generatedImagePath.split("/").pop() || "generated-image.jpg");
+      formData.append("gender", sex);
+      formData.append("age", ageToUse.toString());
+      formData.append("disease", disease);
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/saveImage`, 
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/saveGeneratedImage`, 
         {
           method: "POST",
           body: formData,

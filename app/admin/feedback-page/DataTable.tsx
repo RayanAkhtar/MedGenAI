@@ -19,6 +19,7 @@ interface DataTableProps {
 
 const DataTable: React.FC<DataTableProps> = ({ data }) => {
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
+  console.log(feedbacks)
 
   const resolveFeedback = async (feedbackId: string): Promise<void> => {
     try {

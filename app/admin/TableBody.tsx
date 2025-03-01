@@ -9,7 +9,7 @@ interface TableBodyProps<T> {
 
 function TableBody<T>({ data, renderRow, getRowKey }: TableBodyProps<T>) {
   return (
-    <tbody className="relative z-10 bg-white"> {/* Ensure it doesn't overlap the header */}
+    <tbody className="relative z-10 bg-white">
       {data.map((item, index) => {
         const key = getRowKey(item, index);
         return <React.Fragment key={key}>{renderRow(item)}</React.Fragment>;

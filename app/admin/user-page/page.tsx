@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import Navbar from '@/app/components/Navbar';
 import UserTable from '@/app/admin/user-page/UserTable';
@@ -24,10 +24,10 @@ const UserPage = () => {
     sortOrder: 'desc',
   });
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       if (filters.tags.length === 0) {
-        setData([])
+        setData([]);
         return;
       }
       const tagsParam = filters.tags
@@ -41,11 +41,11 @@ const UserPage = () => {
     } catch (err) {
       console.error('Error fetching data:', err);
     }
-  };
+  }, [filters]);
 
   useEffect(() => {
     fetchData();
-  }, [filters, fetchData])
+  }, [fetchData])
 
   return (
     <div className="bg-white">
