@@ -54,6 +54,9 @@ export default function UserProfile() {
   // Store the fetched game data
   const [fetchedGame, setFetchedGame] = useState<GameData | null>(null);
 
+  // Track whether the game has been successfully assigned
+  const [isAssigned, setIsAssigned] = useState<boolean>(false);
+
   useEffect(() => {
     const fetchProfile = async () => {
       if (!username) return;
@@ -118,19 +121,36 @@ export default function UserProfile() {
 
   // --- Function to handle "Assign" button click ---
   const handleAssign = async () => {
-    // Here, do your "assign game" logic, e.g.:
-    // - call an API endpoint to assign the game to the user
-    // - handle success or error states
-    // For now, we'll just log and close the popover:
+    try {
+      const userId = profile?.user_id;
+      const gameId = gameCode;
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/newGameSession`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            game_id: gameId,
+            user_id: userId
+          })
+        }
+      );
 
-    console.log('Assigning game:', fetchedGame?.game_id, 'to user:', username);
-    // Example: 
-    // const assignRes = await fetch(...)
+      if (!response.ok) {
+        // Handle HTTP-level errors
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
 
-    // Once done, you can close the modal or show a success message
-    setShowAssignGameModal(false);
-    setFetchedGame(null);
-    setGameCode('');
+      const data = await response.json();
+      console.log('Server response:', data);
+      
+      // If the server responded successfully, mark as assigned
+      setIsAssigned(true);
+    } catch (error) {
+      console.error('Error in handleAssign:', error);
+    }
   };
 
   return (
@@ -149,6 +169,7 @@ export default function UserProfile() {
                   setGameError(null);   // Reset error every time we open
                   setFetchedGame(null); // Reset any fetched data
                   setGameCode('');      // Reset input
+                  setIsAssigned(false); // Reset assigned state
                   setShowAssignGameModal(true);
                 }}
               >
@@ -191,9 +212,22 @@ export default function UserProfile() {
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           {/* Modal content */}
           <div className="bg-white p-6 rounded shadow-md w-[90%] max-w-md">
-            {/* If we have not fetchedGame, show the input + "Find" button.
-                Otherwise, show the game details + "Assign" button. */}
-            {!fetchedGame ? (
+            {/* 1) If isAssigned === true, show "Assigned!" message.
+                2) Else if we have NOT found a game, show the "Enter Code" UI.
+                3) Otherwise, we show the game details + "Assign" button. */}
+            {isAssigned ? (
+              <>
+                <h2 className="text-xl font-semibold mb-4">Game Assigned Successfully!</h2>
+                <div className="flex justify-end space-x-2">
+                  <button
+                    onClick={() => setShowAssignGameModal(false)}
+                    className="px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400 transition-colors"
+                  >
+                    Close
+                  </button>
+                </div>
+              </>
+            ) : !fetchedGame ? (
               <>
                 <h2 className="text-xl font-semibold mb-4">Enter Code</h2>
 
