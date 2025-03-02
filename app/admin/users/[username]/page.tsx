@@ -31,6 +31,7 @@ interface GameData {
   game_status: string;
   expiry_date: string | null;
   created_by: string;
+  error: string;
 }
 
 export default function UserProfile() {
@@ -41,16 +42,16 @@ export default function UserProfile() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Game error, specifically for fetching a game
+  // Game fetch error
   const [gameError, setGameError] = useState<string | null>(null);
 
-  // --- State for the popover (modal) ---
+  // State for popover (modal)
   const [showAssignGameModal, setShowAssignGameModal] = useState<boolean>(false);
 
-  // --- Track the input for the game code ---
+  // Store the code typed by the admin
   const [gameCode, setGameCode] = useState<string>('');
 
-  // --- Store the fetched GameData (if any) ---
+  // Store the fetched game data
   const [fetchedGame, setFetchedGame] = useState<GameData | null>(null);
 
   useEffect(() => {
@@ -68,7 +69,9 @@ export default function UserProfile() {
         console.log(`Username: ${username}`);
 
         if (!data[0].username) {
-          throw new Error(`Failed to fetch profile. Username not found: ${username}`);
+          throw new Error(
+            `Failed to fetch profile. Username not found: ${username}`
+          );
         }
 
         // If data is an array, use the first object
@@ -98,19 +101,36 @@ export default function UserProfile() {
       if (!res.ok) {
         throw new Error(`Failed to fetch game with code: ${gameCode}`);
       }
-      const gameData: GameData = await res.json();
+      const gameData: GameData[] = await res.json();
 
-      // Clear any previous error and store the game data
+      if (gameData[0].error) {
+        throw new Error(`Failed to fetch game with code: ${gameCode}`);
+      }
+
       setGameError(null);
-      setFetchedGame(gameData);
-
-      // Close the modal after success
-      setShowAssignGameModal(false);
+      setFetchedGame(gameData[0]);
       console.log('Game data fetched:', gameData);
     } catch (err) {
-      // Keep the modal open and show the error
       setGameError((err as Error).message);
+      setFetchedGame(null); // reset any previously fetched data
     }
+  };
+
+  // --- Function to handle "Assign" button click ---
+  const handleAssign = async () => {
+    // Here, do your "assign game" logic, e.g.:
+    // - call an API endpoint to assign the game to the user
+    // - handle success or error states
+    // For now, we'll just log and close the popover:
+
+    console.log('Assigning game:', fetchedGame?.game_id, 'to user:', username);
+    // Example: 
+    // const assignRes = await fetch(...)
+
+    // Once done, you can close the modal or show a success message
+    setShowAssignGameModal(false);
+    setFetchedGame(null);
+    setGameCode('');
   };
 
   return (
@@ -123,14 +143,16 @@ export default function UserProfile() {
             <div className="flex justify-end items-center">
               {/* Button to open the Assign Game popover */}
               <button
-                className="px-4 py-2 bg-[var(--heartflow-red)] text-white w-[30%] h-[80%] rounded-[25px]
+                className="px-4 py-2 bg-[var(--heartflow-red)] text-white w-[30%] h-[60%] rounded-[25px]
                 hover:bg-[var(--heartflow-blue)] transition-colors duration-300"
                 onClick={() => {
-                  setGameError(null); // Reset error every time we open
+                  setGameError(null);   // Reset error every time we open
+                  setFetchedGame(null); // Reset any fetched data
+                  setGameCode('');      // Reset input
                   setShowAssignGameModal(true);
                 }}
               >
-                Assign Game
+                Assign New Game
               </button>
             </div>
           )}
@@ -160,16 +182,6 @@ export default function UserProfile() {
             <Tags />
           </div>
         )}
-
-        {/* OPTIONAL: Display the fetched game data if you want to show it on the same page */}
-        {fetchedGame && (
-          <div className="mt-10 p-4 border border-gray-200 rounded">
-            <h3 className="text-xl font-semibold mb-2">Fetched Game Data</h3>
-            <pre className="bg-gray-100 p-2 rounded text-sm">
-              {JSON.stringify(fetchedGame, null, 2)}
-            </pre>
-          </div>
-        )}
       </div>
 
       {/* ------------------------------------------------------------------------
@@ -179,33 +191,70 @@ export default function UserProfile() {
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           {/* Modal content */}
           <div className="bg-white p-6 rounded shadow-md w-[90%] max-w-md">
-            <h2 className="text-xl font-semibold mb-4">Enter Code</h2>
+            {/* If we have not fetchedGame, show the input + "Find" button.
+                Otherwise, show the game details + "Assign" button. */}
+            {!fetchedGame ? (
+              <>
+                <h2 className="text-xl font-semibold mb-4">Enter Code</h2>
 
-            {/* Error message for game fetch, if any */}
-            {gameError && <p className="text-red-500 mb-4">{gameError}</p>}
+                {gameError && <p className="text-red-500 mb-4">{gameError}</p>}
 
-            <input
-              type="text"
-              value={gameCode}
-              onChange={(e) => setGameCode(e.target.value)}
-              placeholder="Game code..."
-              className="border border-gray-300 rounded px-3 py-2 w-full mb-4"
-            />
+                <input
+                  type="text"
+                  value={gameCode}
+                  onChange={(e) => setGameCode(e.target.value)}
+                  placeholder="Game code..."
+                  className="border border-gray-300 rounded px-3 py-2 w-full mb-4"
+                />
 
-            <div className="flex justify-end space-x-2">
-              <button
-                onClick={() => setShowAssignGameModal(false)}
-                className="px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleFind}
-                className="px-4 py-2 bg-[var(--heartflow-red)] text-white rounded hover:bg-[var(--heartflow-blue)] transition-colors"
-              >
-                Find
-              </button>
-            </div>
+                <div className="flex justify-end space-x-2">
+                  <button
+                    onClick={() => setShowAssignGameModal(false)}
+                    className="px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleFind}
+                    className="px-4 py-2 bg-[var(--heartflow-red)] text-white rounded hover:bg-[var(--heartflow-blue)] transition-colors"
+                  >
+                    Find
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <h2 className="text-xl font-semibold mb-4">
+                  Game Found: {fetchedGame.game_id}
+                </h2>
+
+                {/* Display game details nicely */}
+                <div className="mb-4">
+                  <p><strong>Game Mode:</strong> {fetchedGame.game_mode}</p>
+                  <p><strong>Date Created:</strong> {fetchedGame.date_created}</p>
+                  <p><strong>Game Board:</strong> {fetchedGame.game_board}</p>
+                  <p><strong>Game Status:</strong> {fetchedGame.game_status}</p>
+                  <p><strong>Expiry Date:</strong> {fetchedGame.expiry_date || 'N/A'}</p>
+                  <p><strong>Created By:</strong> {fetchedGame.created_by}</p>
+                </div>
+
+                {/* Buttons to close or assign */}
+                <div className="flex justify-end space-x-2">
+                  <button
+                    onClick={() => setShowAssignGameModal(false)}
+                    className="px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400 transition-colors"
+                  >
+                    Close
+                  </button>
+                  <button
+                    onClick={handleAssign}
+                    className="px-4 py-2 bg-[var(--heartflow-red)] text-white rounded hover:bg-[var(--heartflow-blue)] transition-colors"
+                  >
+                    Assign
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
