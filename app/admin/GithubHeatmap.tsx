@@ -1,43 +1,13 @@
-import { useState } from "react";
-
+import { useState, useEffect } from "react";
 
 type EngagementData = {
   year: number;
   data: { month: number; week: number; day: number; engagement: number }[];
 };
 
-
-const generateDummyData = (year: number): EngagementData => {
-  const data: { month: number; week: number; day: number; engagement: number }[] = [];
-
-  for (let month = 0; month < 12; month++) {
-    for (let week = 0; week < 5; week++) {
-      for (let day = 0; day < 7; day++) {
-        if (Math.random() > 0.8) continue;
-
-        data.push({
-          month,
-          week,
-          day,
-          engagement: Math.floor(Math.random() * 10),
-        });
-      }
-    }
-  }
-
-  return { year, data };
-};
-
-
-const dummyEngagementData: { [year: number]: EngagementData } = {
-  2022: generateDummyData(2022),
-  2023: generateDummyData(2023),
-  2024: generateDummyData(2024),
-  2025: generateDummyData(2025),
-};
-
-
-const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const months = [
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+];
 
 const daysInMonth = (month: number, year: number): number => {
   const isLeapYear =
@@ -64,17 +34,63 @@ const daysInMonth = (month: number, year: number): number => {
   }
 };
 
+const getFirstDayOfMonth = (month: number, year: number): number => {
+  const date = new Date(year, month, 1);
+  return date.getDay();
+};
+
+const getWeekOfMonth = (day: number, firstDayOfMonth: number): number => {
+  const dayOfWeek = (day + firstDayOfMonth - 1) % 7;
+  return Math.ceil((day + dayOfWeek) / 7);
+};
+
 export default function GithubHeatmap() {
   const [selectedYear, setSelectedYear] = useState<number>(2025);
   const [hovered, setHovered] = useState<{ month: number; week: number; day: number } | null>(null);
+  const [engagementData, setEngagementData] = useState<{ [year: number]: EngagementData }>({});
 
   const getColor = (value: number) => {
     if (value === 0) return "#E0E0E0"; // Light gray
-    if (value <= 2) return "#A0D995";  // Light green
-    if (value <= 5) return "#67C26B";  // Medium green
-    if (value <= 8) return "#2A9639";  // Dark green
+    if (value >= 1) return "#A0D995";  // Light green
+    if (value >= 4) return "#67C26B";  // Medium green
+    if (value >= 9) return "#2A9639";  // Dark green
     return "#166D26";                  // Deepest green
   };
+
+  useEffect(() => {
+    const fetchEngagementData = async () => {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/engagementHeatmap`);
+        const data = await response.json();
+        console.log("data", data);
+
+        const formattedData: { [year: number]: EngagementData } = {};
+
+        data.forEach((item: any) => {
+          formattedData[item.year] = {
+            year: item.year,
+            data: item.data.map((entry: any) => {
+              const firstDayOfMonth = getFirstDayOfMonth(entry.month, item.year);
+              const weekOfMonth = getWeekOfMonth(entry.day, firstDayOfMonth);
+
+              return {
+                month: entry.month,
+                week: weekOfMonth,
+                day: entry.day,
+                engagement: entry.engagement,
+              };
+            }),
+          };
+        });
+
+        setEngagementData(formattedData);
+      } catch (error) {
+        console.error("Error fetching engagement data:", error);
+      }
+    };
+
+    fetchEngagementData();
+  }, []);
 
   return (
     <div className="p-6 bg-white rounded-2xl shadow-md border border-gray-200 w-full">
@@ -87,7 +103,7 @@ export default function GithubHeatmap() {
             value={selectedYear}
             onChange={(e) => setSelectedYear(Number(e.target.value))}
           >
-            {Object.keys(dummyEngagementData).map((year) => (
+            {Object.keys(engagementData).map((year) => (
               <option key={year} value={year}>
                 {year}
               </option>
@@ -104,30 +120,27 @@ export default function GithubHeatmap() {
 
               <div className="grid grid-rows-7 grid-flow-col gap-1">
                 {Array.from({ length: 35 }).map((_, index) => {
-                  const week = Math.floor(index / 7);
-                  const day = index % 7;
-
+                  const day = index + 1;
                   const daysInCurrentMonth = daysInMonth(monthIndex, selectedYear);
 
-                  if (index >= daysInCurrentMonth) return null;
+                  if (day > daysInCurrentMonth) return null;
 
-                  const engagement = dummyEngagementData[selectedYear].data.find(
-                    (d) => d.month === monthIndex && d.week === week && d.day === day
-                  )?.engagement || 0;
-
-                  const calendarDay = index + 1;
+                  const engagement =
+                    engagementData[selectedYear]?.data.find(
+                      (d) => d.month === monthIndex && d.week === getWeekOfMonth(day, getFirstDayOfMonth(monthIndex, selectedYear)) && d.day === day
+                    )?.engagement || 0;
 
                   return (
                     <div
-                      key={`${month}-${week}-${day}`}
+                      key={`${month}-${day}`}
                       className="w-4 h-4 rounded-md transition-transform hover:scale-105 relative"
                       style={{ backgroundColor: getColor(engagement) }}
-                      onMouseEnter={() => setHovered({ month: monthIndex, week, day })}
+                      onMouseEnter={() => setHovered({ month: monthIndex, week: getWeekOfMonth(day, getFirstDayOfMonth(monthIndex, selectedYear)), day })}
                       onMouseLeave={() => setHovered(null)}
                     >
-                      {hovered?.month === monthIndex && hovered?.week === week && hovered?.day === day && (
+                      {hovered?.month === monthIndex && hovered?.week === getWeekOfMonth(day, getFirstDayOfMonth(monthIndex, selectedYear)) && hovered?.day === day && (
                         <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded-md shadow-md whitespace-nowrap z-50">
-                          {`${calendarDay} ${months[hovered.month]} ${selectedYear}`}: {engagement} interactions
+                          {`${day} ${months[hovered.month]} ${selectedYear}`}: {engagement} interactions
                         </div>
                       )}
                     </div>
