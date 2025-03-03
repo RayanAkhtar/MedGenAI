@@ -20,7 +20,7 @@ export default function ImageStatsCard({
   const [buttonState, setButtonState] = useState("select"); // 'select' | 'upload'
   const [imageCount, setImageCount] = useState(imageData.total);
   const [sex, setSex] = useState<"male" | "female">("male");
-  const [disease, setDisease] = useState<"none" | "pleural_effusion">("none");
+  const [disease, setDisease] = useState<"none" | "Pleural_Effusion">("none");
   const [age, setAge] = useState<number>(18);
 
   useEffect(() => {
@@ -100,11 +100,11 @@ export default function ImageStatsCard({
         <h3 className="text-lg font-semibold text-gray-600 mb-4">Disease</h3>
         <select
           value={disease}
-          onChange={(e) => setDisease(e.target.value as "none" | "pleural_effusion")}
+          onChange={(e) => setDisease(e.target.value as "none" | "Pleural_Effusion")}
           className="block w-full mt-2 px-4 py-2 border rounded-lg bg-white text-lg text-gray-700 shadow-sm focus:ring focus:ring-blue-200 focus:outline-none"
         >
           <option value="none">None</option>
-          <option value="pleural_effusion">Pleural Effusion</option>
+          <option value="Pleural_Effusion">Pleural Effusion</option>
         </select>
       </div>
 
