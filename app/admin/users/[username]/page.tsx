@@ -20,6 +20,9 @@ interface UserProfileData {
   games_started: number;
   games_won: number;
   score: number;
+  accuracy_percentage: number;
+  total_images_guessed: number;
+  correct_guesses: number;
 }
 
 // New interface for game data
@@ -69,7 +72,8 @@ export default function UserProfile() {
           throw new Error('Failed to fetch profile');
         }
         const data: UserProfileData[] = await response.json();
-        console.log(`Username: ${username}`);
+        // console.log(`Username: ${username}`);
+        // console.log('Profile data:', data);
 
         if (!data[0].username) {
           throw new Error(
@@ -112,7 +116,7 @@ export default function UserProfile() {
 
       setGameError(null);
       setFetchedGame(gameData[0]);
-      console.log('Game data fetched:', gameData);
+      // console.log('Game data fetched:', gameData);
     } catch (err) {
       setGameError((err as Error).message);
       setFetchedGame(null); // reset any previously fetched data
@@ -197,8 +201,9 @@ export default function UserProfile() {
             />
 
             {/* Score Box */}
-            <ScoreBox score={profile.score} />
-
+            <ScoreBox score={profile.score} 
+              accuracy={profile.accuracy_percentage} 
+              totalImagesAttempted={profile.total_images_guessed}/>
             {/* Tags */}
             <Tags />
           </div>
