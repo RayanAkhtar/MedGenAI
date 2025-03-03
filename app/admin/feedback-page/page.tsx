@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
@@ -16,6 +16,9 @@ const FeedbackPage = () => {
   const [filters, setFilters] = useState({
     type: filterParam === 'real' ? 'real' : filterParam === 'ai' ? 'ai' : 'all',
     resolved: filterParam === 'complete' ? true : filterParam === 'false' ? false : null,
+    sex: '',
+    disease: '',
+    ageRange: '',
     sortBy: 'last_feedback_time',
     sortOrder: 'asc',
   });
@@ -41,7 +44,7 @@ const FeedbackPage = () => {
   const fetchFeedbackCount = useCallback(async () => {
     try {
       const countRes = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getFeedbackCount?image_type=${filters.type}&resolved=${filters.resolved}`
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getFeedbackCount?image_type=${filters.type}&resolved=${filters.resolved}&sex=${filters.sex}&disease=${filters.disease}&age_range=${filters.ageRange}`
       );
       const { total_count } = await countRes.json();
       setTotalPages(Math.ceil(total_count / 20));
@@ -53,7 +56,7 @@ const FeedbackPage = () => {
   // 2. Main data fetch function (memoized using useCallback)
   const fetchData = useCallback(async (page = 1) => {
     try {
-      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getFeedbacks?image_type=${filters.type}&resolved=${filters.resolved}&sort_by=${filters.sortBy}&sort_order=${filters.sortOrder}&page=${page}&limit=20`;
+      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getFeedbacks?image_type=${filters.type}&resolved=${filters.resolved}&sex=${filters.sex}&disease=${filters.disease}&age_range=${filters.ageRange}&sort_by=${filters.sortBy}&sort_order=${filters.sortOrder}&page=${page}&limit=20`;
       
       const response = await fetch(url);
       const result = await response.json();

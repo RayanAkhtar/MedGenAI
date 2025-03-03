@@ -19,8 +19,8 @@ export default function ImageStatsCard({
   const [file, setFile] = useState<File | null>(null);
   const [buttonState, setButtonState] = useState("select"); // 'select' | 'upload'
   const [imageCount, setImageCount] = useState(imageData.total);
-  const [sex, setSex] = useState<"male" | "female">("male");
-  const [disease, setDisease] = useState<"none" | "Pleural_Effusion">("none");
+  const [sex, setSex] = useState<"Male" | "Female">("Male");
+  const [disease, setDisease] = useState<"None" | "Pleural_Effusion">("None");
   const [age, setAge] = useState<number>(18);
 
   useEffect(() => {
@@ -77,8 +77,8 @@ export default function ImageStatsCard({
             <input
               type="radio"
               value="male"
-              checked={sex === "male"}
-              onChange={() => setSex("male")}
+              checked={sex === "Male"}
+              onChange={() => setSex("Male")}
               className="form-radio text-blue-500 transform scale-150"
             />
             <span className="text-xl">Male</span>
@@ -87,8 +87,8 @@ export default function ImageStatsCard({
             <input
               type="radio"
               value="female"
-              checked={sex === "female"}
-              onChange={() => setSex("female")}
+              checked={sex === "Female"}
+              onChange={() => setSex("Female")}
               className="form-radio text-pink-500 transform scale-150"
             />
             <span className="text-xl">Female</span>
@@ -100,7 +100,7 @@ export default function ImageStatsCard({
         <h3 className="text-lg font-semibold text-gray-600 mb-4">Disease</h3>
         <select
           value={disease}
-          onChange={(e) => setDisease(e.target.value as "none" | "Pleural_Effusion")}
+          onChange={(e) => setDisease(e.target.value as "None" | "Pleural_Effusion")}
           className="block w-full mt-2 px-4 py-2 border rounded-lg bg-white text-lg text-gray-700 shadow-sm focus:ring focus:ring-blue-200 focus:outline-none"
         >
           <option value="none">None</option>
