@@ -10,33 +10,17 @@ const months = [
 ];
 
 const daysInMonth = (month: number, year: number): number => {
-  const isLeapYear =
-    (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0); // leap year every 4 years
+  const isLeapYear = (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
 
   switch (month) {
-    case 0:  // January
-    case 2:  // March
-    case 4:  // May
-    case 6:  // July
-    case 7:  // August
-    case 9:  // October
-    case 11: // December
-      return 31;
-    case 3:  // April
-    case 5:  // June
-    case 8:  // September
-    case 10: // November
-      return 30;
-    case 1:  // February
-      return isLeapYear ? 29 : 28;
-    default:
-      return 30;
+    case 1: return isLeapYear ? 29 : 28; // Feb
+    case 3: case 5: case 8: case 10: return 30; // Apr, Jun, Sep, Nov
+    default: return 31; // Jan, Mar, May, Jul, Aug, Oct, Dec
   }
 };
 
 const getFirstDayOfMonth = (month: number, year: number): number => {
-  const date = new Date(year, month, 1);
-  return date.getDay();
+  return new Date(year, month - 1, 1).getDay(); // Months start from 1, not 0 in the API
 };
 
 const getWeekOfMonth = (day: number, firstDayOfMonth: number): number => {
@@ -70,11 +54,12 @@ export default function GithubHeatmap() {
           formattedData[item.year] = {
             year: item.year,
             data: item.data.map((entry: any) => {
+              const monthIndex = entry.month - 1;
               const firstDayOfMonth = getFirstDayOfMonth(entry.month, item.year);
               const weekOfMonth = getWeekOfMonth(entry.day, firstDayOfMonth);
 
               return {
-                month: entry.month,
+                month: monthIndex,
                 week: weekOfMonth,
                 day: entry.day,
                 engagement: entry.engagement,
@@ -121,7 +106,7 @@ export default function GithubHeatmap() {
               <div className="grid grid-rows-7 grid-flow-col gap-1">
                 {Array.from({ length: 35 }).map((_, index) => {
                   const day = index + 1;
-                  const daysInCurrentMonth = daysInMonth(monthIndex, selectedYear);
+                  const daysInCurrentMonth = daysInMonth(monthIndex + 1, selectedYear); // Adjust for 1-based input
 
                   if (day > daysInCurrentMonth) return null;
 
@@ -129,7 +114,7 @@ export default function GithubHeatmap() {
                     engagementData[selectedYear]?.data.find(
                       (d) =>
                         d.month === monthIndex &&
-                        d.week === getWeekOfMonth(day, getFirstDayOfMonth(monthIndex, selectedYear)) &&
+                        d.week === getWeekOfMonth(day, getFirstDayOfMonth(monthIndex + 1, selectedYear)) &&
                         d.day === day
                     )?.engagement || 0;
 
@@ -141,21 +126,20 @@ export default function GithubHeatmap() {
                       onMouseEnter={() =>
                         setHovered({
                           month: monthIndex,
-                          week: getWeekOfMonth(day, getFirstDayOfMonth(monthIndex, selectedYear)),
+                          week: getWeekOfMonth(day, getFirstDayOfMonth(monthIndex + 1, selectedYear)),
                           day,
                         })
                       }
                       onMouseLeave={() => setHovered(null)}
                     >
                       {hovered?.month === monthIndex &&
-                        hovered?.week === getWeekOfMonth(day, getFirstDayOfMonth(monthIndex, selectedYear)) &&
+                        hovered?.week === getWeekOfMonth(day, getFirstDayOfMonth(monthIndex + 1, selectedYear)) &&
                         hovered?.day === day && (
                           <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 bg-black text-white text-xs px-2 py-1 rounded-md shadow-lg z-50 whitespace-nowrap">
                             {`${day} ${months[hovered.month]} ${selectedYear}`}: {engagement} interactions
                           </div>
                         )}
                     </div>
-
                   );
                 })}
               </div>
