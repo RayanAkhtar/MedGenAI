@@ -96,24 +96,24 @@ export default function GithubHeatmap() {
     <div className="p-6 bg-white rounded-2xl shadow-md border border-gray-200 w-full">
       <h3 className="text-xl font-semibold text-black text-center mb-4">Engagement Heatmap</h3>
 
-      <div className="mb-4 flex justify-center">
-        <div className="relative">
-          <select
-            className="px-4 py-2 border border-gray-300 bg-gray-100 text-black text-sm font-medium rounded-lg shadow-sm cursor-pointer hover:bg-gray-200 focus:ring-2 focus:ring-blue-500 transition-all"
-            value={selectedYear}
-            onChange={(e) => setSelectedYear(Number(e.target.value))}
+      <div className="mb-4 flex justify-center gap-2 flex-wrap">
+        {Object.keys(engagementData).map((year) => (
+          <button
+            key={year}
+            className={`px-4 py-2 font-medium rounded-lg shadow-sm transition-all ${
+              selectedYear === Number(year)
+                ? "bg-blue-500 text-white text-lg px-6 py-3"
+                : "bg-gray-200 text-gray-700 hover:bg-gray-300 text-sm"
+            }`}
+            onClick={() => setSelectedYear(Number(year))}
           >
-            {Object.keys(engagementData).map((year) => (
-              <option key={year} value={year}>
-                {year}
-              </option>
-            ))}
-          </select>
-        </div>
+            {year}
+          </button>
+        ))}
       </div>
 
-      <div className="overflow-x-auto w-full">
-        <div className="flex gap-4 min-w-max px-2">
+      <div className="w-full flex justify-center sm:justify-start overflow-x-auto pl-6 pr-6 pt-10">
+        <div className="flex gap-4 min-w-full sm:min-w-max">
           {months.map((month, monthIndex) => (
             <div key={month} className="flex flex-col items-center">
               <span className="text-xs text-gray-600 font-semibold mb-1">{month}</span>
@@ -127,7 +127,10 @@ export default function GithubHeatmap() {
 
                   const engagement =
                     engagementData[selectedYear]?.data.find(
-                      (d) => d.month === monthIndex && d.week === getWeekOfMonth(day, getFirstDayOfMonth(monthIndex, selectedYear)) && d.day === day
+                      (d) =>
+                        d.month === monthIndex &&
+                        d.week === getWeekOfMonth(day, getFirstDayOfMonth(monthIndex, selectedYear)) &&
+                        d.day === day
                     )?.engagement || 0;
 
                   return (
@@ -135,15 +138,24 @@ export default function GithubHeatmap() {
                       key={`${month}-${day}`}
                       className="w-4 h-4 rounded-md transition-transform hover:scale-105 relative"
                       style={{ backgroundColor: getColor(engagement) }}
-                      onMouseEnter={() => setHovered({ month: monthIndex, week: getWeekOfMonth(day, getFirstDayOfMonth(monthIndex, selectedYear)), day })}
+                      onMouseEnter={() =>
+                        setHovered({
+                          month: monthIndex,
+                          week: getWeekOfMonth(day, getFirstDayOfMonth(monthIndex, selectedYear)),
+                          day,
+                        })
+                      }
                       onMouseLeave={() => setHovered(null)}
                     >
-                      {hovered?.month === monthIndex && hovered?.week === getWeekOfMonth(day, getFirstDayOfMonth(monthIndex, selectedYear)) && hovered?.day === day && (
-                        <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded-md shadow-md whitespace-nowrap z-50">
-                          {`${day} ${months[hovered.month]} ${selectedYear}`}: {engagement} interactions
-                        </div>
-                      )}
+                      {hovered?.month === monthIndex &&
+                        hovered?.week === getWeekOfMonth(day, getFirstDayOfMonth(monthIndex, selectedYear)) &&
+                        hovered?.day === day && (
+                          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 bg-black text-white text-xs px-2 py-1 rounded-md shadow-lg z-50 whitespace-nowrap">
+                            {`${day} ${months[hovered.month]} ${selectedYear}`}: {engagement} interactions
+                          </div>
+                        )}
                     </div>
+
                   );
                 })}
               </div>
