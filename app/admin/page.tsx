@@ -6,6 +6,7 @@ import AdminStats from "./AdminStats";
 import FeedbackPieChart from "./FeedbackPieChart";
 import ImageStatsCard from "./ImageStatsCard";
 import Sitemap from "./Sitemap";
+import GithubHeatmap from "./GithubHeatmap";
 
 export default function Admin() {
   const [feedbackStatusData, setFeedbackStatusData] = useState({ complete: 0, incomplete: 0 });
@@ -43,6 +44,10 @@ export default function Admin() {
   return (
     <main className="h-screen bg-[var(--background)] text-[var(--foreground)] overflow-y-auto">
       <Navbar />
+
+      <section>
+        <GithubHeatmap />
+      </section>
 
       <section className="p-8 bg-white">
         <AdminStats />
