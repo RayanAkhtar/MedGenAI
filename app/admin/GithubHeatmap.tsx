@@ -5,6 +5,11 @@ type EngagementData = {
   data: { month: number; week: number; day: number; engagement: number }[];
 };
 
+type ApiResponseItem = {
+  year: number;
+  data: { month: number; week: number; day: number; engagement: number }[];
+};
+
 const months = [
   "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
 ];
@@ -45,8 +50,6 @@ const getColor = (value: number) => {
   return "#166D26";
 };
 
-
-
 export default function GithubHeatmap() {
   const [selectedYear, setSelectedYear] = useState<number>(2025);
   const [hovered, setHovered] = useState<{ month: number; week: number; day: number } | null>(null);
@@ -56,15 +59,15 @@ export default function GithubHeatmap() {
     const fetchEngagementData = async () => {
       try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/engagementHeatmap`);
-        const data = await response.json();
+        const data: ApiResponseItem[] = await response.json();
         console.log("data", data);
 
         const formattedData: { [year: number]: EngagementData } = {};
 
-        data.forEach((item: any) => {
+        data.forEach((item: ApiResponseItem) => {
           formattedData[item.year] = {
             year: item.year,
-            data: item.data.map((entry: any) => {
+            data: item.data.map((entry) => {
               const monthIndex = entry.month - 1;
               const firstDayOfMonth = getFirstDayOfMonth(entry.month, item.year);
               const weekOfMonth = getWeekOfMonth(entry.day, firstDayOfMonth);

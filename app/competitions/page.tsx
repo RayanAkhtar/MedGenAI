@@ -1,9 +1,6 @@
 'use client'
 
-import { useRouter } from 'next/router'
 import Sidebar from '../components/Sidebar'
-import { useAuth } from '../context/AuthContext'
-import { useEffect, useState } from 'react'
 
 const competitions = [
     {
