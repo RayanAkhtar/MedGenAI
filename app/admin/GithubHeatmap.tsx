@@ -28,18 +28,29 @@ const getWeekOfMonth = (day: number, firstDayOfMonth: number): number => {
   return Math.ceil((day + dayOfWeek) / 7);
 };
 
+const getColor = (value: number) => {
+  // Grey
+  if (value === 0) return "#E0E0E0";
+  
+  // Green from light to dark green
+  if (value <= 1) return "#D3F4C2";
+  if (value <= 2) return "#A0D995";
+  if (value <= 3) return "#82D075";
+  if (value <= 5) return "#67C26B";
+  if (value <= 10) return "#4D9F56";
+  if (value <= 15) return "#3B9C47";
+  if (value <= 20) return "#2A9639";
+  if (value <= 30) return "#218B32";
+  if (value <= 50) return "#1A7A2D";
+  return "#166D26";
+};
+
+
+
 export default function GithubHeatmap() {
   const [selectedYear, setSelectedYear] = useState<number>(2025);
   const [hovered, setHovered] = useState<{ month: number; week: number; day: number } | null>(null);
   const [engagementData, setEngagementData] = useState<{ [year: number]: EngagementData }>({});
-
-  const getColor = (value: number) => {
-    if (value === 0) return "#E0E0E0"; // Light gray
-    if (value >= 1) return "#A0D995";  // Light green
-    if (value >= 4) return "#67C26B";  // Medium green
-    if (value >= 9) return "#2A9639";  // Dark green
-    return "#166D26";                  // Deepest green
-  };
 
   useEffect(() => {
     const fetchEngagementData = async () => {
