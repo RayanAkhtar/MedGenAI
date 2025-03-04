@@ -39,8 +39,8 @@ export default function AdminStats() {
     const fetchData = async () => {
       try {
         const [guessesResponse, accuracyResponse] = await Promise.all([
-          fetch(`/api/admin/getGuessesPerMonth`),
-          fetch(`/api/admin/getImageDetectionAccuracy`),
+          fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getGuessesPerMonth`),
+          fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getImageDetectionAccuracy`),
         ]);
 
         if (!guessesResponse.ok || !accuracyResponse.ok) {

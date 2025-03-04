@@ -10,15 +10,8 @@ const getDefaultExpiryDate = () => {
   return today.toISOString().split("T")[0]; // Format: YYYY-MM-DD
 };
 
-interface FormData {
-  name: string;
-  expiryDate: string;
-  gameCode: string;
-  gameType: "Single" | "Binary";
-}
-
 export default function Admin() {
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState({
     name: "",
     expiryDate: getDefaultExpiryDate(), // ⏳ Set default expiry date
     gameCode: "",
@@ -26,9 +19,7 @@ export default function Admin() {
   });
 
   // 🔄 Handle form input changes
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
@@ -37,7 +28,7 @@ export default function Admin() {
   };
 
   // 🚀 Dummy submit handler
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e) => {
     e.preventDefault(); // Prevents page refresh
     console.log("Form submitted with data:", formData);
     alert("Form submitted! Check the console for form data. 🎉");

@@ -15,15 +15,15 @@ export default function Admin() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const feedbackStatusResponse = await fetch(`/api/admin/getFeedbackResolutionStatus`);
+        const feedbackStatusResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getFeedbackResolutionStatus`);
         const feedbackStatus = await feedbackStatusResponse.json();
 
         const complete = feedbackStatus?.resolvedCount || 0;
         const incomplete = feedbackStatus?.unresolvedCount || 0;
         setFeedbackStatusData({ complete, incomplete });
 
-        const realImagesResponse = await fetch(`/api/admin/getTotalRealImages`);
-        const aiImagesResponse = await fetch(`/api/admin/getTotalAIImages`);
+        const realImagesResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getTotalRealImages`);
+        const aiImagesResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getTotalAIImages`);
         const realImages = (await realImagesResponse.json());
         const aiImages = (await aiImagesResponse.json());
 
@@ -64,7 +64,7 @@ export default function Admin() {
               }}
               uploadType="real"
               feedbackLink="/admin/feedback-page?filter=real"
-              uploadEndpoint={`/api/admin/uploadRealImage`}
+              uploadEndpoint={`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/uploadRealImage`}
             />
             <ImageStatsCard
               title="AI Images"
@@ -74,7 +74,7 @@ export default function Admin() {
               }}
               uploadType="ai"
               feedbackLink="/admin/feedback-page?filter=ai"
-              uploadEndpoint={`/api/admin/uploadAIImage`}
+              uploadEndpoint={`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/uploadAIImage`}
             />
           </div>
           <Sitemap />
