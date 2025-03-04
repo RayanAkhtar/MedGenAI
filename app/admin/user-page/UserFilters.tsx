@@ -76,6 +76,7 @@ const UserFilters: React.FC<UserFiltersProps> = ({ filters, setFilters }) => {
       value: filters.sortBy,
       onChange: (newValue) => setFilters((prev) => ({ ...prev, sortBy: newValue })),
       options: [
+        { value: 'username', label: 'Username'},
         { value: 'level', label: 'Level' },
         { value: 'accuracy', label: 'Accuracy' },
         { value: 'engagement', label: 'Engagement' },

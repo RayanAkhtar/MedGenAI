@@ -21,7 +21,7 @@ const UserPage = () => {
   const [filters, setFilters] = useState<FiltersState>({
     tags: [],
     all: 'any',
-    sortBy: 'level',
+    sortBy: 'username',
     sortOrder: 'desc',
   });
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -31,12 +31,11 @@ const UserPage = () => {
 
   const fetchUserCount = useCallback(async () => {
     try {
-      if (filters.tags.length === 0) {
-        return;
-      }
-      const tagsParam = filters.tags
+      const tagsParam = filters.tags.length > 0 
+        ? filters.tags
         .map((tag) => `tags=${encodeURIComponent(tag)}`)
-        .join('&');
+        .join('&')
+        : '';
       const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/count-users-by-tags?${tagsParam}&all=${filters.all == 'all'}`
       console.log(url);
       const response = await fetch(url);
@@ -49,13 +48,11 @@ const UserPage = () => {
 
   const fetchData = useCallback(async () => {
     try {
-      if (filters.tags.length === 0) {
-        setData([]);
-        return;
-      }
-      const tagsParam = filters.tags
+      const tagsParam = filters.tags.length > 0
+        ? filters.tags
         .map((tag) => `tags=${encodeURIComponent(tag)}`)
-        .join('&');
+        .join('&')
+        : '';
       const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/filter-users?${tagsParam}&all=${filters.all == 'all'}&sort_by=${filters.sortBy}&desc=${filters.sortOrder === 'desc'}&limit=${limit}&offset=${(currentPage - 1) * limit}`;
       console.log(url);
       const response = await fetch(url);
