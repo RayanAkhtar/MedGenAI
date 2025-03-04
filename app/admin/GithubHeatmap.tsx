@@ -58,7 +58,7 @@ export default function GithubHeatmap() {
   useEffect(() => {
     const fetchEngagementData = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/engagementHeatmap`);
+        const response = await fetch(`/api/admin/engagementHeatmap`);
         const data: ApiResponseItem[] = await response.json();
         console.log("data", data);
 

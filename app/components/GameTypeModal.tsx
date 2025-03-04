@@ -22,10 +22,6 @@ interface ImageData {
   type: string;
 }
 
-interface GameResponse {
-  images: ImageData[];
-  gameId: string;
-}
 
 const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
   const router = useRouter();
@@ -36,7 +32,7 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
   const [customCode, setCustomCode] = useState<string>("");
   const [showDetails, setShowDetails] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [errorState, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const { setGameData } = useGame();
 
   const gameModes = [
@@ -63,20 +59,20 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
     },
   ];
 
-  // const gameBoards = [
-  //   {
-  //     name: "Single",
-  //     description: "One image at a time",
-  //     icon: faGamepad,
-  //     color: "bg-green-500",
-  //   },
-  //   {
-  //     name: "Dual",
-  //     description: "Choose counter factual from a pair of images",
-  //     icon: faTrophy,
-  //     color: "bg-red-500",
-  //   },
-  // ];
+  const gameBoards = [
+    {
+      name: "Single",
+      description: "One image at a time",
+      icon: faGamepad,
+      color: "bg-green-500",
+    },
+    {
+      name: "Dual",
+      description: "Choose counter factual from a pair of images",
+      icon: faTrophy,
+      color: "bg-red-500",
+    },
+  ];
 
   const handleGameSelect = async (route: string) => {
     if (route === "/game/classic" && imageCount && selectedBoard) {
@@ -136,10 +132,17 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
         } else {
           router.push(`${route}/${selectedBoard.toLowerCase()}/${gameCode}`); // TODO: Sharif needs to update backend
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error("Failed to start game:", error);
-        setError(error.message);
-      } finally {
+    
+        if (error instanceof Error) {
+          setError(error.message);
+        } else {
+          setError("An unknown error occurred");
+        }
+      
+      }
+       finally {
         setIsLoading(false);
       }
     } else if (route === "/game/custom") {
