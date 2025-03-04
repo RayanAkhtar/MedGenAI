@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Navbar from '@/app/components/Navbar';
 import UserTable from '@/app/admin/user-page/UserTable';
 import UserFilters, { FiltersState } from '@/app/admin/user-page/UserFilters';
+import Pagination from '@/app/admin/Pagination';
 
 interface User {
   username: string;
@@ -23,6 +24,28 @@ const UserPage = () => {
     sortBy: 'level',
     sortOrder: 'desc',
   });
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
+
+  const limit = 2;
+
+  const fetchUserCount = useCallback(async () => {
+    try {
+      if (filters.tags.length === 0) {
+        return;
+      }
+      const tagsParam = filters.tags
+        .map((tag) => `tags=${encodeURIComponent(tag)}`)
+        .join('&');
+      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/count-users-by-tags?${tagsParam}&all=${filters.all == 'all'}`
+      console.log(url);
+      const response = await fetch(url);
+      const result = await response.json();
+      setTotalPages(Math.ceil(result['count'] / limit));
+    } catch (err) {
+      console.error('Error fetching data:', err);
+    }
+  }, [filters]);
 
   const fetchData = useCallback(async () => {
     try {
@@ -33,7 +56,7 @@ const UserPage = () => {
       const tagsParam = filters.tags
         .map((tag) => `tags=${encodeURIComponent(tag)}`)
         .join('&');
-      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/filter-users?${tagsParam}&all=${filters.all == 'all'}&sort_by=${filters.sortBy}&desc=${filters.sortOrder === 'desc'}`;
+      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/filter-users?${tagsParam}&all=${filters.all == 'all'}&sort_by=${filters.sortBy}&desc=${filters.sortOrder === 'desc'}&limit=${limit}&offset=${(currentPage - 1) * limit}`;
       console.log(url);
       const response = await fetch(url);
       const result = await response.json();
@@ -41,11 +64,12 @@ const UserPage = () => {
     } catch (err) {
       console.error('Error fetching data:', err);
     }
-  }, [filters]);
+  }, [filters, currentPage]);
 
   useEffect(() => {
+    fetchUserCount();
     fetchData();
-  }, [fetchData])
+  }, [filters, currentPage])
 
   return (
     <div className="bg-white">
@@ -63,6 +87,11 @@ const UserPage = () => {
 
         <UserFilters filters={filters} setFilters={setFilters} />
         <UserTable data={data} />
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          setCurrentPage={setCurrentPage}
+        />
       </div>
     </div>
   );
