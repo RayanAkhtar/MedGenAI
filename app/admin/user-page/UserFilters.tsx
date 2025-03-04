@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Filters from '@/app/admin/Filters';
 import { SelectFilterItemProps } from '@/app/admin/SelectFilterItem';
 

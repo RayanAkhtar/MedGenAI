@@ -69,7 +69,7 @@ const UserPage = () => {
   useEffect(() => {
     fetchUserCount();
     fetchData();
-  }, [filters, currentPage])
+  }, [filters, currentPage, fetchUserCount, fetchData])
 
   return (
     <div className="bg-white">
