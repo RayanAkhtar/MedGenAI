@@ -26,7 +26,7 @@ const UserPage = () => {
   });
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
-
+  const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
 
   const limit = 2;
 
@@ -69,6 +69,18 @@ const UserPage = () => {
     fetchData();
   }, [filters, currentPage, fetchUserCount, fetchData])
 
+  const handleSelectUser = (checked: boolean, user: User) => {
+    setSelectedUsers((prev) => {
+      if (checked) {
+        // Add user if not already selected
+        const alreadySelected = prev.some((u) => u.username === user.username);
+        return alreadySelected ? prev : [...prev, user];
+      } else {
+        // Else remove them
+        return prev.filter((u) => u.username !== user.username);
+      }
+    });
+  };
 
   return (
     <div className="bg-white">
@@ -85,7 +97,11 @@ const UserPage = () => {
         <h1 className="text-3xl font-bold text-center py-8">User Page</h1>
 
         <UserFilters filters={filters} setFilters={setFilters} />
-        <UserTable data={data} />
+        <UserTable 
+          data={data} 
+          selectedUsers={selectedUsers}
+          onSelectUser={handleSelectUser}
+        />
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}
