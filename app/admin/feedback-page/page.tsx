@@ -56,7 +56,7 @@ const FeedbackPage = () => {
   // 2. Main data fetch function (memoized using useCallback)
   const fetchData = useCallback(async (page = 1) => {
     try {
-      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getFeedbacks?image_type=${filters.type}&resolved=${filters.resolved}&sex=${filters.sex}&disease=${filters.disease}&age_range=${filters.ageRange}&sort_by=${filters.sortBy}&sort_order=${filters.sortOrder}&page=${page}&limit=20`;
+      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getFeedbacks?image_type=${filters.type}&resolved=${filters.resolved}&sex=${filters.sex}&disease=${filters.disease}&age_range=${filters.ageRange}&sort_by=${filters.sortBy}&sort_order=${filters.sortOrder}&page=${page}&limit=21`;
       
       const response = await fetch(url);
       const result = await response.json();
