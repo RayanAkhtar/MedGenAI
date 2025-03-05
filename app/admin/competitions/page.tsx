@@ -19,7 +19,7 @@ export default function Admin() {
   });
 
   // 🔄 Handle form input changes
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
@@ -28,7 +28,7 @@ export default function Admin() {
   };
 
   // 🚀 Dummy submit handler
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault(); // Prevents page refresh
     console.log("Form submitted with data:", formData);
     alert("Form submitted! Check the console for form data. 🎉");

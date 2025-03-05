@@ -18,16 +18,8 @@ interface UserFiltersProps {
 
 const UserFilters: React.FC<UserFiltersProps> = ({ filters, setFilters }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [tags, setTags] = useState<string[]>([]);
   const dropdownRef = useRef<HTMLDivElement>(null);
-
-  const options = [
-    { value: 'Lung Legend', label: 'Lung Legend' },
-    { value: 'Neuro Ninja', label: 'Neuro Ninja' },
-    { value: 'X-Ray Visionary', label: 'X-Ray Visionary' },
-    { value: 'AI Antagonist', label: 'AI Antagonist' },
-    { value: 'Diagnosis Master', label: 'Diagnosis Master' },
-    { value: 'AI Skeptic', label: 'AI Skeptic' },
-  ];
 
   // Toggle dropdown
   const toggleDropdown = () => setIsOpen((prev) => !prev);
@@ -53,6 +45,21 @@ const UserFilters: React.FC<UserFiltersProps> = ({ filters, setFilters }) => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    const fetchTags = async () => {
+      try {
+        const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/tags`;
+        const response = await fetch(url);
+        const result = await response.json();
+        setTags(result);
+      } catch (err) {
+        console.error('Error fetching data:', err);
+      }
+    };
+
+    fetchTags();
+  }, []);
+
   // Other filter items
   const items: SelectFilterItemProps[] = [
     {
@@ -69,6 +76,7 @@ const UserFilters: React.FC<UserFiltersProps> = ({ filters, setFilters }) => {
       value: filters.sortBy,
       onChange: (newValue) => setFilters((prev) => ({ ...prev, sortBy: newValue })),
       options: [
+        { value: 'username', label: 'Username'},
         { value: 'level', label: 'Level' },
         { value: 'accuracy', label: 'Accuracy' },
         { value: 'engagement', label: 'Engagement' },
@@ -103,18 +111,18 @@ const UserFilters: React.FC<UserFiltersProps> = ({ filters, setFilters }) => {
         {isOpen && (
           <div className='absolute top-full left-0 mt-2 w-full bg-blue-500 border border-blue-500 rounded-lg shadow-lg z-10'>
             <div className='max-h-48 overflow-y-auto'>
-              {options.map((opt) => (
+              {tags.map((tag) => (
                 <label
-                  key={opt.value}
+                  key={tag}
                   className='flex items-center gap-2 px-4 py-2 cursor-pointer hover:bg-blue-600 text-white'
                 >
                   <input
                     type='checkbox'
-                    checked={filters.tags.includes(opt.value)}
-                    onChange={(e) => handleTagsChange(e.target.checked, opt.value)}
+                    checked={filters.tags.includes(tag)}
+                    onChange={(e) => handleTagsChange(e.target.checked, tag)}
                     className='cursor-pointer'
                   />
-                  {opt.label}
+                  {tag}
                 </label>
               ))}
             </div>
