@@ -22,10 +22,10 @@ interface ImageData {
   type: string;
 }
 
-interface GameResponse {
-  images: ImageData[];
-  gameId: string;
-}
+// interface GameResponse {
+//   images: ImageData[];
+//   gameId: string;
+// }
 
 const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
   const router = useRouter();

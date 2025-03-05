@@ -314,7 +314,7 @@ export default function ClassicGame() {
                         <p className="mb-6">Analyze {imageCount} images and determine if they&apos;re real or AI-generated.</p>
                         <ul className="mb-6 space-y-2">
                             <li>• Each correct guess earns you a point</li>
-                            <li>• You'll get immediate feedback after each guess</li>
+                            <li>• You&apos;ll get immediate feedback after each guess</li>
                             <li>• For AI images, click on the part that looks AI-generated</li>
                             <li>• You can reposition the marker by clicking elsewhere</li>
                             <li>• You can provide optional feedback for each AI image</li>

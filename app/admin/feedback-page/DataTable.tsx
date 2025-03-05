@@ -19,7 +19,7 @@ interface DataTableProps {
 
 const DataTable: React.FC<DataTableProps> = ({ data }) => {
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
-  console.log("Feedbacks is", feedbacks);
+  console.log(feedbacks)
 
   const resolveFeedback = async (feedbackId: string): Promise<void> => {
     try {
@@ -39,7 +39,6 @@ const DataTable: React.FC<DataTableProps> = ({ data }) => {
         );
       } else {
         console.error('Failed to resolve feedback');
-        console.log("response is", response);
       }
     } catch (error) {
       console.error('Error resolving feedback:', error);
