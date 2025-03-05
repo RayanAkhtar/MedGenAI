@@ -56,7 +56,7 @@ export default function Login() {
 
         <div className="flex min-h-screen bg-white dark:bg-white">
             {/* Left side - Login Form */}
-            <div className="w-1/2 flex flex-col items-center jsamustify-center px-8 lg:px-16 border-r border-gray-200 bg-white dark:bg-white">
+            <div className="w-1/2 flex flex-col items-center justify-center px-8 lg:px-16 border-r border-gray-200 bg-white dark:bg-white">
                 <div className="w-full max-w-md space-y-8">
                     {/* Logo */}
                     <div className="flex justify-center">
