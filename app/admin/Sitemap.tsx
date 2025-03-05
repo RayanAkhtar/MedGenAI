@@ -18,8 +18,18 @@ export default function Sitemap() {
           </Link>
         </li>
         <li>
-        <Link href="/admin/user-page" className="block px-4 py-2 bg-[var(--heartflow-red)] text-white rounded-lg hover:bg-[var(--heartflow-blue)] transition-colors duration-300">
+          <Link href="/admin/user-page" className="block px-4 py-2 bg-[var(--heartflow-red)] text-white rounded-lg hover:bg-[var(--heartflow-blue)] transition-colors duration-300">
             Users
+          </Link>
+        </li>
+        <li>
+          <Link href="/admin/competitions" className="block px-4 py-2 bg-[var(--heartflow-red)] text-white rounded-lg hover:bg-[var(--heartflow-blue)] transition-colors duration-300">
+            Create Competition
+          </Link>
+        </li>
+        <li>
+          <Link href="/admin/generate-ai-image" className="block px-4 py-2 bg-[var(--heartflow-red)] text-white rounded-lg hover:bg-[var(--heartflow-blue)] transition-colors duration-300">
+            Generate Counterfactual Image
           </Link>
         </li>
       </ul>

@@ -17,8 +17,8 @@ function Table<T>({
   getRowKey,
 }: GenericTableProps<T>) {
   return (
-    <div className="overflow-x-auto p-8 bg-white rounded-2xl shadow-lg">
-      <table className="min-w-full table-auto">
+    <div className="p-8 bg-white shadow-lg">
+      <table className="w-full border-collapse bg-white">
         <TableHead columns={columns} />
         <TableBody data={data} renderRow={renderRow} getRowKey={getRowKey} />
       </table>

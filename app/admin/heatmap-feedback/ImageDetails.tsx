@@ -34,7 +34,7 @@ const ImageDetails: React.FC<ImageDetailsProps> = ({
             <p>{imageType ?? 'N/A'}</p>
           </div>
           <div className="bg-gray-100 p-4 rounded-lg shadow-md">
-            <p className="font-semibold text-gray-700">Gender:</p>
+            <p className="font-semibold text-gray-700">Sex:</p>
             <p>{gender ?? 'Unknown'}</p>
           </div>
           <div className="bg-gray-100 p-4 rounded-lg shadow-md">
