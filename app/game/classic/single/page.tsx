@@ -35,7 +35,8 @@ export default function ClassicGame() {
     const { gameId, imageCount, images, setGameData, clearGameData } = useGame();
     const imageRef = useRef<HTMLDivElement>(null);
     
-    const gameCode = searchParams.get('code');
+    // This is the game identifier from the URL
+    const urlGameId = searchParams.get('code');
     
     const [score, setScore] = useState(0);
     const [showRules, setShowRules] = useState(true);
@@ -52,12 +53,9 @@ export default function ClassicGame() {
     const [showCompletionScreen, setShowCompletionScreen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
-    // Get game code from URL query parameter    
-
-    // Fetch game data if not already in context
     useEffect(() => {
         async function fetchGameData() {
-            if (!gameId && gameCode) {
+            if (!gameId && urlGameId && !isLoading) {
                 try {
                     setIsLoading(true);
                     const user = auth.currentUser;
@@ -65,7 +63,9 @@ export default function ClassicGame() {
                         throw new Error("No user logged in");
                     }
                     const idToken = await user.getIdToken(true);
-                    const response: Response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/game/get-game/${gameCode}`, {
+                    console.log('Fetching game data for game:', urlGameId);
+                    
+                    const response: Response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/game/get-game/${urlGameId}`, {
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${idToken}`
@@ -79,7 +79,6 @@ export default function ClassicGame() {
 
                     const data = await response.json();
                     console.log("Raw API response:", data);
-                    const gameCode = data.game_id;
 
                     if (data.images.length > 0) {
                         const formattedImages = data.images.map(
@@ -92,27 +91,21 @@ export default function ClassicGame() {
 
                         console.log("Formatted images:", formattedImages);
 
-                        // Set game data in context
-                        setGameData(data.gameId, data.imageCount, formattedImages);
+                        // Set game data in context using the game ID from the response
+                        setGameData(data.game_id, data.images.length, formattedImages);
                     }
-                    
-                    // Redirect to the game page
-                    router.push(`/game/classic/single?code=${gameCode}`);
                     
                 } catch (error) {
                     console.error('Error fetching game data:', error);
-                    // Show completion screen anyway, but we could add an error state
                     setShowCompletionScreen(true);
                 } finally {
                     setIsLoading(false);
                 }
-            } else {
-                setIsLoading(false);
             }
         }
 
         fetchGameData();
-    }, [gameCode, gameId, setGameData, router]);
+    }, [urlGameId, gameId, setGameData, isLoading]);
 
     const handleGuess = async (guess: 'real' | 'ai') => {
         const currentImage = images[currentIndex];
@@ -226,10 +219,7 @@ export default function ClassicGame() {
             setIsSubmitting(true);
             const idToken = await user?.getIdToken(true);
             
-            console.log("Submitting game results:", {
-                gameId,
-                userGuesses: finalGuesses
-            });
+            console.log("Submitting game results for gameId:", gameId);
             
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/game/finish-classic-game`, {
                 method: 'POST',
@@ -256,17 +246,27 @@ export default function ClassicGame() {
             
         } catch (error) {
             console.error('Error submitting game results:', error);
-            // Show completion screen anyway, but we could add an error state
             setShowCompletionScreen(true);
         } finally {
             setIsSubmitting(false);
         }
     };
 
-    const returnToDashboard = () => {
-        // Clear game data and redirect to dashboard
-        clearGameData();
-        router.push('/dashboard');
+    const returnToDashboard = async () => {
+        try {
+            // Wait for a short delay to ensure data is processed
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            // Clear game data
+            clearGameData();
+            
+            // Navigate to dashboard
+            router.push('/dashboard');
+        } catch (error) {
+            console.error('Error returning to dashboard:', error);
+            // Navigate anyway
+            router.push('/dashboard');
+        }
     };
 
     // Show game completion screen
@@ -326,6 +326,8 @@ export default function ClassicGame() {
                         >
                             Start Playing
                         </button>
+
+
                     </div>
                 </div>
             )}
