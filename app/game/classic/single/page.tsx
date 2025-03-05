@@ -2,10 +2,11 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/app/context/AuthContext';
 import { useGame } from '@/app/context/GameContext';
 import FeedbackBox from '@/app/game/feedback';
+import { auth } from '@/app/firebase/firebase';
 
 interface UserGuess {
     url: string;
@@ -19,12 +20,22 @@ interface ClickPosition {
     x: number;
     y: number;
 }
+interface GameResponse {
+    game_id: string;
+    images: {
+        url: string;
+        type: string;
+    }[];
+}
 
 export default function ClassicGame() {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const { user } = useAuth();
-    const { gameId, imageCount, images, clearGameData } = useGame();
+    const { gameId, imageCount, images, setGameData, clearGameData } = useGame();
     const imageRef = useRef<HTMLDivElement>(null);
+    
+    const gameCode = searchParams.get('code');
     
     const [score, setScore] = useState(0);
     const [showRules, setShowRules] = useState(true);
@@ -39,15 +50,69 @@ export default function ClassicGame() {
     const [showClickPrompt, setShowClickPrompt] = useState(false);
     const [canRepositionMarker, setCanRepositionMarker] = useState(false);
     const [showCompletionScreen, setShowCompletionScreen] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
+    // Get game code from URL query parameter    
+
+    // Fetch game data if not already in context
     useEffect(() => {
-        // Redirect if no game data is present
-        console.log("Game data check:", { gameId, imageCount, images }) // Debug log
-        if (!gameId || !imageCount || images.length === 0) {
-            console.log("Missing game data, redirecting to dashboard") // Debug log
-            router.push('/dashboard');
+        async function fetchGameData() {
+            if (!gameId && gameCode) {
+                try {
+                    setIsLoading(true);
+                    const user = auth.currentUser;
+                    if (!user) {
+                        throw new Error("No user logged in");
+                    }
+                    const idToken = await user.getIdToken(true);
+                    const response: Response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/game/get-game/${gameCode}`, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${idToken}`
+                        }
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error || 'Failed to fetch game data');
+                    }
+
+                    const data = await response.json();
+                    console.log("Raw API response:", data);
+                    const gameCode = data.game_id;
+
+                    if (data.images.length > 0) {
+                        const formattedImages = data.images.map(
+                            (img: { url: string; type: string }, index: number) => ({
+                                id: index + 1,
+                                path: `${process.env.NEXT_PUBLIC_API_BASE_URL}${img.url}`,
+                                type: img.type,
+                            })
+                        );
+
+                        console.log("Formatted images:", formattedImages);
+
+                        // Set game data in context
+                        setGameData(data.gameId, data.imageCount, formattedImages);
+                    }
+                    
+                    // Redirect to the game page
+                    router.push(`/game/classic/single?code=${gameCode}`);
+                    
+                } catch (error) {
+                    console.error('Error fetching game data:', error);
+                    // Show completion screen anyway, but we could add an error state
+                    setShowCompletionScreen(true);
+                } finally {
+                    setIsLoading(false);
+                }
+            } else {
+                setIsLoading(false);
+            }
         }
-    }, [gameId, imageCount, images, router]);
+
+        fetchGameData();
+    }, [gameCode, gameId, setGameData, router]);
 
     const handleGuess = async (guess: 'real' | 'ai') => {
         const currentImage = images[currentIndex];
