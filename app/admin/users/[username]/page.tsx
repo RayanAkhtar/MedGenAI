@@ -10,6 +10,7 @@ import { GameStats } from './components/GameStats';
 import { ScoreBox } from './components/ScoreBox';
 import { Tags } from './components/Tags';
 import { BasicInformation } from './components/BasicInformation';
+import Link from 'next/link';
 
 // Updated type for all profile data fields
 interface UserProfileData {
@@ -60,6 +61,13 @@ export default function UserProfile() {
   return (
     <div>
       <Navbar />
+      <div className="mt-10">
+        <Link href="/admin/user-page">
+          <button className="ml-5 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-all mb-10">
+            Back to User Search
+          </button>
+        </Link>
+      </div>
       <div className="m-20 p-10">
         <h1 className="text-5xl font-bold mb-10 text-black">User Profile</h1>
         

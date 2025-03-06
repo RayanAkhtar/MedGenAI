@@ -17,7 +17,6 @@ export function Tags({ user_id }: TagsProps) {
   const [tags, setTags] = useState<Tag[]>([]);
   const [availableTags, setAvailableTags] = useState<Tag[]>([]);
   const [newTag, setNewTag] = useState('');
-  const [isSearchActive, setIsSearchActive] = useState(false);
 
   useEffect(() => {
     const fetchUserTags = async () => {
@@ -113,11 +112,11 @@ export function Tags({ user_id }: TagsProps) {
 
   return (
     <div className="p-8 border rounded-2xl shadow-lg bg-white lg:col-span-2 w-full space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center relative">
         <h2 className="text-4xl font-bold text-center text-gray-800 mb-6">Tags</h2>
 
-        <div>
-          <div className="flex items-center w-full relative">
+        <div className="relative w-full">
+          <div className="flex items-center w-full">
             <input
               type="text"
               className="p-3 border-2 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
@@ -126,25 +125,24 @@ export function Tags({ user_id }: TagsProps) {
               onChange={(e) => setNewTag(e.target.value)}
             />
           </div>
+
+          {newTag && (
+            <div className="mt-2 absolute left-0 right-0 max-h-48 overflow-auto bg-white shadow-lg rounded-lg border p-2 z-10">
+              {filteredTags.map((tag) => (
+                <button
+                  key={tag.tag_id}
+                  className="px-4 py-2 border-2 rounded-lg shadow-xl text-2xl font-semibold text-gray-900 text-left hover:bg-gray-100 w-full"
+                  onClick={() => handleAddTag(tag)}
+                >
+                  {tag.name}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
-      {newTag && (
-        <div className="mt-4 flex flex-col gap-2 max-h-48 overflow-auto bg-white shadow-lg rounded-lg border p-2 absolute w-full sm:w-72 md:w-96 z-10 mx-auto">
-          {filteredTags.map((tag) => (
-            <button
-              key={tag.tag_id}
-              className="px-4 py-2 border-2 rounded-lg shadow-xl text-2xl font-semibold text-gray-900 text-left hover:bg-gray-100"
-              onClick={() => handleAddTag(tag)}
-            >
-              {tag.name}
-            </button>
-          ))}
-        </div>
-      )}
-
       <div className="flex flex-wrap justify-center gap-6 mt-6">
-
         {tags.map((tag) => (
           <div
             key={tag.tag_id}
