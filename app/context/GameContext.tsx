@@ -24,14 +24,13 @@ export function GameProvider({ children }: { children: ReactNode }) {
     const [images, setImages] = useState<GameImage[]>([])
 
     const setGameData = (gameId: string, imageCount: number, images: GameImage[]) => {
-        // Simple shuffle using sort with random comparison
         const shuffledImages = [...images].sort(() => Math.random() - 0.5)
         
         setGameId(gameId)
         setImageCount(imageCount)
         setImages(shuffledImages)
         
-        console.log("Game data set with shuffled images")
+        console.log("Game data set with shuffled images, gameId:", gameId)
     }
 
     const clearGameData = () => {

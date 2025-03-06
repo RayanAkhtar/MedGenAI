@@ -27,6 +27,7 @@ const UserPage = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
 
+
   const limit = 2;
 
   const fetchUserCount = useCallback(async () => {
@@ -67,6 +68,7 @@ const UserPage = () => {
     fetchUserCount();
     fetchData();
   }, [filters, currentPage, fetchUserCount, fetchData])
+
 
   return (
     <div className="bg-white">

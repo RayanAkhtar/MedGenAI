@@ -36,7 +36,7 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
   const [customCode, setCustomCode] = useState<string>("");
   const [showDetails, setShowDetails] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [, setError] = useState<string | null>(null);
+  const [errorState, setError] = useState<string | null>(null);
   const { setGameData } = useGame();
 
   const gameModes = [
@@ -113,8 +113,7 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
 
         const data = await response.json();
         console.log("Raw API response:", data);
-        const gameCode = "AL19JQ82TR"; // TODO: data.gameCode;
-
+        const gameCode = data.gameId;
 
         if (selectedBoard === "Single") {
           const formattedImages = data.images.map(
@@ -127,30 +126,27 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
 
           console.log("Formatted images:", formattedImages);
 
+          // Set game data in context
           setGameData(data.gameId, imageCount, formattedImages);
         }
-
+        
         closeModal();
-        if (selectedBoard == "Single") {
-          router.push(`${route}`); // TODO: Sharif needs to update backend
-        } else {
-          router.push(`${route}/${selectedBoard.toLowerCase()}/${gameCode}`); // TODO: Sharif needs to update backend
-        }
-      } catch (error: unknown) {
-        if (error instanceof Error) {
-          console.error("Failed to start game:", error);
-          setError(error.message);
-        } else {
-          console.error("Unknown error:", error);
-          setError("An unknown error occurred.");
-        }
+        
+        // Route using query parameter instead of path segment
+        const boardType = selectedBoard.toLowerCase();
+        router.push(`/game/classic/${boardType}?code=${gameCode}`);
+        
+      } catch (error: any) {
+        console.error("Failed to start game:", error);
+        setError(error.message);
       } finally {
         setIsLoading(false);
       }
     } else if (route === "/game/custom") {
       if (selectedBoard && customCode) {
         closeModal();
-        router.push(`${route}/${selectedBoard.toLowerCase()}/${customCode}`);
+        const boardType = selectedBoard.toLowerCase();
+        router.push(`/game/custom/${boardType}?code=${customCode}`);
       }
     } else {
       console.error("Invalid game route:", route);
@@ -315,9 +311,9 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
                               }
                               disabled={
                                 (selectedGameMode.name === "Classic" &&
-                                  (!imageCount || isLoading)) ||
+                                  (!imageCount || !selectedBoard || isLoading)) ||
                                 (selectedGameMode.name === "Custom" &&
-                                  (!customCode || isLoading))
+                                  (!customCode || !selectedBoard || isLoading))
                               }
                               className="w-full mt-4 py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600 
                                                                  disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
@@ -331,6 +327,11 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
                                 "Start Game"
                               )}
                             </button>
+                            {errorState && (
+                              <div className="text-red-500 text-sm mt-2">
+                                {errorState}
+                              </div>
+                            )}
                           </div>
                         ) : (
                           <div className="h-full flex items-center justify-center text-black">

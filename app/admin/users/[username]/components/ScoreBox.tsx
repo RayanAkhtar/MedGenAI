@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 
 interface ScoreBoxProps {
   score: number;
@@ -8,7 +8,10 @@ interface ScoreBoxProps {
   totalImagesAttempted: number;
 }
 
-export function ScoreBox({ score, accuracy, totalImagesAttempted }: ScoreBoxProps) {
+
+export function ScoreBox({ score, accuracy,totalImagesAttempted }: ScoreBoxProps) {
+  useEffect(() => {
+  }, []);
   return (
     <div className="p-10 border rounded-2xl shadow-lg bg-white col-span-1 md:col-span-2 text-center space-y-8">
       <h2 className="text-4xl font-semibold text-gray-800">Player Stats</h2>
@@ -19,7 +22,7 @@ export function ScoreBox({ score, accuracy, totalImagesAttempted }: ScoreBoxProp
         </div>
         <div className="flex flex-col justify-between p-6 border-2 border-green-500 rounded-lg shadow-xl h-full">
           <h3 className="text-2xl font-semibold mb-4 text-gray-800">Accuracy</h3>
-          <p className="text-6xl font-extrabold text-gray-900">{accuracy}%</p> {/* Display accuracy */}
+          <p className="text-6xl font-extrabold text-gray-900">{Number(accuracy).toFixed(1)}%</p> {/* Display accuracy */}
         </div>
         <div className="flex flex-col justify-between p-6 border-2 border-purple-500 rounded-lg shadow-xl h-full">
           <h3 className="text-2xl font-semibold mb-4 text-gray-800">Total Images Attempted</h3>
