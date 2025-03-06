@@ -29,6 +29,8 @@ export default function UserProfile() {
   const username = params?.username as string; // Explicitly cast userId as string
 
   const [profile, setProfile] = useState<UserProfileData | null>(null);
+  const [accuracy, setAccuracy] = useState<number | null>(null);
+  const [totalImagesAttempted, setTotalImagesAttempted] = useState<number | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -56,6 +58,45 @@ export default function UserProfile() {
     };
 
     fetchProfile();
+  }, [username]);
+
+  useEffect(() => {
+    const fetchAccuracy = async () => {
+      if (!username) return;
+
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getAccuracyForUser/${username}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch accuracy');
+        }
+        const data = await response.json();
+        console.log("data is", data)
+        setAccuracy(data.accuracy.toFixed(2));
+      } catch (err) {
+        setError((err as Error).message);
+      }
+    };
+
+    fetchAccuracy();
+  }, [username]);
+
+  useEffect(() => {
+    const fetchTotalImagesAttempted = async () => {
+      if (!username) return;
+
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getTotalImagesAttemptedForUser/${username}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch total images attempted');
+        }
+        const data = await response.json();
+        setTotalImagesAttempted(data.totalImagesAttempted);
+      } catch (err) {
+        setError((err as Error).message);
+      }
+    };
+
+    fetchTotalImagesAttempted();
   }, [username]);
 
   return (
@@ -89,7 +130,13 @@ export default function UserProfile() {
             />
 
             {/* Score Box */}
-            <ScoreBox score={profile.score} />
+            {accuracy !== null && totalImagesAttempted !== null && profile.score !== null && (
+              <ScoreBox
+                score={profile.score}
+                accuracy={accuracy}
+                totalImagesAttempted={totalImagesAttempted}
+              />
+            )}
 
             {/* Tags - Pass the updated tags list to the Tags component */}
             <Tags user_id={profile.user_id} />
