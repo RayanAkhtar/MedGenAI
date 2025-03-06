@@ -259,7 +259,7 @@ export default function UserProfile() {
               accuracy={profile.accuracy_percentage} 
               totalImagesAttempted={profile.total_images_guessed}/>
             {/* Tags */}
-            <Tags />
+            <Tags user_id={profile.user_id}/>
           </div>
         )}
       </div>
