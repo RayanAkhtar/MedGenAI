@@ -53,26 +53,25 @@ export default function Login() {
     if (loading) return null;
 
     return (
-
         <div className="flex min-h-screen bg-white dark:bg-white">
             {/* Left side - Login Form */}
             <div className="w-1/2 flex flex-col items-center justify-center px-8 lg:px-16 border-r border-gray-200 bg-white dark:bg-white">
                 <div className="w-full max-w-md space-y-8">
                     {/* Logo */}
-                    <div className="flex justify-center">
+                    <div className="flex justify-center mb-12">
                         <Link href="/">
                             <Image
                                 src="/images/cod_logo_full.png"
-                                alt="HeartFlow Logo"
+                                alt="Call Of Diagnosis Logo"
                                 width={350}
                                 height={50}
                                 priority
-                                />
+                            />
                         </Link>
                     </div>
 
                     {/* Login Form */}
-                    <div className="mt-10 space-y-6">
+                    <div className="space-y-6">
                         <h2 className="text-center text-2xl font-semibold text-gray-900 dark:text-gray-900">
                             Sign in
                         </h2>
@@ -90,7 +89,7 @@ export default function Login() {
                             </div>
                         )}
 
-                        <form onSubmit={handleSubmit} className="mt-8 space-y-4">
+                        <form onSubmit={handleSubmit} className="space-y-4">
                             <div>
                                 <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-700">
                                     Email
@@ -149,7 +148,7 @@ export default function Login() {
             </div>
 
             {/* Right side - Image */}
-            <div className="hidden md:block w-1/2 p-12">
+            <div className="hidden md:flex w-1/2 items-center justify-center p-12">
                 <div className="h-full w-full relative bg-white dark:bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-200">
                     <div className="bg-white dark:bg-white">
                         <Image

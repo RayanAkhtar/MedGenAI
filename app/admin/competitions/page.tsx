@@ -2,6 +2,10 @@
 
 import { useState } from "react";
 import Navbar from "@/app/components/Navbar";
+import AdminStats from "../AdminStats";
+import FeedbackPieChart from "../FeedbackPieChart";
+import ImageStatsCard from "../ImageStatsCard";
+import { auth } from "@/app/firebase/firebase";
 
 // 📅 Helper function to get date 7 days from now in YYYY-MM-DD format
 const getDefaultExpiryDate = () => {
@@ -10,16 +14,23 @@ const getDefaultExpiryDate = () => {
   return today.toISOString().split("T")[0]; // Format: YYYY-MM-DD
 };
 
+interface FormData {
+  name: string;
+  expiryDate: string;
+  gameCode: string;
+  gameType: "Single" | "Binary";
+}
+
 export default function Admin() {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     name: "",
-    expiryDate: getDefaultExpiryDate(), // ⏳ Set default expiry date
+    expiryDate: getDefaultExpiryDate(),
     gameCode: "",
     gameType: "Single",
   });
 
-  // 🔄 Handle form input changes
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLSelectElement>) => {
+  // Handle form input changes with proper typing
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
@@ -27,11 +38,53 @@ export default function Admin() {
     }));
   };
 
-  // 🚀 Dummy submit handler
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); // Prevents page refresh
-    console.log("Form submitted with data:", formData);
-    alert("Form submitted! Check the console for form data. 🎉");
+  // Submit handler with API integration
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    
+    try {
+      const user = auth.currentUser;
+      if (!user) {
+        throw new Error("No user logged in");
+      }
+
+      const idToken = await user.getIdToken(true);
+      
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/competition/create`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${idToken}`
+        },
+        body: JSON.stringify({
+          competition_name: formData.name,
+          end_date: formData.expiryDate,
+          game_id: formData.gameCode,
+          game_board: formData.gameType
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to create competition');
+      }
+
+      const result = await response.json();
+      console.log("Competition created:", result);
+      alert("Competition created successfully! 🎉");
+      
+      // Reset form
+      setFormData({
+        name: "",
+        expiryDate: getDefaultExpiryDate(),
+        gameCode: "",
+        gameType: "Single"
+      });
+
+    } catch (error) {
+      console.error('Error creating competition:', error);
+      alert(error instanceof Error ? error.message : 'Failed to create competition');
+    }
   };
 
   return (
