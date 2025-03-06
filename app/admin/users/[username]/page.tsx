@@ -4,12 +4,13 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Navbar from '@/app/components/Navbar';
 
-// Import your components
+
 import { ProgressBar } from './components/ProgressBar';
 import { GameStats } from './components/GameStats';
 import { ScoreBox } from './components/ScoreBox';
 import { Tags } from './components/Tags';
 import { BasicInformation } from './components/BasicInformation';
+import Link from 'next/link';
 
 // Updated type for all profile data fields
 interface UserProfileData {
@@ -20,6 +21,7 @@ interface UserProfileData {
   games_started: number;
   games_won: number;
   score: number;
+  tags?: { tagId: string; tagName: string }[]; 
   accuracy_percentage: number;
   total_images_guessed: number;
   correct_guesses: number;
@@ -42,6 +44,8 @@ export default function UserProfile() {
   const username = params?.username as string;
 
   const [profile, setProfile] = useState<UserProfileData | null>(null);
+  const [accuracy, setAccuracy] = useState<number | null>(null);
+  const [totalImagesAttempted, setTotalImagesAttempted] = useState<number | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -95,6 +99,46 @@ export default function UserProfile() {
     };
 
     fetchProfile();
+  }, [username]);
+
+
+  useEffect(() => {
+    const fetchAccuracy = async () => {
+      if (!username) return;
+
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getAccuracyForUser/${username}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch accuracy');
+        }
+        const data = await response.json();
+        console.log("data is", data)
+        setAccuracy(data.accuracy.toFixed(2));
+      } catch (err) {
+        setError((err as Error).message);
+      }
+    };
+
+    fetchAccuracy();
+  }, [username]);
+
+  useEffect(() => {
+    const fetchTotalImagesAttempted = async () => {
+      if (!username) return;
+
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getTotalImagesAttemptedForUser/${username}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch total images attempted');
+        }
+        const data = await response.json();
+        setTotalImagesAttempted(data.totalImagesAttempted);
+      } catch (err) {
+        setError((err as Error).message);
+      }
+    };
+
+    fetchTotalImagesAttempted();
   }, [username]);
 
   // --- Function to fetch game data by code ---
@@ -157,12 +201,21 @@ export default function UserProfile() {
     }
   };
 
+
   return (
     <div>
       <Navbar />
+      <div className="mt-10">
+        <Link href="/admin/user-page">
+          <button className="ml-5 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-all mb-10">
+            Back to User Search
+          </button>
+        </Link>
+      </div>
       <div className="m-20 p-10">
+
         <div className="grid grid-cols-2">
-          <h1 className="text-5xl font-bold mb-10">User Profile</h1>
+        <h1 className="text-5xl font-bold mb-10 text-black">User Profile</h1>
           {!error && !loading && (
             <div className="flex justify-end items-center">
               {/* Button to open the Assign Game popover */}
@@ -201,6 +254,7 @@ export default function UserProfile() {
             />
 
             {/* Score Box */}
+
             <ScoreBox score={profile.score} 
               accuracy={profile.accuracy_percentage} 
               totalImagesAttempted={profile.total_images_guessed}/>
