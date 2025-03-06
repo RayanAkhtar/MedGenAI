@@ -92,17 +92,13 @@ const UserPage = () => {
             Back to Admin
           </button>
         </Link>
-        
       </div>
-      <div className="flex justify-center my-4">
+      <div className="h-screen bg-white text-black">
+        <h1 className="text-3xl font-bold text-center py-8">Users</h1>
         <AssignButton
           usernames={selectedUsers.map((u) => u.username)}
           gameCode="d60751ec"
         />
-      </div>
-      <div className="h-screen bg-white text-black">
-        <h1 className="text-3xl font-bold text-center py-8">User Page</h1>
-
         <UserFilters filters={filters} setFilters={setFilters} />
         <UserTable 
           data={data} 
