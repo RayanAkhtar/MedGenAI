@@ -6,6 +6,7 @@ import Navbar from '@/app/components/Navbar';
 import UserTable from '@/app/admin/user-page/UserTable';
 import UserFilters, { FiltersState } from '@/app/admin/user-page/UserFilters';
 import Pagination from '@/app/admin/Pagination';
+import AssignButton from '@/app/admin/users/[username]/components/AssignButton';
 
 interface User {
   username: string;
@@ -92,6 +93,12 @@ const UserPage = () => {
           </button>
         </Link>
         
+      </div>
+      <div className="flex justify-center my-4">
+        <AssignButton
+          usernames={selectedUsers.map((u) => u.username)}
+          gameCode="d60751ec"
+        />
       </div>
       <div className="h-screen bg-white text-black">
         <h1 className="text-3xl font-bold text-center py-8">User Page</h1>

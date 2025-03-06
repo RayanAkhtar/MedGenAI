@@ -20,7 +20,6 @@ interface User {
 
 const UserTable: React.FC<UserTableProps> = ({ data, selectedUsers, onSelectUser }) => {
   const [users, setUsers] = useState<User[]>(data);
-  console.log("Data passed to UserTable:", data);
 
   useEffect(() => {
     setUsers(data);
@@ -68,7 +67,6 @@ const UserTable: React.FC<UserTableProps> = ({ data, selectedUsers, onSelectUser
   };
 
   const getRowKey = (item: User) => item.username;
-  console.log('users in parent:', users);
   return (
     <Table
       columns={columns}
