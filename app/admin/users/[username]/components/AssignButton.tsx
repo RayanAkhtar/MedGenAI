@@ -2,24 +2,20 @@ import { useState } from 'react';
 
 interface AssignButtonProps {
     usernames: string[];
-    gameCode: string;
 }
 
 export default function AssignButton({ usernames }: AssignButtonProps) {
   const [loading, setLoading] = useState(false);
   const [failed, setFailed] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [showSelectMessage, setShowSelectMessage] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [gameCode, setGameCode] = useState('');
 
   const handleAssign = async () => {
     if (usernames.length === 0) { // Show message if no users are selected
-      setShowSelectMessage(true);
-      setTimeout(() => setShowSelectMessage(false), 2000); 
+      alert('Please select at least one user to assign!');
       return;
     }
-
     setShowModal(true);
   }
   
@@ -56,12 +52,19 @@ export default function AssignButton({ usernames }: AssignButtonProps) {
         setTimeout(() => setSuccess(false), 2000);
       }
       else {
+        const errorData = await response.json();
+        if (errorData.error === "Invalid game code") {
+          alert("Invalid game code. Please try again.");
+        } else {
+          alert(errorData.error || 'Assignment failed. Please try again.');
+        }
         setFailed(true);
         setTimeout(() => setFailed(false), 2000);
       }
     } catch (error) {
       console.error('Error assigning users:', error);
       setFailed(true);
+      alert('Network error. Please try again later.');
       setTimeout(() => setFailed(false), 2000);
     } finally {
       setLoading(false);
@@ -89,11 +92,7 @@ export default function AssignButton({ usernames }: AssignButtonProps) {
       >
         {loading ? 'Assigning...' : failed ? 'Assign Failed' : success ? 'Assigned!' : 'Assign Game'}
       </button>
-      {showSelectMessage && (
-        <span className="text-red-500 text-sm mt-2">
-          Please select at least one user to assign!
-        </span>
-      )}
+
       {showModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-80">

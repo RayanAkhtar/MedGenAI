@@ -95,11 +95,12 @@ const UserPage = () => {
       </div>
       <div className="h-screen bg-white text-black">
         <h1 className="text-3xl font-bold text-center py-8">Users</h1>
-        <AssignButton
-          usernames={selectedUsers.map((u) => u.username)}
-          gameCode="d60751ec"
-        />
         <UserFilters filters={filters} setFilters={setFilters} />
+        <div className="flex justify-end mb-4 mr-8">
+          <AssignButton
+            usernames={selectedUsers.map((u) => u.username)}
+          />
+        </div>
         <UserTable 
           data={data} 
           selectedUsers={selectedUsers}
