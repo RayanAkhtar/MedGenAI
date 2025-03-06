@@ -5,7 +5,6 @@ import { useParams } from 'next/navigation';
 import Navbar from '@/app/components/Navbar';
 
 // Import our new components
-
 import { ProgressBar } from './components/ProgressBar';
 import { GameStats } from './components/GameStats';
 import { ScoreBox } from './components/ScoreBox';
@@ -21,7 +20,7 @@ interface UserProfileData {
   games_started: number;
   games_won: number;
   score: number;
-  tags?: string[]; // Add optional tags field
+  tags?: { tagId: string; tagName: string }[]; // Updated tags field with objects containing tagId and tagName
 }
 
 export default function UserProfile() {
@@ -84,8 +83,8 @@ export default function UserProfile() {
             {/* Score Box */}
             <ScoreBox score={profile.score} />
 
-            {/* Tags */}
-            <Tags initialTags={profile.tags || ['Neuro Ninja', 'X-ray Visionary', 'AI Antagonist']} />
+            {/* Tags - Pass the updated tags list to the Tags component */}
+            <Tags user_id={profile.user_id} />
           </div>
         )}
       </div>
