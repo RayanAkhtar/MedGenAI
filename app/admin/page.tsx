@@ -23,8 +23,10 @@ export default function Admin() {
         setFeedbackStatusData({ complete, incomplete });
 
         const realImagesResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getTotalRealImages`);
+        console.log('Response: ', realImagesResponse);
         const aiImagesResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getTotalAIImages`);
         const realImages = (await realImagesResponse.json());
+        console.log('real', realImages);
         const aiImages = (await aiImagesResponse.json());
 
         setTotalImagesData({
