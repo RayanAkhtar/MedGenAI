@@ -20,13 +20,7 @@ interface ClickPosition {
     x: number;
     y: number;
 }
-interface GameResponse {
-    game_id: string;
-    images: {
-        url: string;
-        type: string;
-    }[];
-}
+
 
 export default function ClassicGame() {
     const router = useRouter();

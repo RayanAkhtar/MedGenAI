@@ -61,7 +61,7 @@ interface GamePerformance {
 }
 
 export default function Profile() {
-    const { user, loading } = useAuth()
+    const { user, loading: authLoading } = useAuth()
     const router = useRouter()
     const [selectedGameType, setSelectedGameType] = useState<GameType>('all')
     const [profileData, setProfileData] = useState<ProfileData | null>(null)
@@ -70,16 +70,17 @@ export default function Profile() {
     const [isLoading, setIsLoading] = useState(true)
 
     useEffect(() => {
-        if (!loading && !user) {
+        if (!authLoading && !user) {
             router.push('/login')
         }
-    }, [user, loading, router])
+    }, [user, authLoading, router])
 
     useEffect(() => {
         const fetchProfileData = async () => {
             if (!user) return;
             
             try {
+                setIsLoading(true);
                 const idToken = await user.getIdToken(true);
                 
                 // Fetch profile data
@@ -132,7 +133,23 @@ export default function Profile() {
         }
     }, [user]);
 
-    if (loading || !user || !profileData || !performanceData) return null;
+    if (authLoading || isLoading) {
+        return (
+            <div className="flex h-screen items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[var(--heartflow-red)]"></div>
+            </div>
+        );
+    }
+
+    if (!user) return null;
+
+    if (!profileData || !performanceData) {
+        return (
+            <div className="flex h-screen items-center justify-center">
+                <div className="text-red-500">Failed to load profile data</div>
+            </div>
+        );
+    }
 
     const chartData = {
         labels: performanceData[selectedGameType].labels,

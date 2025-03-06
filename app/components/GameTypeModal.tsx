@@ -136,9 +136,14 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
         const boardType = selectedBoard.toLowerCase();
         router.push(`/game/classic/${boardType}?code=${gameCode}`);
         
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error("Failed to start game:", error);
-        setError(error.message);
+
+        if (error instanceof Error) {
+          setError(error.message);
+        } else {
+          setError("An unknown error occurred");
+        }
       } finally {
         setIsLoading(false);
       }
