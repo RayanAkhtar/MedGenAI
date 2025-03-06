@@ -21,6 +21,7 @@ interface UserProfileData {
   games_started: number;
   games_won: number;
   score: number;
+  tags?: string[]; // Add optional tags field
 }
 
 export default function UserProfile() {
@@ -61,7 +62,7 @@ export default function UserProfile() {
     <div>
       <Navbar />
       <div className="m-20 p-10">
-        <h1 className="text-5xl font-bold mb-10">User Profile</h1>
+        <h1 className="text-5xl font-bold mb-10 text-black">User Profile</h1>
         
         {loading && <p className="text-2xl">Loading...</p>}
         {error && <p className="text-red-500 text-2xl">Error: {error}</p>}
@@ -84,7 +85,7 @@ export default function UserProfile() {
             <ScoreBox score={profile.score} />
 
             {/* Tags */}
-            <Tags />
+            <Tags initialTags={profile.tags || ['Neuro Ninja', 'X-ray Visionary', 'AI Antagonist']} />
           </div>
         )}
       </div>
