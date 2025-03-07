@@ -70,6 +70,11 @@ const UserPage = () => {
     fetchData();
   }, [filters, currentPage, fetchUserCount, fetchData])
 
+  useEffect(() => {
+    setCurrentPage(1);
+    setSelectedUsers([]);
+  }, [filters.tags, filters.all])
+
   const handleSelectUser = (checked: boolean, user: User) => {
     setSelectedUsers((prev) => {
       if (checked) {
