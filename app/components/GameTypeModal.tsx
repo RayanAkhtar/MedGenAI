@@ -149,9 +149,130 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
       }
     } else if (route === "/game/custom") {
       if (selectedBoard && customCode) {
-        closeModal();
-        const boardType = selectedBoard.toLowerCase();
-        router.push(`/game/custom/${boardType}?code=${customCode}`);
+        try {
+          setIsLoading(true);
+          const user = auth.currentUser;
+          if (!user) {
+            throw new Error("No user logged in");
+          }
+
+          const idToken = await user.getIdToken(true);
+          
+          // Different API endpoint based on board type
+          const apiUrl = selectedBoard === "Single" 
+            ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/game/initialize-single-game-with-code`
+            : `${process.env.NEXT_PUBLIC_API_BASE_URL}/game/initialize-dual-game-with-code`;
+          
+          const response = await fetch(apiUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${idToken}`,
+            },
+            body: JSON.stringify({
+              gameCode: customCode,
+              imageCount: imageCount || 10, // Default to 10 if not specified
+            }),
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || "Failed to initialize custom game");
+          }
+
+          const data = await response.json();
+          console.log("Custom game initialized:", data);
+          
+          closeModal();
+          const boardType = selectedBoard.toLowerCase();
+          
+          // For single board, set game data in context
+          if (selectedBoard === "Single" && data.images) {
+            const formattedImages = data.images.map(
+              (img: ImageData, index: number) => ({
+                id: index + 1,
+                path: img.url,
+                type: img.type,
+              })
+            );
+            
+            // Set game data in context
+            setGameData(data.gameId || customCode, imageCount || 10, formattedImages);
+          }
+          
+          // Redirect to the appropriate game page
+          router.push(`/game/classic/${boardType}?code=${data.gameId || customCode}`);
+        } catch (error: unknown) {
+          console.error("Failed to start custom game:", error);
+          if (error instanceof Error) {
+            setError(error.message);
+          } else {
+            setError("An unknown error occurred");
+          }
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    } else if (route === "/game/competition") {
+      if (selectedBoard) {
+        try {
+          setIsLoading(true);
+          const user = auth.currentUser;
+          if (!user) {
+            throw new Error("No user logged in");
+          }
+
+          const idToken = await user.getIdToken(true);
+          
+          // Different API endpoint based on board type
+          const apiUrl = selectedBoard === "Single" 
+            ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/game/competition-single-game`
+            : `${process.env.NEXT_PUBLIC_API_BASE_URL}/game/competition-dual-game`;
+          
+          const response = await fetch(apiUrl, {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${idToken}`
+            }
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || "Failed to get competition game");
+          }
+
+          const data = await response.json();
+          console.log("Competition game data:", data);
+          
+          closeModal();
+          const boardType = selectedBoard.toLowerCase();
+          
+          // For single board, set game data in context
+          if (selectedBoard === "Single" && data.images) {
+            const formattedImages = data.images.map(
+              (img: ImageData, index: number) => ({
+                id: index + 1,
+                path: `${process.env.NEXT_PUBLIC_API_BASE_URL}${img.url}`,
+                type: img.type,
+              })
+            );
+            
+            // Set game data in context
+            setGameData(data.gameId, data.images.length, formattedImages);
+          }
+          
+          // Redirect to the appropriate game page
+          router.push(`/game/competition/${boardType}?code=${data.gameId}`);
+        } catch (error: unknown) {
+          console.error("Failed to start competition game:", error);
+          if (error instanceof Error) {
+            setError(error.message);
+          } else {
+            setError("An unknown error occurred");
+          }
+        } finally {
+          setIsLoading(false);
+        }
       }
     } else {
       console.error("Invalid game route:", route);
@@ -237,7 +358,9 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
                             </h3>
 
                             <div className="flex-1 min-h-0">
-                              {selectedGameMode.name !== "Competition" && (
+                              {(selectedGameMode.name === "Classic" || 
+                                selectedGameMode.name === "Competition" || 
+                                selectedGameMode.name === "Custom") && (
                                 <div className="mt-6">
                                   <h4 className="text-sm font-medium text-black mb-3">
                                     Select Game Board
@@ -246,16 +369,12 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
                                     {gameBoards.map((board) => (
                                       <button
                                         key={board.name}
-                                        onClick={() =>
-                                          setSelectedBoard(board.name)
-                                        }
+                                        onClick={() => setSelectedBoard(board.name)}
                                         className={`py-2 px-3 rounded border text-sm font-medium transition-colors
-                                                                                    ${
-                                                                                      selectedBoard ===
-                                                                                      board.name
-                                                                                        ? "bg-blue-500 text-white border-blue-500"
-                                                                                        : "border-gray-300 hover:border-blue-500"
-                                                                                    }`}
+                                                  ${selectedBoard === board.name
+                                                    ? "bg-blue-500 text-white border-blue-500"
+                                                    : "border-gray-300 hover:border-blue-500"
+                                                  }`}
                                       >
                                         {board.name}
                                       </button>
@@ -305,7 +424,31 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
                                         setCustomCode(e.target.value)
                                       }
                                       className="w-full p-2 border rounded"
+                                      placeholder="Enter game code"
                                     />
+                                    
+                                    {selectedBoard === "Single" && (
+                                      <div className="mt-4">
+                                        <h4 className="text-sm font-medium text-black mb-3">
+                                          Number of Images
+                                        </h4>
+                                        <div className="grid grid-cols-4 gap-2">
+                                          {[5, 10, 15, 20, 30, 40, 50].map((num) => (
+                                            <button
+                                              key={num}
+                                              onClick={() => setImageCount(num)}
+                                              className={`py-2 px-3 rounded border text-sm font-medium transition-colors
+                                                ${imageCount === num
+                                                  ? "bg-blue-500 text-white border-blue-500"
+                                                  : "border-gray-300 hover:border-blue-500"
+                                              }`}
+                                            >
+                                              {num}
+                                            </button>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    )}
                                   </div>
                                 )}
                             </div>
@@ -318,7 +461,9 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
                                 (selectedGameMode.name === "Classic" &&
                                   (!imageCount || !selectedBoard || isLoading)) ||
                                 (selectedGameMode.name === "Custom" &&
-                                  (!customCode || !selectedBoard || isLoading))
+                                  (!customCode || !selectedBoard || isLoading)) ||
+                                (selectedGameMode.name === "Competition" &&
+                                  (!selectedBoard || isLoading))
                               }
                               className="w-full mt-4 py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600 
                                                                  disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
