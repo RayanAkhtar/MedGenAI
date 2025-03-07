@@ -1,11 +1,11 @@
 'use client'
 
-import { createContext, useContext, useState, ReactNode } from 'react'
+import React, { createContext, useContext, useState, ReactNode } from 'react'
 
 interface GameImage {
     id: number
     path: string
-    type: string
+    type: 'real' | 'ai'
 }
 
 interface GameContextType {
@@ -24,9 +24,13 @@ export function GameProvider({ children }: { children: ReactNode }) {
     const [images, setImages] = useState<GameImage[]>([])
 
     const setGameData = (gameId: string, imageCount: number, images: GameImage[]) => {
+        const shuffledImages = [...images].sort(() => Math.random() - 0.5)
+        
         setGameId(gameId)
         setImageCount(imageCount)
-        setImages(images)
+        setImages(shuffledImages)
+        
+        console.log("Game data set with shuffled images, gameId:", gameId)
     }
 
     const clearGameData = () => {
