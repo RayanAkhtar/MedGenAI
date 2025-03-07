@@ -2,10 +2,11 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/app/context/AuthContext';
 import { useGame } from '@/app/context/GameContext';
 import FeedbackBox from '@/app/game/feedback';
+import { auth } from '@/app/firebase/firebase';
 
 interface UserGuess {
     url: string;
@@ -20,11 +21,16 @@ interface ClickPosition {
     y: number;
 }
 
+
 export default function ClassicGame() {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const { user } = useAuth();
-    const { gameId, imageCount, images, clearGameData } = useGame();
+    const { gameId, imageCount, images, setGameData, clearGameData } = useGame();
     const imageRef = useRef<HTMLDivElement>(null);
+    
+    // This is the game identifier from the URL
+    const urlGameId = searchParams.get('code');
     
     const [score, setScore] = useState(0);
     const [showRules, setShowRules] = useState(true);
@@ -39,15 +45,61 @@ export default function ClassicGame() {
     const [showClickPrompt, setShowClickPrompt] = useState(false);
     const [canRepositionMarker, setCanRepositionMarker] = useState(false);
     const [showCompletionScreen, setShowCompletionScreen] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
-        // Redirect if no game data is present
-        console.log("Game data check:", { gameId, imageCount, images }) // Debug log
-        if (!gameId || !imageCount || images.length === 0) {
-            console.log("Missing game data, redirecting to dashboard") // Debug log
-            router.push('/dashboard');
+        async function fetchGameData() {
+            if (!gameId && urlGameId && !isLoading) {
+                try {
+                    setIsLoading(true);
+                    const user = auth.currentUser;
+                    if (!user) {
+                        throw new Error("No user logged in");
+                    }
+                    const idToken = await user.getIdToken(true);
+                    console.log('Fetching game data for game:', urlGameId);
+                    
+                    const response: Response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/game/get-game/${urlGameId}`, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${idToken}`
+                        }
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error || 'Failed to fetch game data');
+                    }
+
+                    const data = await response.json();
+                    console.log("Raw API response:", data);
+
+                    if (data.images.length > 0) {
+                        const formattedImages = data.images.map(
+                            (img: { url: string; type: string }, index: number) => ({
+                                id: index + 1,
+                                path: `${process.env.NEXT_PUBLIC_API_BASE_URL}${img.url}`,
+                                type: img.type,
+                            })
+                        );
+
+                        console.log("Formatted images:", formattedImages);
+
+                        // Set game data in context using the game ID from the response
+                        setGameData(data.game_id, data.images.length, formattedImages);
+                    }
+                    
+                } catch (error) {
+                    console.error('Error fetching game data:', error);
+                    setShowCompletionScreen(true);
+                } finally {
+                    setIsLoading(false);
+                }
+            }
         }
-    }, [gameId, imageCount, images, router]);
+
+        fetchGameData();
+    }, [urlGameId, gameId, setGameData, isLoading]);
 
     const handleGuess = async (guess: 'real' | 'ai') => {
         const currentImage = images[currentIndex];
@@ -161,10 +213,7 @@ export default function ClassicGame() {
             setIsSubmitting(true);
             const idToken = await user?.getIdToken(true);
             
-            console.log("Submitting game results:", {
-                gameId,
-                userGuesses: finalGuesses
-            });
+            console.log("Submitting game results for gameId:", gameId);
             
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/game/finish-classic-game`, {
                 method: 'POST',
@@ -191,17 +240,27 @@ export default function ClassicGame() {
             
         } catch (error) {
             console.error('Error submitting game results:', error);
-            // Show completion screen anyway, but we could add an error state
             setShowCompletionScreen(true);
         } finally {
             setIsSubmitting(false);
         }
     };
 
-    const returnToDashboard = () => {
-        // Clear game data and redirect to dashboard
-        clearGameData();
-        router.push('/dashboard');
+    const returnToDashboard = async () => {
+        try {
+            // Wait for a short delay to ensure data is processed
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            // Clear game data
+            clearGameData();
+            
+            // Navigate to dashboard
+            router.push('/dashboard');
+        } catch (error) {
+            console.error('Error returning to dashboard:', error);
+            // Navigate anyway
+            router.push('/dashboard');
+        }
     };
 
     // Show game completion screen
@@ -261,6 +320,8 @@ export default function ClassicGame() {
                         >
                             Start Playing
                         </button>
+
+
                     </div>
                 </div>
             )}

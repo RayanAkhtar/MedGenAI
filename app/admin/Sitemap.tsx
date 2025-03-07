@@ -32,6 +32,11 @@ export default function Sitemap() {
             Generate Counterfactual Image
           </Link>
         </li>
+        <li>
+          <Link href="/admin/manage-tags" className="block px-4 py-2 bg-[var(--heartflow-red)] text-white rounded-lg hover:bg-[var(--heartflow-blue)] transition-colors duration-300">
+            Manage User Tags
+          </Link>
+        </li>
       </ul>
     </div>
   );

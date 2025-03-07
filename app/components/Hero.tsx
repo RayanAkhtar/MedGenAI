@@ -19,17 +19,17 @@ const Hero = () => {
             </div>
 
             <div className="flex gap-6">
-                <button className="px-10 py-3 bg-[var(--heartflow-blue)] text-white rounded-3xl hover:bg-[var(--heartflow-blue)]/90 transition-all duration-300 ease-in-out transform hover:scale-105 flex items-center">
+                <a href="/dashboard" className="px-10 py-3 bg-[var(--heartflow-blue)] text-white rounded-3xl hover:bg-[var(--heartflow-blue)]/90 transition-all duration-300 ease-in-out transform hover:scale-105 flex items-center">
                     Get started
                     <FontAwesomeIcon
                         icon={faChevronRight}
                         className="w-4 h-4 ml-2"
                     />
-                </button>
+                </a>
                 
-                <button className="px-10 py-3 bg-[var(--heartflow-red)] text-white rounded-3xl hover:bg-[var(--heartflow-red)]/90 transition-all duration-300 ease-in-out transform hover:scale-105">
+                <a href="/admin" className="px-10 py-3 bg-[var(--heartflow-red)] text-white rounded-3xl hover:bg-[var(--heartflow-red)]/90 transition-all duration-300 ease-in-out transform hover:scale-105">
                     Admin
-                </button>
+                </a>
             </div>
         </div>
     )
