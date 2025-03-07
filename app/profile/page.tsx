@@ -32,16 +32,16 @@ ChartJS.register(
     Legend
 )
 
-type GameType = 'all' | 'single' | 'dual';
+export type GameType = 'all' | 'single' | 'dual';
 
-interface ProfileData {
+export interface ProfileData {
     gamesPlayed: number;
     accuracy: number;
     rank: number;
     points: number;
 }
 
-interface GameHistory {
+export interface GameHistory {
     id: number;
     type: string;
     accuracy: number;
@@ -54,7 +54,7 @@ interface PerformanceData {
     data: number[];
 }
 
-interface GamePerformance {
+export interface GamePerformance {
     all: PerformanceData;
     single: PerformanceData;
     dual: PerformanceData;

@@ -11,22 +11,23 @@ import { auth } from "@/app/firebase/firebase";
 const getDefaultExpiryDate = () => {
   const today = new Date();
   today.setDate(today.getDate() + 7); // Add 7 days
-  return today.toISOString().split("T")[0]; // Format: YYYY-MM-DD
+  return today; // Format: YYYY-MM-DD
 };
 
 interface FormData {
   name: string;
-  expiryDate: string;
+  expiryDate: Date;
   gameCode: string;
-  gameType: "Single" | "Binary";
 }
 
 export default function Admin() {
+
+  const params = new URLSearchParams(window.location.search);
+  const game_code = params.get("game_code") || "";
   const [formData, setFormData] = useState<FormData>({
     name: "",
     expiryDate: getDefaultExpiryDate(),
-    gameCode: "",
-    gameType: "Single",
+    gameCode: game_code,
   });
 
   // Handle form input changes with proper typing
@@ -42,49 +43,82 @@ export default function Admin() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
-    try {
-      const user = auth.currentUser;
-      if (!user) {
-        throw new Error("No user logged in");
-      }
+    // try {
+    //   const user = auth.currentUser;
+    //   if (!user) {
+    //     throw new Error("No user logged in");
+    //   }
 
-      const idToken = await user.getIdToken(true);
+    //   const idToken = await user.getIdToken(true);
+
+    //   const date = new Date("2025-03-14").toISOString().slice(0, 19).replace('T', ' ');
       
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/competition/create`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${idToken}`
-        },
-        body: JSON.stringify({
-          competition_name: formData.name,
-          end_date: formData.expiryDate,
-          game_id: formData.gameCode,
-          game_board: formData.gameType
-        })
-      });
+    //   const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/competition/create`, {
+    //     method: 'POST',
+    //     headers: {
+    //       'Content-Type': 'application/json',
+    //       'Authorization': `Bearer ${idToken}`
+    //     },
+    //     body: JSON.stringify({
+    //       game_code: formData.gameCode,
+    //       name: formData.name,
+    //       // expiry: formData.expiryDate,
+    //       expiry: date
+    //     })
+    //   });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to create competition');
-      }
+    //   if (!response.ok) {
+    //     const errorData = await response.json();
+    //     throw new Error(errorData.error || 'Failed to create competition');
+    //   }
 
-      const result = await response.json();
-      console.log("Competition created:", result);
-      alert("Competition created successfully! 🎉");
+    //   const result = await response.json();
+    //   console.log("Competition created:", result);
+    //   alert("Competition created successfully! 🎉");
       
-      // Reset form
-      setFormData({
-        name: "",
-        expiryDate: getDefaultExpiryDate(),
-        gameCode: "",
-        gameType: "Single"
-      });
+    //   // Reset form
+    //   setFormData({
+    //     name: "",
+    //     expiryDate: getDefaultExpiryDate(),
+    //     gameCode: "",
+    //   });
 
-    } catch (error) {
-      console.error('Error creating competition:', error);
-      alert(error instanceof Error ? error.message : 'Failed to create competition');
-    }
+
+    //   alert("Created successsfuly")
+    // } catch (error) {
+    //   console.error('Error creating competition:', error);
+    //   alert(error instanceof Error ? error.message : 'Failed to create competition');
+    // }
+
+      // /api/competitions/create
+        console.log(new Date())
+        const data = {
+          name: formData.name,
+          expiry: new Date("2025-03-14").toISOString().slice(0, 19).replace('T', ' '),
+          game_code: formData.gameCode
+      };
+      
+      
+      fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/competition/create`, {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+      })
+      .then(response => {      
+          if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          
+          return response.json();
+      })
+      .then(result => {
+          console.log('Response:', result);
+      })
+      .catch(error => {
+          console.error('Error:', error);
+      });
   };
 
   return (
@@ -93,6 +127,7 @@ export default function Admin() {
       <section className="p-8 bg-white rounded-2xl shadow-md max-w-2xl mx-auto mt-10">
         <h2 className="text-2xl font-semibold mb-6">Create Game Competition</h2>
         <form className="space-y-4" onSubmit={handleSubmit}>
+
           <div>
             <label className="block text-sm font-medium mb-1">Name</label>
             <input
@@ -109,7 +144,7 @@ export default function Admin() {
             <input
               type="date"
               name="expiryDate"
-              value={formData.expiryDate}
+              value={formData.expiryDate.toISOString().slice(0, 19).replace('T', ' ')}
               onChange={handleChange}
               className="w-full border rounded p-2"
             />
@@ -125,18 +160,6 @@ export default function Admin() {
               placeholder="Enter Game Code"
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Game Type</label>
-            <select
-              name="gameType"
-              value={formData.gameType}
-              onChange={handleChange}
-              className="w-full border rounded p-2"
-            >
-              <option value="Single">Single</option>
-              <option value="Binary">Dual</option>
-            </select>
-          </div>
 
           {/* 🚀 Submit Button */}
           <div className="text-center">
@@ -147,7 +170,45 @@ export default function Admin() {
               Create Competition
             </button>
           </div>
+          
         </form>
+          <button onClick={async ()=> {
+            // /api/competitions/create
+              console.log("HELLO")
+              const data = {
+                name: "TEST TSET",
+                expiry: new Date("2025-03-14").toISOString().slice(0, 19).replace('T', ' '),
+                game_code: 3
+            };
+            
+            console.log("B");
+            
+            fetch("http://3.10.53.122:5340/api/competitions/create", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                console.log("C");
+            
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                
+                return response.json();
+            })
+            .then(result => {
+                console.log('Response:', result);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+          }
+          }>
+            TEST
+          </button>
       </section>
     </main>
   );
