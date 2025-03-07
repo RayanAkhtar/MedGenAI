@@ -73,7 +73,7 @@ const UserPage = () => {
   useEffect(() => {
     setCurrentPage(1);
     setSelectedUsers([]);
-  }, [filters])
+  }, [filters.tags, filters.all])
 
   const handleSelectUser = (checked: boolean, user: User) => {
     setSelectedUsers((prev) => {
