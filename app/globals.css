@@ -9,12 +9,12 @@
   --heartflow-red: #F14F4F;
 }
 
-@media (prefers-color-scheme: dark) {
+/* @media (prefers-color-scheme: dark) {
   :root {
     --background: #ffffff;
     --foreground: #ededed;
   }
-}
+} */
 
 body {
   color: var(--foreground);
