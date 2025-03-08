@@ -11,6 +11,8 @@ const GenerateImagePage = () => {
   const [ageRange, setAgeRange] = useState("any");
   const [sex, setSex] = useState("any");
   const [disease, setDisease] = useState("any");
+  const [realImagePath, setRealImagePath] = useState<string | null>(null);
+  const [realImageFileName, setRealImageFileName] = useState<string | null>(null);
   const [generatedImagePath, setGeneratedImagePath] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -20,15 +22,15 @@ const GenerateImagePage = () => {
     setGeneratedImagePath(null);
   
     try {
-      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/generateImage?age=${ageRange}&sex=${sex}&disease=${disease}`;
+      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/generateImage?age=${ageRange}&sex=${sex}&disease=${disease}&realImageFileName=${realImageFileName || ""}`;
   
       const response = await fetch(url);
 
       if (!response.ok) throw new Error("Failed to generate image");
 
       const { imagePath } = await response.json();
-      
-      setGeneratedImagePath(imagePath);
+      console.log("image path", imagePath)
+      setGeneratedImagePath(imagePath);      
 
     } catch (error) {
       console.error("❌ Error generating image:", error);
@@ -37,6 +39,27 @@ const GenerateImagePage = () => {
       setLoading(false);
     }
   };
+
+  const handleLoadRealImage = async () => {
+    try {
+      const pathResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getRandomRealImagePath`);
+      if (!pathResponse.ok) throw new Error("Failed to get image path");
+  
+      const { imagePath, fileName } = await pathResponse.json();
+  
+      const imageUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/${imagePath}`;
+  
+      setRealImagePath(imageUrl);
+      setRealImageFileName(fileName);
+  
+    } catch (error) {
+      console.error("❌ Error loading real image:", error);
+      alert("Error loading real image. Please try again.");
+    }
+  };
+  
+  
+  
 
   const handleSaveImage = async () => {
     if (!generatedImagePath) return;
@@ -98,11 +121,21 @@ const GenerateImagePage = () => {
           disease={disease} 
           setDisease={setDisease} 
         />
-
+  
+        <button
+          onClick={handleLoadRealImage}
+          className="bg-green-500 text-white px-6 py-2 rounded-md font-semibold hover:bg-green-600 transition mb-4 mt-10"
+        >
+          Get Real Image
+        </button>
+  
         <GenerateButton onClick={handleGenerateImage} loading={loading} />
-
-        <ImageDisplay imagePath={generatedImagePath} />
-
+  
+        <div className="flex flex-row gap-8 mt-6">
+          <ImageDisplay title="Real Image" imagePath={realImagePath} />
+          <ImageDisplay title="Generated Image" imagePath={generatedImagePath} />
+        </div>
+  
         <SaveButton 
           onClick={handleSaveImage} 
           disabled={!generatedImagePath || saving} 
