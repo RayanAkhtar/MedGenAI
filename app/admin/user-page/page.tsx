@@ -42,7 +42,9 @@ const UserPage = () => {
       console.log(url);
       const response = await fetch(url);
       const result = await response.json();
-      setTotalPages(Math.ceil(result['count'] / limit));
+      if (response.ok) {
+        setTotalPages(Math.ceil(result['count'] / limit));
+      }
     } catch (err) {
       console.error('Error fetching data:', err);
     }
@@ -59,7 +61,9 @@ const UserPage = () => {
       console.log(url);
       const response = await fetch(url);
       const result = await response.json();
-      setData(result);
+      if (response.ok) {
+        setData(result);
+      }
     } catch (err) {
       console.error('Error fetching data:', err);
     }
@@ -69,6 +73,11 @@ const UserPage = () => {
     fetchUserCount();
     fetchData();
   }, [filters, currentPage, fetchUserCount, fetchData])
+
+  useEffect(() => {
+    setCurrentPage(1);
+    setSelectedUsers([]);
+  }, [filters.tags, filters.all])
 
   const handleSelectUser = (checked: boolean, user: User) => {
     setSelectedUsers((prev) => {
