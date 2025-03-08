@@ -6,11 +6,12 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '../context/AuthContext'
 
 type Competition = {
-    id: number;
+    game_id: number;
     name: string;
     game_board: 'dual' | 'single';
     expiry_date: string;
     active: boolean;
+    game_code: string;
 }
 
 export default function Competitions() {
@@ -20,8 +21,8 @@ export default function Competitions() {
     const [competitions, setCompetitions] = useState<Competition[]>([])
     const [showExpired, setShowExpired] = useState<boolean>(false)
 
-    function convertToLink(game_id: number, game_board: 'dual' | 'single'): string {
-        return game_board === 'dual' ? `/game/classic/dual/${game_id}` : `/game/classic/single/${game_id}`
+    function convertToLink(game_code: string, game_board: 'dual' | 'single'): string {
+        return game_board === 'dual' ? `/game/classic/dual/${game_code}` : `/game/classic/single/${game_code}`
     }
 
     useEffect(() => {
@@ -34,7 +35,7 @@ export default function Competitions() {
         const fetchCompetitions = async () => {
 
             if (!user) return;
-            var userName = "";
+            let userName = "";
             if (user.displayName) {
                 userName = encodeURIComponent(user.displayName);
 				console.log('User:', userName)
@@ -43,8 +44,8 @@ export default function Competitions() {
 			}
             try {
                 setIsLoading(true);
-					console.log(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getGames/${encodeURI(userName)}`);
 					fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getGames/${(userName)}`, {
+					// fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getGames/${encodeURIComponent("Bob Bobbery")}`, {
 					method: 'GET',
                     headers: {
                         'Content-Type': 'application/json'
@@ -122,8 +123,8 @@ export default function Competitions() {
                                         {competitions.filter(comp => showExpired || comp.active).map((comp, index) => (
                                             <tr key={index} className="text-sm">
                                                 <td className="py-3">
-                                                    <a href={convertToLink(comp.id, comp.game_board)} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
-                                                        {comp.name}
+                                                    <a href={convertToLink(comp.game_code, comp.game_board)} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
+                                                        {comp.game_code}
                                                     </a>
                                                 </td>
                                                 <td className="py-3 text-center">{comp.game_board === "dual" ? "Dual" : "Single"}</td>
