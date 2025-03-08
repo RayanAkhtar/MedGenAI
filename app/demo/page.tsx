@@ -14,6 +14,7 @@ const ParentComponent: React.FC = () => {
   const [score, setScore] = useState(0);
   const [correctCount, setCorrectCount] = useState(0);
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
+  const [isTimerRunning, setIsTimerRunning] = useState(true);
 
   const images = ["https://picsum.photos/200", "https://picsum.photos/300"];
 
@@ -33,18 +34,23 @@ const ParentComponent: React.FC = () => {
     setScore(score + 10); // Example scoring logic
     setCorrectCount(correctCount + 1); // Example correct count logic
     setIsFeedbackOpen(true);
+    setIsTimerRunning(false);
   };
 
-  const handleFeedbackSubmit = (feedback: string) => {
-    console.log("Feedback submitted:", feedback);
+  const handleFeedbackSubmit = (
+    feedback: string,
+    clickPosition: { x: number; y: number } | null
+  ) => {
+    console.log("Feedback submitted:", feedback, clickPosition);
     setIsFeedbackOpen(false);
     setSelectedImage(null);
     setConfidenceScore(null);
+    setIsTimerRunning(true);
   };
 
   return (
     <div>
-      <Timer onTimeUp={handleTimeUp} duration={10} />
+      {isTimerRunning && <Timer onTimeUp={handleTimeUp} duration={10} />}
       {!isTimeUp && (
         <>
           <DualImageViewer
@@ -89,6 +95,7 @@ const ParentComponent: React.FC = () => {
         isOpen={isFeedbackOpen}
         onClose={() => setIsFeedbackOpen(false)}
         onSubmit={handleFeedbackSubmit}
+        imageUrl={selectedImage || ""}
       />
     </div>
   );

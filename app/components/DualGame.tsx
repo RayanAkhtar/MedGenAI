@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import DualImageViewer from "./DualImageViewer";
 import ConfidenceSelector from "./ConfidenceSelector";
 import FeedbackPopup from "./FeedbackPopup";
@@ -11,11 +11,26 @@ import { useGame } from "@/app/context/GameContext";
 
 interface DualGameProps {
   gameMode: "classic" | "competition" | "custom";
-  images: string[];
-  gameCode: string;
+  gameData: {
+    gameId: string;
+    gameCode: string;
+    gameMode: string;
+    rounds: {
+      roundId: string;
+      images: {
+        id: string;
+        url: string;
+        isCorrect: boolean;
+      }[];
+    }[];
+    settings: {
+      timerPerRound: number;
+      maxRounds: number;
+    };
+  };
 }
 
-const DualGame: React.FC<DualGameProps> = ({ gameMode, images, gameCode }) => {
+const DualGame: React.FC<DualGameProps> = ({ gameMode, gameData }) => {
   const {
     gameId,
     images: gameImages,
@@ -25,67 +40,133 @@ const DualGame: React.FC<DualGameProps> = ({ gameMode, images, gameCode }) => {
     clearGameData,
   } = useGame();
 
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [isTimeUp, setIsTimeUp] = useState(false);
+  const [confidenceScore, setConfidenceScore] = useState<number | null>(null);
+  const [score, setScore] = useState(0);
+  const [correctCount, setCorrectCount] = useState(0);
+  const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
+  const [isTimerRunning, setIsTimerRunning] = useState(true);
+  const [currentRound, setCurrentRound] = useState(0);
+
+  const rounds = gameData.rounds;
+  const timerPerRound = gameData.settings.timerPerRound;
+  console.log("gameData", gameData);
   useEffect(() => {
     setGameData(
-      gameCode,
-      images.length,
-      images.map((image, index) => ({ id: index, path: image, type: "real" }))
+      gameData.gameCode,
+      rounds.length,
+      rounds.flatMap((round) =>
+        round.images.map((image) => ({
+          id: Number(image.id),
+          path: image.url,
+          type: image.isCorrect ? "real" : "ai",
+        }))
+      )
     );
-  }, [gameCode, images, setGameData]);
+  }, []); // Ensure this useEffect runs only once
+
+  useEffect(() => {
+    if (currentRound >= rounds.length) {
+      setIsTimeUp(true);
+    }
+  }, [currentRound, rounds.length]);
 
   const handleImageSelect = (image: string) => {
-    setSelectedImages([{ id: 1, path: image, type: "real" }]); // Mock data for selected image
+    setSelectedImage(image);
   };
 
-  const handleFeedbackSubmit = (feedback: string) => {
-    // Mock feedback submission logic
-    console.log("Feedback submitted:", feedback);
-    setSelectedImages([]);
+  const handleTimeUp = () => {
+    setIsTimeUp(true);
+  };
+
+  const handleConfidenceSelect = (score: number) => {
+    setConfidenceScore(score);
+  };
+
+  const handleNext = () => {
+    const selectedImageData = rounds[currentRound].images.find(
+      (img) => img.url === selectedImage
+    );
+    if (selectedImageData) {
+      if (selectedImageData.isCorrect) {
+        setScore(score + 10);
+        setCorrectCount(correctCount + 1);
+      } else {
+        setScore(score + 2);
+      }
+    }
+    setIsFeedbackOpen(true);
+    setIsTimerRunning(false);
+  };
+
+  const handleFeedbackSubmit = (
+    feedback: string,
+    clickPosition: { x: number; y: number } | null
+  ) => {
+    console.log("Feedback submitted:", feedback, clickPosition);
+    setIsFeedbackOpen(false);
+    setSelectedImage(null);
+    setConfidenceScore(null);
+    setIsTimerRunning(true);
+    setCurrentRound(currentRound + 1);
   };
 
   if (!gameId) {
     return <Loader message="Loading game..." />;
   }
 
-  if (selectedImages && selectedImages.length >= 10) {
-    return (
-      <Summary
-        stats={{
-          score: selectedImages.length,
-          correct: selectedImages.length,
-          avgTime: 0,
-        }}
-        gameMode={gameMode}
-      />
-    );
-  }
-
   return (
     <div className="p-4 space-y-4">
-      <Timer onTimeUp={() => setSelectedImages([])} />
-      <ScoreDisplay
-        score={selectedImages ? selectedImages.length : 0}
-        correctCount={selectedImages ? selectedImages.length : 0}
-        isHidden={gameMode === "competition"}
-      />
-      <DualImageViewer
-        images={gameImages.map((image) => image.path)}
-        onSelect={handleImageSelect}
-        selectedImage={
-          selectedImages && selectedImages.length > 0
-            ? selectedImages[0].path
-            : null
-        }
-      />
-      <ConfidenceSelector
-        onSelect={(confidence) =>
-          console.log("Confidence selected:", confidence)
-        }
-      />
+      {isTimerRunning && currentRound < rounds.length && (
+        <Timer onTimeUp={handleTimeUp} duration={timerPerRound} />
+      )}
+      {!isTimeUp && currentRound < rounds.length && (
+        <>
+          <DualImageViewer
+            images={rounds[currentRound].images.map((img) => img.url)}
+            onSelect={handleImageSelect}
+            selectedImage={selectedImage}
+          />
+          {selectedImage && (
+            <div className="mt-4 flex flex-col items-center">
+              <p className="mb-2 text-lg font-semibold">Select confidence</p>
+              <ConfidenceSelector onSelect={handleConfidenceSelect} />
+            </div>
+          )}
+          {selectedImage && confidenceScore !== null && (
+            <div className="mt-4 flex justify-center">
+              <button
+                onClick={handleNext}
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              >
+                Next
+              </button>
+            </div>
+          )}
+          <div className="mt-4 flex justify-center">
+            <ScoreDisplay
+              score={score}
+              correctCount={correctCount}
+              isHidden={gameMode === "competition"}
+            />
+          </div>
+        </>
+      )}
+      {isTimeUp && (
+        <div className="text-center text-red-500">
+          Time's up!
+          <Summary
+            stats={{ score, correct: correctCount, avgTime: 10 }} // Example avgTime
+            gameMode={gameMode}
+          />
+        </div>
+      )}
       <FeedbackPopup
-        isOpen={!!selectedImages && selectedImages.length > 0}
-        onClose={() => setSelectedImages([])}
+        isOpen={isFeedbackOpen}
+        onClose={() => setIsFeedbackOpen(false)}
         onSubmit={handleFeedbackSubmit}
+        imageUrl={selectedImage || ""}
       />
     </div>
   );

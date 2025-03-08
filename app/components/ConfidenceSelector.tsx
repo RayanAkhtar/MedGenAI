@@ -24,7 +24,7 @@ const ConfidenceSelector: React.FC<ConfidenceSelectorProps> = ({
         <button
           key={index}
           onClick={() => handleClick(index)}
-          className={`px-4 py-2 rounded hover:bg-blue-600 ${
+          className={`px-6 py-3 text-lg rounded hover:bg-blue-600 ${
             selectedScore === index
               ? "bg-blue-500 text-white border-2 border-green-500"
               : "bg-blue-500 text-white"
