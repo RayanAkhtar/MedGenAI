@@ -35,6 +35,7 @@ export default function Competitions() {
         const fetchCompetitions = async () => {
 
             if (!user) return;
+            let userName = "";
             if (user.displayName) {
                 userName = encodeURIComponent(user.displayName);
 				console.log('User:', userName)
