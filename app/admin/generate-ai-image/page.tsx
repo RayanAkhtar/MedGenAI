@@ -16,25 +16,32 @@ const GenerateImagePage = () => {
   const [generatedImagePath, setGeneratedImagePath] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [imageGenerationError, setImageGenerationError] = useState<string | null>(null); // 🔹 New state
 
   const handleGenerateImage = async () => {
     setLoading(true);
     setGeneratedImagePath(null);
-  
+    setImageGenerationError(null); // Reset error on new request
+
     try {
       const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/generateImage?age=${ageRange}&sex=${sex}&disease=${disease}&realImageFileName=${realImageFileName || ""}`;
-  
       const response = await fetch(url);
 
-      if (!response.ok) throw new Error("Failed to generate image");
+      if (!response.ok) {
+        throw new Error("Failed to generate image");
+      }
 
       const { imagePath } = await response.json();
-      console.log("image path", imagePath)
-      setGeneratedImagePath(imagePath);      
 
+      if (!imagePath) {
+        setImageGenerationError("No matching images found for the selected conditions.");
+        return;
+      }
+
+      setGeneratedImagePath(imagePath);
     } catch (error) {
       console.error("❌ Error generating image:", error);
-      alert("Error generating image. Please try again.");
+      setImageGenerationError("The backend API could not generate an image for the applied conditions.");
     } finally {
       setLoading(false);
     }
@@ -44,22 +51,18 @@ const GenerateImagePage = () => {
     try {
       const pathResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getRandomRealImagePath`);
       if (!pathResponse.ok) throw new Error("Failed to get image path");
-  
+
       const { imagePath, fileName } = await pathResponse.json();
-  
+
       const imageUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/${imagePath}`;
-  
+
       setRealImagePath(imageUrl);
       setRealImageFileName(fileName);
-  
     } catch (error) {
       console.error("❌ Error loading real image:", error);
       alert("Error loading real image. Please try again.");
     }
   };
-  
-  
-  
 
   const handleSaveImage = async () => {
     if (!generatedImagePath) return;
@@ -77,7 +80,7 @@ const GenerateImagePage = () => {
         const rangeList = ageRange.split("-");
         const minAge = parseInt(rangeList[0]);
         const maxAge = parseInt(rangeList[1]);
-        
+
         ageToUse = Math.floor(Math.random() * (maxAge - minAge + 1)) + minAge;
       }
 
@@ -88,7 +91,7 @@ const GenerateImagePage = () => {
       formData.append("disease", disease);
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/saveGeneratedImage`, 
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/saveGeneratedImage`,
         {
           method: "POST",
           body: formData,
@@ -98,7 +101,6 @@ const GenerateImagePage = () => {
       if (!response.ok) throw new Error("Failed to save image");
 
       alert("Image saved successfully!");
-
     } catch (error) {
       console.error("❌ Error saving image:", error);
       alert("Error saving image. Please try again.");
@@ -112,7 +114,7 @@ const GenerateImagePage = () => {
       <Navbar />
       <main className="min-h-screen text-gray-900 flex flex-col items-center py-10 mt-10">
         <h1 className="text-3xl font-bold mb-6">Generate AI Image</h1>
-        
+
         <ImageFilters 
           ageRange={ageRange} 
           setAgeRange={setAgeRange} 
@@ -121,26 +123,30 @@ const GenerateImagePage = () => {
           disease={disease} 
           setDisease={setDisease} 
         />
-  
+
         <button
           onClick={handleLoadRealImage}
           className="bg-green-500 text-white px-6 py-2 rounded-md font-semibold hover:bg-green-600 transition mb-4 mt-10"
         >
           Get Real Image
         </button>
-  
+
         <GenerateButton onClick={handleGenerateImage} loading={loading} />
-  
+
         <div className="flex flex-row gap-8 mt-6">
           <ImageDisplay title="Real Image" imagePath={realImagePath} />
           <ImageDisplay title="Generated Image" imagePath={generatedImagePath} />
         </div>
-  
+
         <SaveButton 
           onClick={handleSaveImage} 
           disabled={!generatedImagePath || saving} 
           saving={saving} 
         />
+
+        {imageGenerationError && (
+          <p className="text-red-600 font-semibold mt-4">{imageGenerationError}</p>
+        )}
       </main>
     </div>
   );
