@@ -32,12 +32,20 @@ export default function Competitions() {
 
     useEffect(() => {
         const fetchCompetitions = async () => {
+
             if (!user) return;
-            
+            var userName = "";
+            if (user.displayName) {
+                userName = encodeURIComponent(user.displayName);
+				console.log('User:', userName)
+            } else {
+				return
+			}
             try {
                 setIsLoading(true);
-                fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getGames/test_user1`, {
-                    method: 'GET',
+					console.log(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getGames/${encodeURI(userName)}`);
+					fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getGames/${(userName)}`, {
+					method: 'GET',
                     headers: {
                         'Content-Type': 'application/json'
                     }
@@ -111,8 +119,8 @@ export default function Competitions() {
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y">
-                                        {competitions.filter(comp => showExpired || comp.active).map(comp => (
-                                            <tr key={comp.id} className="text-sm">
+                                        {competitions.filter(comp => showExpired || comp.active).map((comp, index) => (
+                                            <tr key={index} className="text-sm">
                                                 <td className="py-3">
                                                     <a href={convertToLink(comp.id, comp.game_board)} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
                                                         {comp.name}
