@@ -67,7 +67,7 @@ export default function Profile() {
     const [profileData, setProfileData] = useState<ProfileData | null>(null)
     const [recentGames, setRecentGames] = useState<GameHistory[]>([])
     const [performanceData, setPerformanceData] = useState<GamePerformance | null>(null)
-    const [, setIsLoading] = useState(true)
+    const [isLoading, setIsLoading] = useState(true)
 
     useEffect(() => {
         if (!authLoading && !user) {

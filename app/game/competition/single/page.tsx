@@ -25,7 +25,7 @@ interface ClickPosition {
 export default function CompetitionGame() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const { user } = useAuth();
+    const { } = useAuth();
     const { gameId, imageCount, images, setGameData, clearGameData } = useGame();
     const imageRef = useRef<HTMLDivElement>(null);
     
@@ -33,10 +33,12 @@ export default function CompetitionGame() {
     const urlGameId = searchParams.get('code');
     
     const [score, setScore] = useState(0);
+    console.log(score)
     const [showRules, setShowRules] = useState(true);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [userGuesses, setUserGuesses] = useState<UserGuess[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    console.log(setIsSubmitting)
     const [clickPosition, setClickPosition] = useState<ClickPosition | null>(null);
     const [showClickPrompt, setShowClickPrompt] = useState(false);
     const [canRepositionMarker, setCanRepositionMarker] = useState(false);
