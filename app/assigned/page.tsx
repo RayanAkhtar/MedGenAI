@@ -9,29 +9,23 @@ const competitions = [
     {
         id: 2,
         name: 'Lung Warriors Only',
-        game_board: 'Dual',
-        link: 'https://example.com/global-coding-challenge',
-        start_date: '2025-03-12',
-        end_date: '2025-03-15',
-        completed: true
+        game_board: 'dual',
+        expiry_date: '2025-03-15',
+        active: true
     },
     {
         id: 3,
         name: 'Dual CFs',
-        game_board: 'Dual',
-        link: 'https://example.com/ai-innovation-cup',
-        start_date: '2025-03-15',
-        end_date: '2025-04-01',
-        completed: false
+        game_board: 'dual',
+        expiry_date: '2025-04-01',
+        active: false
     },
     {
         id: 4,
         name: 'Bobs game',
-        game_board: 'Single',
-        link: 'https://example.com/data-science-derby',
-        start_date: '2025-05-03',
-        end_date: '2025-05-10',
-        completed: true
+        game_board: 'single',
+        expiry_date: '2025-05-10',
+        active: true
     }
 ]
 
@@ -39,7 +33,7 @@ export default function Competitions() {
     const { user, loading: authLoading } = useAuth()
     const router = useRouter()
     const [isLoading, setIsLoading] = useState(true)
-    const [competitionsprime, setCompetitionsprime] = useState(competitions)
+    const [competitions, setCompetitions] = useState([])
     const [showExpired, setShowExpired] = useState(false)
 
     function convertToLink(game_id, game_board) {
@@ -65,7 +59,7 @@ export default function Competitions() {
                 setIsLoading(true);
 
                 // fetch all competitions
-                fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/competitions/all`, {
+                fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/getGames/${user.displayName}`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json'
@@ -80,7 +74,7 @@ export default function Competitions() {
                 })
                 .then(result => {
                     console.log('Response:', result);
-                    setCompetitionsprime(result)
+                    setCompetitions(result)
                 })
                 .catch(error => {
                     console.error('Error:', error);
@@ -145,7 +139,7 @@ export default function Competitions() {
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y">
-                                        {competitions.filter((e,i) => {return showExpired ? true : e.completed}).map((comp, index) => (
+                                        {competitions.filter((e,i) => {return showExpired ? true : e.active}).map((comp, index) => (
                                             <tr key={index} className="text-sm">
                                                 <td className="py-3">
                                                     <a href={convertToLink(comp.id, comp.game_board)} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
@@ -153,7 +147,7 @@ export default function Competitions() {
                                                     </a>
                                                 </td>
                                                 <td className="py-3 text-center">{comp.game_board === "dual" ? "Dual" : "Single"}</td>
-                                                <td className="py-3 text-center">{comp.end_date}</td>
+                                                <td className="py-3 text-center">{comp.expiry_date}</td>
                                             </tr>
                                         ))}
                                     </tbody>
