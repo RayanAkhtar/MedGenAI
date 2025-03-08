@@ -170,8 +170,7 @@ export default function UserProfile() {
   // --- Function to handle "Assign" button click ---
   const handleAssign = async () => {
     try {
-      const userId = profile?.user_id;
-      const gameId = gameCode;
+      const userId = profile?.username;
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/newGameSession`,
         {
@@ -180,8 +179,8 @@ export default function UserProfile() {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            game_id: gameId,
-            user_id: userId
+            game_code: gameCode,
+            user_name: userId
           })
         }
       );
