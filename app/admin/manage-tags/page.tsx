@@ -27,7 +27,7 @@ const ManageTags = () => {
       const data = await res.json();
       setTags(data);
     } catch (err) {
-      setError('Failed to load data. Please try again.');
+      setError(`Failed to load data. Please try again. ${err}`);
     } finally {
       setLoading(false);
     }

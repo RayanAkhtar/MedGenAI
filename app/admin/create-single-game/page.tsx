@@ -44,9 +44,14 @@ export default function CreateSingleGame() {
             console.log("Game created successfully:", data);
             setGameCode(data.gameId);
             
-        } catch (error: any) {
-            console.error("Failed to create game:", error);
-            setError(error.message);
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                console.error("Failed to create game:", error.message);
+                setError(error.message);
+            } else {
+                console.error("An unknown error occurred:", error);
+                setError("An unexpected error occurred");
+            }
         } finally {
             setIsLoading(false);
         }

@@ -46,6 +46,7 @@ export default function UserProfile() {
   const [profile, setProfile] = useState<UserProfileData | null>(null);
   const [accuracy, setAccuracy] = useState<number | null>(null);
   const [totalImagesAttempted, setTotalImagesAttempted] = useState<number | null>(null);
+  console.log(accuracy, totalImagesAttempted)
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -170,8 +171,8 @@ export default function UserProfile() {
   // --- Function to handle "Assign" button click ---
   const handleAssign = async () => {
     try {
-      const userId = profile?.user_id;
-      
+      const userId = profile?.username;
+
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/newGameSession`,
         {
@@ -181,7 +182,7 @@ export default function UserProfile() {
           },
           body: JSON.stringify({
             game_code: gameCode,
-            user_id: userId
+            user_name: userId
           })
         }
       );
