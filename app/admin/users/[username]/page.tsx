@@ -29,7 +29,7 @@ interface UserProfileData {
 
 // New interface for game data
 interface GameData {
-  game_id: number;
+  game_code: number;
   game_mode: string;
   date_created: string;
   game_board: string;
@@ -172,6 +172,7 @@ export default function UserProfile() {
   const handleAssign = async () => {
     try {
       const userId = profile?.username;
+
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/newGameSession`,
         {
@@ -318,7 +319,7 @@ export default function UserProfile() {
             ) : (
               <>
                 <h2 className="text-xl font-semibold mb-4">
-                  Game Found: {fetchedGame.game_id}
+                  Game Found: {fetchedGame.game_code}
                 </h2>
 
                 {/* Display game details nicely */}
