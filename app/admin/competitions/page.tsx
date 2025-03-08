@@ -2,10 +2,7 @@
 
 import { useState } from "react";
 import Navbar from "@/app/components/Navbar";
-import AdminStats from "../AdminStats";
-import FeedbackPieChart from "../FeedbackPieChart";
-import ImageStatsCard from "../ImageStatsCard";
-import { auth } from "@/app/firebase/firebase";
+
 
 // 📅 Helper function to get date 7 days from now in YYYY-MM-DD format
 const getDefaultExpiryDate = () => {

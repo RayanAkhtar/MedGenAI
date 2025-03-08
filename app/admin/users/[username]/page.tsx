@@ -46,6 +46,7 @@ export default function UserProfile() {
   const [profile, setProfile] = useState<UserProfileData | null>(null);
   const [accuracy, setAccuracy] = useState<number | null>(null);
   const [totalImagesAttempted, setTotalImagesAttempted] = useState<number | null>(null);
+  console.log(accuracy, totalImagesAttempted)
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
