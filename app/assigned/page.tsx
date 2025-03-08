@@ -5,44 +5,23 @@ import Sidebar from '../components/Sidebar'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '../context/AuthContext'
 
-const competitions = [
-    {
-        id: 2,
-        name: 'Lung Warriors Only',
-        game_board: 'dual',
-        expiry_date: '2025-03-15',
-        active: true
-    },
-    {
-        id: 3,
-        name: 'Dual CFs',
-        game_board: 'dual',
-        expiry_date: '2025-04-01',
-        active: false
-    },
-    {
-        id: 4,
-        name: 'Bobs game',
-        game_board: 'single',
-        expiry_date: '2025-05-10',
-        active: true
-    }
-]
+type Competition = {
+    id: number;
+    name: string;
+    game_board: 'dual' | 'single';
+    expiry_date: string;
+    active: boolean;
+}
 
 export default function Competitions() {
     const { user, loading: authLoading } = useAuth()
     const router = useRouter()
-    const [isLoading, setIsLoading] = useState(true)
-    const [competitions, setCompetitions] = useState([])
-    const [showExpired, setShowExpired] = useState(false)
+    const [isLoading, setIsLoading] = useState<boolean>(true)
+    const [competitions, setCompetitions] = useState<Competition[]>([])
+    const [showExpired, setShowExpired] = useState<boolean>(false)
 
-    function convertToLink(game_id, game_board) {
-        if (game_board === "dual") {
-            return `/game/classic/dual/${game_id}`
-        } else {
-            return `/game/classic/single/${game_id}`
-        }
-
+    function convertToLink(game_id: number, game_board: 'dual' | 'single'): string {
+        return game_board === 'dual' ? `/game/classic/dual/${game_id}` : `/game/classic/single/${game_id}`
     }
 
     useEffect(() => {
@@ -57,9 +36,6 @@ export default function Competitions() {
             
             try {
                 setIsLoading(true);
-
-
-                // fetch all competitions
                 fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getGames/test_user1`, {
                     method: 'GET',
                     headers: {
@@ -70,18 +46,15 @@ export default function Competitions() {
                     if (!response.ok) {
                         throw new Error(`HTTP error! Status: ${response.status}`);
                     }
-                    
                     return response.json();
                 })
-                .then(result => {
+                .then((result: Competition[]) => {
                     console.log('Response:', result);
-                    setCompetitions(result)
+                    setCompetitions(result);
                 })
                 .catch(error => {
                     console.error('Error:', error);
                 });
-
-                
             } catch (error) {
                 console.error('Error fetching competitions data:', error);
             } finally {
@@ -104,32 +77,30 @@ export default function Competitions() {
 
     if (!user) return null;
 
-
     return (
         <div className="flex min-h-screen bg-white">
             <Sidebar />
-            {/* Right side - Competitions Table with updated styling */}
             <div className="w-full p-12">
                 <h1 className="text-2xl font-bold text-gray-900 mb-6">Assigned Games</h1>
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-4 bg-white rounded-lg shadow-sm border border-gray-200">
                         <div className="p-6">
-                        <div className="title flex flex-row items-center justify-start">
-                            <h2 className="text-lg font-medium text-gray-900 flex items-center">
-                                <span className="w-1.5 h-5 bg-[var(--heartflow-red)] rounded-full mr-3"></span>
-                                Assigned to me
-                            </h2>
-                        </div>
-                        <div className="flex items-center mt-2 mb-2">
-                        <input 
-                            type="checkbox" 
-                            id="showCompleted" 
-                            className="mr-2"
-                            checked={showExpired} 
-                            onChange={() => setShowExpired(!showExpired)} 
-                        />
-                            <label htmlFor="showCompleted" className="text-gray-900">Show Completed Games</label>
-                        </div>
+                            <div className="title flex flex-row items-center justify-start">
+                                <h2 className="text-lg font-medium text-gray-900 flex items-center">
+                                    <span className="w-1.5 h-5 bg-[var(--heartflow-red)] rounded-full mr-3"></span>
+                                    Assigned to me
+                                </h2>
+                            </div>
+                            <div className="flex items-center mt-2 mb-2">
+                                <input 
+                                    type="checkbox" 
+                                    id="showCompleted" 
+                                    className="mr-2"
+                                    checked={showExpired} 
+                                    onChange={() => setShowExpired(!showExpired)} 
+                                />
+                                <label htmlFor="showCompleted" className="text-gray-900">Show Completed Games</label>
+                            </div>
                             <div className="overflow-x-auto">
                                 <table className="w-full">
                                     <thead>
@@ -140,8 +111,8 @@ export default function Competitions() {
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y">
-                                        {competitions.filter((e,i) => {return showExpired ? true : e.active}).map((comp, index) => (
-                                            <tr key={index} className="text-sm">
+                                        {competitions.filter(comp => showExpired || comp.active).map(comp => (
+                                            <tr key={comp.id} className="text-sm">
                                                 <td className="py-3">
                                                     <a href={convertToLink(comp.id, comp.game_board)} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
                                                         {comp.name}
