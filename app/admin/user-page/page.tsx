@@ -7,6 +7,7 @@ import UserTable from '@/app/admin/user-page/UserTable';
 import UserFilters, { FiltersState } from '@/app/admin/user-page/UserFilters';
 import Pagination from '@/app/admin/Pagination';
 import AssignButton from '@/app/admin/users/[username]/components/AssignButton';
+import AssignTagsButton from '@/app/admin/user-page/AssignTagsButton';
 
 interface User {
   username: string;
@@ -105,7 +106,10 @@ const UserPage = () => {
       <div className="h-screen bg-white text-black">
         <h1 className="text-3xl font-bold text-center py-8">Users</h1>
         <UserFilters filters={filters} setFilters={setFilters} />
-        <div className="flex justify-end mb-4 mr-8">
+        <div className="flex justify-between mb-4 mx-8">
+          <AssignTagsButton 
+            usernames={selectedUsers.map((u) => u.username)}
+          />
           <AssignButton
             usernames={selectedUsers.map((u) => u.username)}
           />
