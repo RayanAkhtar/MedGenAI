@@ -38,9 +38,9 @@ export default function Competitions() {
 
     function convertToLink(game_id, game_board) {
         if (game_board === "dual") {
-            return `/game/competition/dual/${game_id}`
+            return `/game/classic/dual/${game_id}`
         } else {
-            return `/game/competition/single/${game_id}`
+            return `/game/classic/single/${game_id}`
         }
 
     }
