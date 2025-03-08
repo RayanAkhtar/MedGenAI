@@ -58,8 +58,9 @@ export default function Competitions() {
             try {
                 setIsLoading(true);
 
+
                 // fetch all competitions
-                fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/getGames/${user.displayName}`, {
+                fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getGames/test_user1`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json'
