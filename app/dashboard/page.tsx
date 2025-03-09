@@ -58,43 +58,35 @@ export default function Dashboard() {
                 const idToken = await user.getIdToken(true);
                 
                 // Fetch user stats
-                console.log('Fetching stats from:', `${process.env.NEXT_PUBLIC_API_BASE_URL}/user_dashboard/stats`);
                 const statsResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/user_dashboard/stats`, {
                     headers: {
                         'Authorization': `Bearer ${idToken}`
                     }
                 });
-                console.log('Stats response status:', statsResponse.status);
-                
-                // Fetch recent activity
-                console.log('Fetching activity from:', `${process.env.NEXT_PUBLIC_API_BASE_URL}/user_dashboard/recent-activity`);
+
+                // Fetch recent activity 
                 const activityResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/user_dashboard/recent-activity`, {
                     headers: {
                         'Authorization': `Bearer ${idToken}`
                     }
                 });
-                console.log('Activity response status:', activityResponse.status);
-                
+
                 // Fetch leaderboard
-                console.log('Fetching leaderboard from:', `${process.env.NEXT_PUBLIC_API_BASE_URL}/user_dashboard/leaderboard`);
                 const leaderboardResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/user_dashboard/leaderboard`, {
                     headers: {
                         'Authorization': `Bearer ${idToken}`
                     }
                 });
-                console.log('Leaderboard response status:', leaderboardResponse.status);
-                
+
                 if (!statsResponse.ok || !activityResponse.ok || !leaderboardResponse.ok) {
-                    console.error('Failed responses:', {
-                        stats: statsResponse.status,
-                        activity: activityResponse.status,
-                        leaderboard: leaderboardResponse.status
-                    });
                     throw new Error('Failed to fetch dashboard data');
                 }
-                const statsData = await statsResponse.json();
-                const activityData = await activityResponse.json();
-                const leaderboardData = await leaderboardResponse.json();
+
+                const [statsData, activityData, leaderboardData] = await Promise.all([
+                    statsResponse.json(),
+                    activityResponse.json(),
+                    leaderboardResponse.json()
+                ]);
                 
                 setUserStats(statsData);
                 setRecentActivity(activityData.activities);

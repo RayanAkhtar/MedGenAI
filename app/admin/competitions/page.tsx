@@ -1,11 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Navbar from "@/app/components/Navbar";
-import AdminStats from "../AdminStats";
-import FeedbackPieChart from "../FeedbackPieChart";
-import ImageStatsCard from "../ImageStatsCard";
-import { auth } from "@/app/firebase/firebase";
 
 // 📅 Helper function to get date 7 days from now in YYYY-MM-DD format
 const getDefaultExpiryDate = () => {
@@ -16,17 +11,17 @@ const getDefaultExpiryDate = () => {
 
 interface FormData {
   name: string;
-  expiryDate: string;
+  expiryDate: string; // Change type to string for input compatibility
   gameCode: string;
-  gameType: "Single" | "Binary";
 }
 
 export default function Admin() {
+  const params = new URLSearchParams(window.location.search);
+  const game_code = params.get("game_code") || "";
   const [formData, setFormData] = useState<FormData>({
     name: "",
     expiryDate: getDefaultExpiryDate(),
-    gameCode: "",
-    gameType: "Single",
+    gameCode: game_code,
   });
 
   // Handle form input changes with proper typing
@@ -42,54 +37,35 @@ export default function Admin() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
-    try {
-      const user = auth.currentUser;
-      if (!user) {
-        throw new Error("No user logged in");
-      }
+    const data = {
+      name: formData.name,
+      expiry: `${formData.expiryDate} 00:00:00`, // Keep time as midnight
+      game_code: formData.gameCode,
+    };
 
-      const idToken = await user.getIdToken(true);
-      
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/competition/create`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${idToken}`
-        },
-        body: JSON.stringify({
-          competition_name: formData.name,
-          end_date: formData.expiryDate,
-          game_id: formData.gameCode,
-          game_board: formData.gameType
-        })
+    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/competitions/create`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((result) => {
+        console.log("Response:", result);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to create competition');
-      }
-
-      const result = await response.json();
-      console.log("Competition created:", result);
-      alert("Competition created successfully! 🎉");
-      
-      // Reset form
-      setFormData({
-        name: "",
-        expiryDate: getDefaultExpiryDate(),
-        gameCode: "",
-        gameType: "Single"
-      });
-
-    } catch (error) {
-      console.error('Error creating competition:', error);
-      alert(error instanceof Error ? error.message : 'Failed to create competition');
-    }
   };
 
   return (
-    <main className="h-screen bg-[var(--background)] text-[var(--foreground)] overflow-y-auto">
-      <Navbar />
+    <main className="h-screen bg-[var(--background)] text-[var(--foreground)] overflow-y-auto text-black">
       <section className="p-8 bg-white rounded-2xl shadow-md max-w-2xl mx-auto mt-10">
         <h2 className="text-2xl font-semibold mb-6">Create Game Competition</h2>
         <form className="space-y-4" onSubmit={handleSubmit}>
@@ -124,18 +100,6 @@ export default function Admin() {
               className="w-full border rounded p-2"
               placeholder="Enter Game Code"
             />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Game Type</label>
-            <select
-              name="gameType"
-              value={formData.gameType}
-              onChange={handleChange}
-              className="w-full border rounded p-2"
-            >
-              <option value="Single">Single</option>
-              <option value="Binary">Dual</option>
-            </select>
           </div>
 
           {/* 🚀 Submit Button */}

@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation"; 
-import Navbar from "@/app/components/Navbar";
 import Image from "next/image";
 import { Dialog } from "@headlessui/react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -156,7 +155,6 @@ export default function HeatmapFeedbackPage() {
 
   return (
     <main className="h-screen bg-white text-[var(--foreground)] overflow-y-auto">
-      <Navbar />
 
       <div className="mt-10 flex justify-between items-center px-5">
         <Link href="/admin/feedback-page">

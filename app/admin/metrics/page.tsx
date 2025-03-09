@@ -6,7 +6,6 @@ import ConfusionMatrix from './ConfusionMatrix';
 import MLMetrics from './MLMetrics';
 import Leaderboard from './Leaderboard';
 import SampleDifficulty from './ImageDifficulty';
-import Navbar from '@/app/components/Navbar';
 import Link from 'next/link';
 
 
@@ -85,7 +84,6 @@ const MetricsPage = () => {
 
   return (
     <main className="h-screen bg-white text-black overflow-y-auto p-8">
-      <Navbar />
 
       <div className="mt-10">
         <Link href="/admin">

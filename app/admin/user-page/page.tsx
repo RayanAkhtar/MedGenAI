@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import Navbar from '@/app/components/Navbar';
 import UserTable from '@/app/admin/user-page/UserTable';
 import UserFilters, { FiltersState } from '@/app/admin/user-page/UserFilters';
 import Pagination from '@/app/admin/Pagination';
@@ -77,7 +76,6 @@ const UserPage = () => {
     setSelectAll((prev) => !prev);
     setSelectedUsers([]);
   };
-
   const handleSelectUser = (checked: boolean, user: User) => {
     setSelectedUsers((prev) => {
       const alreadySelected = prev.some((u) => u.username === user.username);
@@ -106,8 +104,7 @@ const UserPage = () => {
 
   return (
     <div className="bg-white">
-      <Navbar />
-      <div className="mt-10">
+      <div className="pt-10">
         <Link href="/admin">
           <button className="ml-5 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-all mb-10">
             Back to Admin

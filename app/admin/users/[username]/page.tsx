@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import Navbar from '@/app/components/Navbar';
 
 
 import { ProgressBar } from './components/ProgressBar';
@@ -170,8 +169,8 @@ export default function UserProfile() {
   // --- Function to handle "Assign" button click ---
   const handleAssign = async () => {
     try {
-      const userId = profile?.user_id;
-      
+      const userId = profile?.username;
+
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/newGameSession`,
         {
@@ -181,7 +180,7 @@ export default function UserProfile() {
           },
           body: JSON.stringify({
             game_code: gameCode,
-            user_id: userId
+            user_name: userId
           })
         }
       );
@@ -204,7 +203,6 @@ export default function UserProfile() {
 
   return (
     <div>
-      <Navbar />
       <div className="mt-10">
         <Link href="/admin/user-page">
           <button className="ml-5 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-all mb-10">

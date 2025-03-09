@@ -1,6 +1,5 @@
 "use client"
 import { useState, useEffect } from 'react';
-import Navbar from '@/app/components/Navbar';
 import Link from "next/link"
 
 const DownloadPage = () => {
@@ -65,7 +64,6 @@ const DownloadPage = () => {
 
   return (
     <div className="h-screen bg-white text-black overflow-y-auto">
-      <Navbar />
 
       <div className="mt-10">
         <Link href="/admin">

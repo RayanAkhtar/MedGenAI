@@ -27,8 +27,8 @@ const ManageTags = () => {
       if (!res.ok) throw new Error('Failed to load tags');
       const data = await res.json();
       setTags(data);
-    } catch {
-      setError('Failed to load data. Please try again.');
+    } catch (err) {
+      setError(`Failed to load data. Please try again. ${err}`);
     } finally {
       setLoading(false);
     }
@@ -128,7 +128,6 @@ const ManageTags = () => {
 
   return (
     <div className="min-h-screen bg-white text-black overflow-y-auto">
-      <Navbar />
 
       <div className="mt-10">
         <Link href="/admin">
