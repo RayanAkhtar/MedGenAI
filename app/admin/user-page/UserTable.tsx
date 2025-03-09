@@ -2,23 +2,16 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Table from '@/app/admin/Table';
+import User from '@/app/types/User';
 
 interface UserTableProps {
   data: User[];
   selectedUsers: User[];
+  selectAll: boolean;
   onSelectUser: (checked: boolean, user: User) => void;
 }
 
-interface User {
-  username: string;
-  level: number;
-  score: number;
-  games_started: number;
-  accuracy: number;
-  engagement: number;
-}
-
-const UserTable: React.FC<UserTableProps> = ({ data, selectedUsers, onSelectUser }) => {
+const UserTable: React.FC<UserTableProps> = ({ data, selectedUsers, selectAll, onSelectUser }) => {
   const [users, setUsers] = useState<User[]>(data);
 
   useEffect(() => {
@@ -39,13 +32,13 @@ const UserTable: React.FC<UserTableProps> = ({ data, selectedUsers, onSelectUser
   // A function to produce each table row (<tr>) for a given user item
   const renderRow = (item: User) => {
     const isSelected = selectedUsers.some((u) => u.username === item.username);
-
+    const isChecked = selectAll ? !isSelected : isSelected;
     return (
       <tr key={item.username} className="hover:bg-blue-100 transition-all">
         <td className="px-6 py-4">
           <input
             type="checkbox"
-            checked={isSelected}
+            checked={isChecked}
             onChange={(e) => onSelectUser(e.target.checked, item)}
           />
         </td>
