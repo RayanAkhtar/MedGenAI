@@ -5,16 +5,19 @@ import TagModal from '@/app/admin/user-page/TagModal';
 
 interface AssignTagsButtonProps {
   usernames: string[];
+  selectAll: boolean;
+  filterTags: string[];
+  all: boolean;
 }
 
-export default function AssignTagsButton({ usernames }: AssignTagsButtonProps) {
+export default function AssignTagsButton({ usernames, selectAll, filterTags, all }: AssignTagsButtonProps) {
   const [loading, setLoading] = useState(false);
   const [failed, setFailed] = useState(false);
   const [success, setSuccess] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
   const handleOpenModal = () => {
-    if (usernames.length === 0) {
+    if (!selectAll && usernames.length === 0) {
       alert('Please select at least one user to assign tags!');
       return;
     }
@@ -45,7 +48,10 @@ export default function AssignTagsButton({ usernames }: AssignTagsButtonProps) {
           },
           body: JSON.stringify({
             usernames,
-            tags: selectedTags
+            tags: selectedTags,
+            filterTags,
+            selectAll,
+            all
           })
         }
       );
@@ -81,11 +87,11 @@ export default function AssignTagsButton({ usernames }: AssignTagsButtonProps) {
             ? 'bg-red-500'
             : success
             ? 'bg-green-500'
-            : usernames.length === 0
+            : (!selectAll && usernames.length === 0)
             ? 'bg-gray-300 cursor-not-allowed'
             : 'bg-purple-500'
         } text-white rounded hover:${
-          usernames.length === 0 ? 'bg-gray-300' : 'bg-purple-600'
+          (!selectAll && usernames.length === 0) ? 'bg-gray-300' : 'bg-purple-600'
         } transition-colors`}
       >
         {loading

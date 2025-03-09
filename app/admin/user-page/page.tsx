@@ -8,15 +8,7 @@ import UserFilters, { FiltersState } from '@/app/admin/user-page/UserFilters';
 import Pagination from '@/app/admin/Pagination';
 import AssignButton from '@/app/admin/users/[username]/components/AssignButton';
 import AssignTagsButton from '@/app/admin/user-page/AssignTagsButton';
-
-interface User {
-  username: string;
-  level: number;
-  score: number;
-  games_started: number;
-  accuracy: number;
-  engagement: number;
-}
+import User from '@/app/types/User';
 
 const UserPage = () => {
   const [data, setData] = useState<User[]>([]);
@@ -29,6 +21,7 @@ const UserPage = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
+  const [selectAll, setSelectAll] = useState(false);
 
   const limit = 2;
 
@@ -80,15 +73,33 @@ const UserPage = () => {
     setSelectedUsers([]);
   }, [filters.tags, filters.all])
 
+  const handleToggleSelectAll = () => {
+    setSelectAll((prev) => !prev);
+    setSelectedUsers([]);
+  };
+
   const handleSelectUser = (checked: boolean, user: User) => {
     setSelectedUsers((prev) => {
-      if (checked) {
-        // Add user if not already selected
-        const alreadySelected = prev.some((u) => u.username === user.username);
-        return alreadySelected ? prev : [...prev, user];
-      } else {
-        // Else remove them
-        return prev.filter((u) => u.username !== user.username);
+      const alreadySelected = prev.some((u) => u.username === user.username);
+  
+      // If we're in "selectAll" mode, we treat "selectedUsers" as "excluded"
+      if (selectAll) {
+        if (checked) {
+          // The user is now "checked" in the table => that means *remove* them
+          // from the array (they are no longer excluded)
+          return prev.filter((u) => u.username !== user.username);
+        } else {
+          // The user is now "unchecked" => that means *add* them to the array (they are excluded)
+          return alreadySelected ? prev : [...prev, user];
+        }
+      }
+      // Normal mode: "selectedUsers" is truly the selected users
+      else {
+        if (checked) {
+          return alreadySelected ? prev : [...prev, user];
+        } else {
+          return prev.filter((u) => u.username !== user.username);
+        }
       }
     });
   };
@@ -107,16 +118,31 @@ const UserPage = () => {
         <h1 className="text-3xl font-bold text-center py-8">Users</h1>
         <UserFilters filters={filters} setFilters={setFilters} />
         <div className="flex justify-between mb-4 mx-8">
-          <AssignTagsButton 
+          <button
+            onClick={handleToggleSelectAll}
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-all"
+          >
+            {selectAll ? 'Deselect All' : 'Select All'}
+          </button>
+          <div className="flex space-x-4">
+            <AssignTagsButton 
+              usernames={selectedUsers.map((u) => u.username)}
+              filterTags={filters.tags}
+              selectAll={selectAll}
+              all={filters.all == 'all'}
+            />
+            <AssignButton
             usernames={selectedUsers.map((u) => u.username)}
+            filterTags={filters.tags}
+            selectAll={selectAll}
+            all={filters.all == 'all'}
           />
-          <AssignButton
-            usernames={selectedUsers.map((u) => u.username)}
-          />
+          </div>
         </div>
         <UserTable 
           data={data} 
           selectedUsers={selectedUsers}
+          selectAll={selectAll}
           onSelectUser={handleSelectUser}
         />
         <Pagination
