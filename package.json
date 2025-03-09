@@ -7,7 +7,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "exit 0"
+    "test": "jest basic",
+    "test:single": "jest basic",
+    "test:all": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
@@ -17,11 +21,13 @@
     "@fortawesome/react-fontawesome": "^0.2.2",
     "@headlessui/react": "^2.2.0",
     "axios": "^1.7.9",
+    "canvas-confetti": "^1.9.3",
     "chart.js": "^4.4.7",
     "concurrently": "^8.2.2",
     "cross-env": "^7.0.3",
     "firebase": "^11.2.0",
     "font-awesome": "^4.7.0",
+    "framer-motion": "^12.4.10",
     "lucide-react": "^0.474.0",
     "next": "^15.2.1",
     "public-ip": "^7.0.1",
@@ -31,13 +37,46 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@swc/jest": "^0.2.37",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.2.0",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/canvas-confetti": "^1.9.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.1.4",
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "setupFilesAfterEnv": [
+      "<rootDir>/jest.setup.js"
+    ],
+    "transform": {
+      "^.+\\.(js|jsx|ts|tsx)$": [
+        "@swc/jest"
+      ]
+    },
+    "moduleNameMapper": {
+      "^@/app/(.*)$": "<rootDir>/app/$1",
+      "\\.(css|less|scss|sass)$": "identity-obj-proxy"
+    },
+    "testPathIgnorePatterns": [
+      "<rootDir>/.next/",
+      "<rootDir>/node_modules/"
+    ],
+    "collectCoverageFrom": [
+      "app/**/*.{js,jsx,ts,tsx}",
+      "!app/**/*.d.ts",
+      "!app/**/_*.{js,jsx,ts,tsx}",
+      "!app/**/*.stories.{js,jsx,ts,tsx}"
+    ]
   }
 }

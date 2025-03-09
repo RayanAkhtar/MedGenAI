@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import Navbar from '@/app/components/Navbar';
 
 
 import { ProgressBar } from './components/ProgressBar';
@@ -29,7 +28,7 @@ interface UserProfileData {
 
 // New interface for game data
 interface GameData {
-  game_id: number;
+  game_code: number;
   game_mode: string;
   date_created: string;
   game_board: string;
@@ -46,6 +45,7 @@ export default function UserProfile() {
   const [profile, setProfile] = useState<UserProfileData | null>(null);
   const [accuracy, setAccuracy] = useState<number | null>(null);
   const [totalImagesAttempted, setTotalImagesAttempted] = useState<number | null>(null);
+  console.log(accuracy, totalImagesAttempted)
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -170,8 +170,8 @@ export default function UserProfile() {
   // --- Function to handle "Assign" button click ---
   const handleAssign = async () => {
     try {
-      const userId = profile?.user_id;
-      const gameId = gameCode;
+      const userId = profile?.username;
+
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/newGameSession`,
         {
@@ -180,8 +180,8 @@ export default function UserProfile() {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            game_id: gameId,
-            user_id: userId
+            game_code: gameCode,
+            user_name: userId
           })
         }
       );
@@ -204,7 +204,6 @@ export default function UserProfile() {
 
   return (
     <div>
-      <Navbar />
       <div className="mt-10">
         <Link href="/admin/user-page">
           <button className="ml-5 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-all mb-10">
@@ -318,7 +317,7 @@ export default function UserProfile() {
             ) : (
               <>
                 <h2 className="text-xl font-semibold mb-4">
-                  Game Found: {fetchedGame.game_id}
+                  Game Found: {fetchedGame.game_code}
                 </h2>
 
                 {/* Display game details nicely */}

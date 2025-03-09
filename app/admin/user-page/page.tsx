@@ -2,10 +2,10 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import Navbar from '@/app/components/Navbar';
 import UserTable from '@/app/admin/user-page/UserTable';
 import UserFilters, { FiltersState } from '@/app/admin/user-page/UserFilters';
 import Pagination from '@/app/admin/Pagination';
+import AssignButton from '@/app/admin/users/[username]/components/AssignButton';
 
 interface User {
   username: string;
@@ -26,7 +26,7 @@ const UserPage = () => {
   });
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
-
+  const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
 
   const limit = 2;
 
@@ -69,23 +69,46 @@ const UserPage = () => {
     fetchData();
   }, [filters, currentPage, fetchUserCount, fetchData])
 
+  useEffect(() => {
+    setCurrentPage(1);
+    setSelectedUsers([]);
+  }, [filters.tags, filters.all])
+
+  const handleSelectUser = (checked: boolean, user: User) => {
+    setSelectedUsers((prev) => {
+      if (checked) {
+        // Add user if not already selected
+        const alreadySelected = prev.some((u) => u.username === user.username);
+        return alreadySelected ? prev : [...prev, user];
+      } else {
+        // Else remove them
+        return prev.filter((u) => u.username !== user.username);
+      }
+    });
+  };
 
   return (
     <div className="bg-white">
-      <Navbar />
-      <div className="mt-10">
+      <div className="pt-10">
         <Link href="/admin">
           <button className="ml-5 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-all mb-10">
             Back to Admin
           </button>
         </Link>
-        
       </div>
       <div className="h-screen bg-white text-black">
-        <h1 className="text-3xl font-bold text-center py-8">User Page</h1>
-
+        <h1 className="text-3xl font-bold text-center py-8">Users</h1>
         <UserFilters filters={filters} setFilters={setFilters} />
-        <UserTable data={data} />
+        <div className="flex justify-end mb-4 mr-8">
+          <AssignButton
+            usernames={selectedUsers.map((u) => u.username)}
+          />
+        </div>
+        <UserTable 
+          data={data} 
+          selectedUsers={selectedUsers}
+          onSelectUser={handleSelectUser}
+        />
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}
