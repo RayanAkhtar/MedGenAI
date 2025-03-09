@@ -38,7 +38,7 @@ export default function ClassicGame() {
   const [showFeedback, setShowFeedback] = useState(false);
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
   const [userGuesses, setUserGuesses] = useState<UserGuess[]>([]);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [, setIsSubmitting] = useState(false);
   const [showFeedbackForm, setShowFeedbackForm] = useState(false);
   const [currentFeedback, setCurrentFeedback] = useState('');
   const [clickPosition, setClickPosition] = useState<ClickPosition | null>(null);
@@ -391,7 +391,7 @@ export default function ClassicGame() {
             </div>
 
             <p className="mb-6 text-gray-700">
-              Analyze {imageCount} images and determine if they're real or AI-generated.
+              Analyze {imageCount} images and determine if they&apos;re real or AI-generated.
             </p>
 
             <div className="space-y-4 mb-8">
@@ -405,7 +405,7 @@ export default function ClassicGame() {
                 <div className="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center shrink-0 mt-0.5">
                   <span className="text-sm font-bold">2</span>
                 </div>
-                <p className="text-gray-600">You'll get immediate feedback after each guess</p>
+                <p className="text-gray-600">You&apos;ll get immediate feedback after each guess</p>
               </div>
               <div className="flex items-start space-x-3">
                 <div className="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center shrink-0 mt-0.5">
