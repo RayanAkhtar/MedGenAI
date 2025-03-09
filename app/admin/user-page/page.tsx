@@ -36,7 +36,7 @@ const UserPage = () => {
       const response = await fetch(url);
       const result = await response.json();
       if (response.ok) {
-        setTotalPages(Math.ceil(result['count'] / limit));
+        setTotalPages(Math.max(1, Math.ceil(result['count'] / limit)));
       }
     } catch (err) {
       console.error('Error fetching data:', err);

@@ -46,7 +46,7 @@ const FeedbackPage = () => {
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getFeedbackCount?image_type=${filters.type}&resolved=${filters.resolved}&sex=${filters.sex}&disease=${filters.disease}&age_range=${filters.ageRange}`
       );
       const { total_count } = await countRes.json();
-      setTotalPages(Math.ceil(total_count / 20));
+      setTotalPages(Math.max(1, Math.ceil(total_count / 20)));
     } catch (error) {
       console.error('Error fetching feedback count:', error);
     }
