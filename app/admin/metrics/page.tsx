@@ -6,7 +6,6 @@ import ConfusionMatrix from './ConfusionMatrix';
 import MLMetrics from './MLMetrics';
 import Leaderboard from './Leaderboard';
 import SampleDifficulty from './ImageDifficulty';
-import Navbar from '@/app/components/Navbar';
 import Link from 'next/link';
 
 

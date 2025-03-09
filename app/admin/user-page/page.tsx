@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import Navbar from '@/app/components/Navbar';
 import UserTable from '@/app/admin/user-page/UserTable';
 import UserFilters, { FiltersState } from '@/app/admin/user-page/UserFilters';
 import Pagination from '@/app/admin/Pagination';

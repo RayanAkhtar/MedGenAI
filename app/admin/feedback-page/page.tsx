@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import Navbar from '@/app/components/Navbar';
 import { Feedback } from '@/app/types/Feedback';
 import FeedbackTable from '@/app/admin/feedback-page/FeedbackTable';
 import Pagination from '@/app/admin/Pagination';
