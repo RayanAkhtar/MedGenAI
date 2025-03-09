@@ -4,33 +4,31 @@ import React, { useState } from "react";
 
 interface ConfidenceSelectorProps {
   onSelect: (score: number) => void;
-  maxScore?: number;
 }
 
 const ConfidenceSelector: React.FC<ConfidenceSelectorProps> = ({
   onSelect,
-  maxScore = 3,
 }) => {
-  const [selectedScore, setSelectedScore] = useState<number | null>(null);
+  const confidenceLevels = [0, 1, 2, 3];
+  const colors = ["bg-red-500", "bg-yellow-500", "bg-blue-500", "bg-green-500"];
+  const [selectedLevel, setSelectedLevel] = useState<number | null>(null);
 
-  const handleClick = (score: number) => {
-    setSelectedScore(score);
-    onSelect(score);
+  const handleSelect = (level: number) => {
+    setSelectedLevel(level);
+    onSelect(level);
   };
 
   return (
-    <div className="flex justify-center space-x-2">
-      {[...Array(maxScore + 1)].map((_, index) => (
+    <div className="flex space-x-2">
+      {confidenceLevels.map((level) => (
         <button
-          key={index}
-          onClick={() => handleClick(index)}
-          className={`px-6 py-3 text-lg rounded hover:bg-blue-600 ${
-            selectedScore === index
-              ? "bg-blue-500 text-white border-2 border-green-500"
-              : "bg-blue-500 text-white"
-          }`}
+          key={level}
+          onClick={() => handleSelect(level)}
+          className={`px-6 py-2 text-white rounded hover:opacity-75 text-sm ${
+            colors[level]
+          } ${selectedLevel === level ? "ring-4 ring-gray-300" : ""}`}
         >
-          {index}
+          {level}
         </button>
       ))}
     </div>

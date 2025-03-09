@@ -26,7 +26,7 @@ const Timer: React.FC<TimerProps> = ({ onTimeUp, duration = 60 }) => {
   }, [onTimeUp]);
 
   return (
-    <div className="text-2xl text-red-500 text-center my-5">{timeLeft}s</div>
+    <div className="text-3xl text-red-500 text-center my-5">{timeLeft}s</div>
   );
 };
 

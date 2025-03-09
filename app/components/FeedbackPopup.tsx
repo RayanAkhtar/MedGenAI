@@ -10,6 +10,7 @@ interface FeedbackPopupProps {
     feedback: string,
     clickPosition: { x: number; y: number } | null
   ) => void;
+  onSkip: () => void;
   imageUrl: string;
 }
 
@@ -17,6 +18,7 @@ const FeedbackPopup: React.FC<FeedbackPopupProps> = ({
   isOpen,
   onClose,
   onSubmit,
+  onSkip,
   imageUrl,
 }) => {
   const [feedback, setFeedback] = useState("");
@@ -34,6 +36,12 @@ const FeedbackPopup: React.FC<FeedbackPopupProps> = ({
 
   const handleSubmit = () => {
     onSubmit(feedback, clickPosition);
+    setFeedback("");
+    setClickPosition(null);
+  };
+
+  const handleSkip = () => {
+    onSkip();
     setFeedback("");
     setClickPosition(null);
   };
@@ -60,13 +68,24 @@ const FeedbackPopup: React.FC<FeedbackPopupProps> = ({
         value={feedback}
         onChange={(e) => setFeedback(e.target.value)}
         className="w-full p-2 border rounded mb-4"
+        placeholder="Enter your feedback here..."
       />
-      <button
-        onClick={handleSubmit}
-        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-      >
-        Submit
-      </button>
+      <div className="flex justify-between">
+        <button
+          onClick={handleSkip}
+          className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+        >
+          Skip
+        </button>
+        {(feedback || clickPosition) && (
+          <button
+            onClick={handleSubmit}
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            Submit
+          </button>
+        )}
+      </div>
     </Modal>
   );
 };
