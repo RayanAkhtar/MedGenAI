@@ -119,8 +119,7 @@ export default function Admin() {
   };
 
   return (
-    <main className="h-screen bg-[var(--background)] text-[var(--foreground)] overflow-y-auto">
-      <Navbar />
+    <main className="h-screen bg-[var(--background)] text-[var(--foreground)] overflow-y-auto text-black">
       <section className="p-8 bg-white rounded-2xl shadow-md max-w-2xl mx-auto mt-10">
         <h2 className="text-2xl font-semibold mb-6">Create Game Competition</h2>
         <form className="space-y-4" onSubmit={handleSubmit}>
@@ -204,7 +203,6 @@ export default function Admin() {
             });
           }
           }>
-            TEST
           </button>
       </section>
     </main>

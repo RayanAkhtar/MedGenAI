@@ -82,8 +82,7 @@ const FeedbackPage = () => {
 
   return (
     <div className="bg-white">
-      <Navbar />
-      <div className="mt-10">
+      <div className="pt-10">
         <Link href="/admin">
           <button className="ml-5 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-all mb-10">
             Back to Admin

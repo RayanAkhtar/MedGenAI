@@ -65,7 +65,6 @@ const DownloadPage = () => {
 
   return (
     <div className="h-screen bg-white text-black overflow-y-auto">
-      <Navbar />
 
       <div className="mt-10">
         <Link href="/admin">

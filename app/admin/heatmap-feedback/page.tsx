@@ -156,7 +156,6 @@ export default function HeatmapFeedbackPage() {
 
   return (
     <main className="h-screen bg-white text-[var(--foreground)] overflow-y-auto">
-      <Navbar />
 
       <div className="mt-10 flex justify-between items-center px-5">
         <Link href="/admin/feedback-page">

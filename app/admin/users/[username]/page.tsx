@@ -205,7 +205,6 @@ export default function UserProfile() {
 
   return (
     <div>
-      <Navbar />
       <div className="mt-10">
         <Link href="/admin/user-page">
           <button className="ml-5 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-all mb-10">

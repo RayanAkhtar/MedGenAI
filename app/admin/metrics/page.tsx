@@ -85,7 +85,6 @@ const MetricsPage = () => {
 
   return (
     <main className="h-screen bg-white text-black overflow-y-auto p-8">
-      <Navbar />
 
       <div className="mt-10">
         <Link href="/admin">

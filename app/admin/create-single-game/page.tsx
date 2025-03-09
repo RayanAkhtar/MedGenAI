@@ -58,7 +58,7 @@ export default function CreateSingleGame() {
     };
 
     return (
-            <div className="max-w-4xl mx-auto p-6">
+            <div className="max-w-4xl mx-auto p-6 text-black">
                 <h1 className="text-2xl font-bold mb-6">Create Single Game</h1>
                 
                 <div className="bg-white p-6 rounded-lg shadow-md">
