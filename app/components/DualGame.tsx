@@ -124,7 +124,7 @@ const DualGame: React.FC<DualGameProps> = ({ gameMode, gameData }) => {
   }
 
   return (
-    <div className="p-4 space-y-4 min-h-screen flex flex-col justify-center">
+    <div className="p-4 space-y-4 h-screen flex flex-col justify-center">
       {!isTimeUp && currentRound < rounds.length && (
         <div className="flex justify-between items-start gap-6 p-4 flex-grow">
           <div className="flex-1 flex justify-center">
@@ -204,17 +204,19 @@ const DualGame: React.FC<DualGameProps> = ({ gameMode, gameData }) => {
         </div>
       )}
       {isTimeUp && (
-        <div className="text-center text-red-500">
-          Time's up!
+        <div className="text-center text-red-500 flex-grow flex items-center justify-center">
           <Summary
-            stats={{ score, correct: correctCount, avgTime: 10 }} // Example avgTime
+            stats={{ score, correct: correctCount, avgTime: 10, roundsCompleted: currentRound }} // Example avgTime
             gameMode={gameMode}
           />
         </div>
       )}
       <FeedbackPopup
         isOpen={isFeedbackOpen}
-        onClose={() => setIsFeedbackOpen(false)}
+        onClose={() => {
+          setIsFeedbackOpen(false);
+          setIsTimerRunning(true);
+        }}
         onSubmit={handleFeedbackSubmit}
         onSkip={handleSkipFeedback}
         imageUrl={selectedImage || ""}

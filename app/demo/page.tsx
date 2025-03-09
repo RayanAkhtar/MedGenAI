@@ -91,12 +91,7 @@ const ParentComponent: React.FC = () => {
           />
         </div>
       )}
-      <FeedbackPopup
-        isOpen={isFeedbackOpen}
-        onClose={() => setIsFeedbackOpen(false)}
-        onSubmit={handleFeedbackSubmit}
-        imageUrl={selectedImage || ""}
-      />
+      
     </div>
   );
 };
