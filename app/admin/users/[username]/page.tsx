@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import Navbar from '@/app/components/Navbar';
 
 
 import { ProgressBar } from './components/ProgressBar';

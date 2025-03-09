@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Navbar from "@/app/components/Navbar";
 import AdminStats from "./AdminStats";
 import FeedbackPieChart from "./FeedbackPieChart";
 import ImageStatsCard from "./ImageStatsCard";

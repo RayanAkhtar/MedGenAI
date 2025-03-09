@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation"; 
-import Navbar from "@/app/components/Navbar";
 import Image from "next/image";
 import { Dialog } from "@headlessui/react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';

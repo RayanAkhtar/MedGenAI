@@ -1,6 +1,5 @@
 "use client"
 import { useState, useEffect } from 'react';
-import Navbar from '@/app/components/Navbar';
 import Link from "next/link"
 
 const DownloadPage = () => {

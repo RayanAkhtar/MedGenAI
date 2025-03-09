@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Navbar from "@/app/components/Navbar";
 import ImageFilters from "./ImageFilters";
 import ImageDisplay from "./ImageDisplay";
 import GenerateButton from "./GenerateButton";
