@@ -1,5 +1,8 @@
 import '@testing-library/jest-dom';
 
+// Import Next.js font mock
+import './__tests__/mocks/next-font-mock';
+
 // Mock the Next.js router
 jest.mock('next/navigation', () => ({
   useRouter: () => ({
