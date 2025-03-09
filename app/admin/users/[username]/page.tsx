@@ -44,8 +44,8 @@ export default function UserProfile() {
   const username = params?.username as string;
 
   const [profile, setProfile] = useState<UserProfileData | null>(null);
-  const [accuracy, setAccuracy] = useState<number | null>(null);
-  const [totalImagesAttempted, setTotalImagesAttempted] = useState<number | null>(null);
+  const [, setAccuracy] = useState<number | null>(null);
+  const [, setTotalImagesAttempted] = useState<number | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
