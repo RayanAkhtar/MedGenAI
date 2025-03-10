@@ -1,11 +1,11 @@
-'use client'
+"use client";
 
-import React, { createContext, useContext, useState, ReactNode } from 'react'
+import React, { createContext, useContext, useState, ReactNode } from "react";
 
 interface GameImage {
-    id: number
-    path: string
-    type: 'real' | 'ai'
+  id: number;
+  path: string;
+  type: "real" | "ai";
 }
 
 interface GameContextType {
@@ -17,7 +17,7 @@ interface GameContextType {
     clearGameData: () => void
 }
 
-const GameContext = createContext<GameContextType | undefined>(undefined)
+const GameContext = createContext<GameContextType | undefined>(undefined);
 
 export function GameProvider({ children }: { children: ReactNode }) {
     const [gameId, setGameId] = useState<string | null>(null)
@@ -36,15 +36,15 @@ export function GameProvider({ children }: { children: ReactNode }) {
         console.log("Game data set with shuffled images, gameId:", gameId)
     }
 
-    const clearGameData = () => {
-        setGameId(null)
-        setImageCount(null)
-        setImages([])
-    }
+  const clearGameData = () => {
+    setGameId(null);
+    setImageCount(null);
+    setImages([]);
+    setSelectedImagesState(null);
+  };
 
     return (
         <GameContext.Provider value={{
-            gameCode,
             gameId,
             imageCount,
             images,
@@ -57,9 +57,9 @@ export function GameProvider({ children }: { children: ReactNode }) {
 }
 
 export function useGame() {
-    const context = useContext(GameContext)
-    if (context === undefined) {
-        throw new Error('useGame must be used within a GameProvider')
-    }
-    return context
-} 
+  const context = useContext(GameContext);
+  if (context === undefined) {
+    throw new Error("useGame must be used within a GameProvider");
+  }
+  return context;
+}

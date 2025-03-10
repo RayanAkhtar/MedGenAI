@@ -5,9 +5,10 @@ import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/app/context/AuthContext';
 import { useGame } from '@/app/context/GameContext';
-import FeedbackBox from '@/app/game/feedback';
+import FeedbackBox from '@/app/components/feedback';
 import { auth } from '@/app/firebase/firebase';
-import Link from 'next/link';
+import GameBackground from '@/app/components/GameBackground';
+import GameComplete from '@/app/components/GameComplete';
 
 interface UserGuess {
   url: string;
@@ -263,84 +264,19 @@ export default function ClassicGame() {
 
   if (showCompletionScreen) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-4">
-        <div className="max-w-lg w-full bg-white rounded-2xl overflow-hidden shadow-xl border border-gray-100 animate-fadeIn">
-          <div className="p-8">
-            <div className="flex flex-col items-center mb-8">
-              <div className="w-20 h-20 bg-gradient-to-tr from-green-400 to-teal-500 rounded-full flex items-center justify-center mb-4 shadow-lg">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-10 w-10 text-white"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-              </div>
-              <h2 className="text-3xl font-bold text-gray-800 mb-2">Game Complete!</h2>
-              <div className="w-full bg-gray-100 rounded-full h-1 mb-6"></div>
-
-              <div className="grid grid-cols-2 gap-8 w-full text-center mb-6">
-                <div>
-                  <p className="text-gray-500 text-sm font-medium uppercase tracking-wider">Your Score</p>
-                  <p className="text-4xl font-bold text-gray-800">{score}</p>
-                </div>
-                <div>
-                  <p className="text-gray-500 text-sm font-medium uppercase tracking-wider">Accuracy</p>
-                  <p className="text-4xl font-bold text-gray-800">
-                    {Math.round((score / images.length) * 100)}%
-                  </p>
-                </div>
-              </div>
-
-              <div className="w-full bg-gray-100 h-3 rounded-full mb-2 overflow-hidden">
-                <div
-                  className="h-full bg-gradient-to-r from-green-400 to-teal-500 rounded-full transition-all duration-1000"
-                  style={{ width: `${Math.round((score / images.length) * 100)}%` }}
-                ></div>
-              </div>
-              <p className="text-gray-500 text-sm mb-8">
-                You got {score} out of {images.length} images correct
-              </p>
-            </div>
-
-            <div className="space-y-4">
-              <button
-                onClick={returnToDashboard}
-                className="w-full py-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl font-medium hover:from-blue-600 hover:to-indigo-700 transition-all transform hover:scale-[1.02] hover:shadow-lg"
-              >
-                Return to Dashboard
-              </button>
-
-              <Link
-                href={`/admin/competitions?game_code=${gameId}`}
-                className="block w-full py-4 bg-gradient-to-r from-purple-500 to-pink-600 text-white font-medium rounded-xl hover:from-purple-600 hover:to-pink-700 transition-all transform hover:scale-[1.02] hover:shadow-lg text-center"
-              >
-                Create Competition with this Game
-              </Link>
-
-              <button
-                onClick={() => {
-                  setCurrentIndex(0);
-                  setScore(0);
-                  setUserGuesses([]);
-                  setShowCompletionScreen(false);
-                  setShowRules(true);
-                }}
-                className="w-full py-4 bg-gray-200 text-gray-700 font-medium rounded-xl hover:bg-gray-300 transition-all"
-              >
-                Play Again
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <GameComplete
+        score={score}
+        totalImages={images.length}
+        gameId={gameId}
+        returnToDashboard={returnToDashboard}
+        playAgain={() => {
+          setCurrentIndex(0);
+          setScore(0);
+          setUserGuesses([]);
+          setShowCompletionScreen(false);
+          setShowRules(true);
+        }}
+      />
     );
   }
 
@@ -349,16 +285,7 @@ export default function ClassicGame() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white text-gray-800">
       {/* Background pattern */}
-      <div className="absolute inset-0 opacity-5">
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage:
-              'radial-gradient(circle at 25px 25px, black 2%, transparent 0%), radial-gradient(circle at 75px 75px, black 2%, transparent 0%)',
-            backgroundSize: '100px 100px',
-          }}
-        ></div>
-      </div>
+      <GameBackground/>
 
       {/* Rules Modal */}
       {showRules && (

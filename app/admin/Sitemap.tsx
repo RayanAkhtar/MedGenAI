@@ -38,6 +38,11 @@ export default function Sitemap() {
           </Link>
         </li>
         <li>
+          <Link href="/admin/create-dual-game" className="block px-4 py-2 bg-[var(--heartflow-red)] text-white rounded-lg hover:bg-[var(--heartflow-blue)] transition-colors duration-300">
+            Create Dual Game
+          </Link>
+        </li>
+        <li>
           <Link href="/admin/create-single-game" className="block px-4 py-2 bg-[var(--heartflow-red)] text-white rounded-lg hover:bg-[var(--heartflow-blue)] transition-colors duration-300">
             Create Single Game
           </Link>

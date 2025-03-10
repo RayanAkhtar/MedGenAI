@@ -36,7 +36,7 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
   const [customCode, setCustomCode] = useState<string>("");
   const [showDetails, setShowDetails] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [errorState, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const { setGameData } = useGame();
 
   const gameModes = [
@@ -88,12 +88,16 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
         }
 
         const idToken = await user.getIdToken(true);
-        const apiUrl =
-          selectedBoard === "Single"
-            ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/game/initialize-classic-game`
-            : `${
-                process.env.NEXT_PUBLIC_API_BASE_URL
-              }/game/initialize-classic-${selectedBoard.toLowerCase()}-game`;
+        let apiUrl = "";
+        let bodyData = {};
+
+        if (selectedBoard === "Single") {
+          apiUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/game/initialize-classic-game`;
+          bodyData = { imageCount: imageCount };
+        } else if (selectedBoard === "Dual") {
+          apiUrl = "http://127.0.0.1:5000/api/initialize_dual_game";
+          bodyData = { num_rounds: imageCount };
+        }
 
         const response = await fetch(apiUrl, {
           method: "POST",
@@ -101,9 +105,7 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${idToken}`,
           },
-          body: JSON.stringify({
-            imageCount: imageCount,
-          }),
+          body: JSON.stringify(bodyData),
         });
 
         if (!response.ok) {
@@ -129,13 +131,16 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
           // Set game data in context
           setGameData(data.gameCode, data.gameId, imageCount, formattedImages);
         }
-        
+
         closeModal();
-        
+
         // Route using query parameter instead of path segment
         const boardType = selectedBoard.toLowerCase();
-        router.push(`/game/classic/${boardType}?code=${gameCode}`);
-        
+        if (selectedBoard === "Dual") {
+          router.push(`/game/classic/dual/${gameCode}`);
+        } else {
+          router.push(`/game/classic/${boardType}?code=${gameCode}`);
+        }
       } catch (error: unknown) {
         console.error("Failed to start game:", error);
 
@@ -477,9 +482,9 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
                                 "Start Game"
                               )}
                             </button>
-                            {errorState && (
+                            {error && (
                               <div className="text-red-500 text-sm mt-2">
-                                {errorState}
+                                {error}
                               </div>
                             )}
                           </div>
