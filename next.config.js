@@ -22,6 +22,12 @@ const nextConfig = {
       }
     ],
   },
+  experimental: {
+    serverActions: {}  // If you are using server actions, keep this
+  },
+  webpack: (config) => {
+    return config;  // Ensure Webpack is used explicitly
+  }
 }
 
-module.exports = nextConfig 
+module.exports = nextConfig;

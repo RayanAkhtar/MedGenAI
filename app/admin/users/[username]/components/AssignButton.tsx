@@ -1,10 +1,13 @@
 import { useState } from 'react';
 
 interface AssignButtonProps {
-    usernames: string[];
+  usernames: string[];
+  selectAll: boolean;
+  filterTags: string[];
+  all: boolean;
 }
 
-export default function AssignButton({ usernames }: AssignButtonProps) {
+export default function AssignButton({ usernames, selectAll, filterTags, all }: AssignButtonProps) {
   const [loading, setLoading] = useState(false);
   const [failed, setFailed] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -12,8 +15,8 @@ export default function AssignButton({ usernames }: AssignButtonProps) {
   const [gameCode, setGameCode] = useState('');
 
   const handleAssign = async () => {
-    if (usernames.length === 0) { // Show message if no users are selected
-      alert('Please select at least one user to assign!');
+    if (usernames.length === 0 && !selectAll) { // Show message if no users are selected
+      alert('Please select at least one user to assign a game!');
       return;
     }
     setShowModal(true);
@@ -42,7 +45,10 @@ export default function AssignButton({ usernames }: AssignButtonProps) {
           },
           body: JSON.stringify({
             game_code: gameCode,
-            usernames: usernames
+            usernames: usernames,
+            filterTags,
+            selectAll,
+            all
           })
         }
       );
@@ -63,8 +69,8 @@ export default function AssignButton({ usernames }: AssignButtonProps) {
       }
     } catch (error) {
       console.error('Error assigning users:', error);
-      setFailed(true);
       alert('Network error. Please try again later.');
+      setFailed(true);
       setTimeout(() => setFailed(false), 2000);
     } finally {
       setLoading(false);
@@ -83,11 +89,11 @@ export default function AssignButton({ usernames }: AssignButtonProps) {
             ? 'bg-red-500'
             : success
             ? 'bg-green-500'
-            : usernames.length === 0
+            : (usernames.length === 0 && !selectAll)
             ? 'bg-gray-300 cursor-not-allowed'
             : 'bg-[var(--heartflow-red)]'
         } text-white rounded hover:${
-          usernames.length === 0 ? 'bg-gray-300' : 'bg-[var(--heartflow-blue)]'
+          (usernames.length === 0 && !selectAll) ? 'bg-gray-300' : 'bg-[var(--heartflow-blue)]'
         } transition-colors`}
       >
         {loading ? 'Assigning...' : failed ? 'Assign Failed' : success ? 'Assigned!' : 'Assign Game'}

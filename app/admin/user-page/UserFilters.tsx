@@ -51,7 +51,9 @@ const UserFilters: React.FC<UserFiltersProps> = ({ filters, setFilters }) => {
         const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/tags`;
         const response = await fetch(url);
         const result = await response.json();
-        setTags(result);
+        if (response.ok) {
+          setTags(result);
+        }
       } catch (err) {
         console.error('Error fetching data:', err);
       }
