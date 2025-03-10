@@ -40,11 +40,11 @@ export function GameProvider({ children }: { children: ReactNode }) {
     setGameId(null);
     setImageCount(null);
     setImages([]);
-    setSelectedImagesState(null);
   };
 
     return (
         <GameContext.Provider value={{
+            gameCode,
             gameId,
             imageCount,
             images,
