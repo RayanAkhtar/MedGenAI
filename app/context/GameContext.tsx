@@ -9,32 +9,42 @@ interface GameImage {
 }
 
 interface GameContextType {
-    gameCode: string | null
-    gameId: string | null
-    imageCount: number | null
+  gameCode: string | null;
+  gameId: string | null;
+  imageCount: number | null;
+  images: GameImage[];
+  setGameData: (
+    gameCode: string,
+    gameId: string,
+    imageCount: number,
     images: GameImage[]
-    setGameData: (gameCode: string, gameId: string, imageCount: number, images: GameImage[]) => void
-    clearGameData: () => void
+  ) => void;
+  clearGameData: () => void;
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
 
 export function GameProvider({ children }: { children: ReactNode }) {
-    const [gameId, setGameId] = useState<string | null>(null)
-    const [imageCount, setImageCount] = useState<number | null>(null)
-    const [images, setImages] = useState<GameImage[]>([])
-    const [gameCode, setGameCode] = useState<string | null>(null)
+  const [gameId, setGameId] = useState<string | null>(null);
+  const [imageCount, setImageCount] = useState<number | null>(null);
+  const [images, setImages] = useState<GameImage[]>([]);
+  const [gameCode, setGameCode] = useState<string | null>(null);
 
-    const setGameData = (gameCode: string, gameId: string, imageCount: number, images: GameImage[]) => {
-        const shuffledImages = [...images].sort(() => Math.random() - 0.5)
-        
-        setGameCode(gameCode)
-        setGameId(gameId)
-        setImageCount(imageCount)
-        setImages(shuffledImages)
-        
-        console.log("Game data set with shuffled images, gameId:", gameId)
-    }
+  const setGameData = (
+    gameCode: string,
+    gameId: string,
+    imageCount: number,
+    images: GameImage[]
+  ) => {
+    const shuffledImages = [...images].sort(() => Math.random() - 0.5);
+
+    setGameCode(gameCode);
+    setGameId(gameId);
+    setImageCount(imageCount);
+    setImages(shuffledImages);
+
+    console.log("Game data set with shuffled images, gameId:", gameId);
+  };
 
   const clearGameData = () => {
     setGameId(null);
@@ -42,18 +52,20 @@ export function GameProvider({ children }: { children: ReactNode }) {
     setImages([]);
   };
 
-    return (
-        <GameContext.Provider value={{
-            gameCode,
-            gameId,
-            imageCount,
-            images,
-            setGameData,
-            clearGameData
-        }}>
-            {children}
-        </GameContext.Provider>
-    )
+  return (
+    <GameContext.Provider
+      value={{
+        gameCode,
+        gameId,
+        imageCount,
+        images,
+        setGameData,
+        clearGameData,
+      }}
+    >
+      {children}
+    </GameContext.Provider>
+  );
 }
 
 export function useGame() {
