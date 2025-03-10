@@ -9,25 +9,40 @@ const DualGameMaker = () => {
   const [gameCode, setGameCode] = useState("");
 
   const handleGetRandomImage = async () => {
-    try {
-      const response = await fetch("http://127.0.0.1:5000/api/get_random_img");
+    // const response = await fetch("http://127.0.0.1:5000/api/get_random_img");
+    try {   
+      const response: Response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/generateImage`, {
+          method: 'GET',
+      });
+
+      if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to fetch image');
+      }
+
       const data = await response.json();
+      console.log("Raw API response:", data);
       const newRounds = [...rounds];
-      newRounds[currentRound].realImage = data.imageUrl;
+      newRounds[currentRound].realImage = data.imagePath;
       setRounds(newRounds);
     } catch (error) {
-      console.error("Error fetching random image:", error);
+      console.error("Error getting real image", error);
     }
   };
 
   const handleGenerateAIImage = async (type: string) => {
     try {
-      const response = await fetch(
-        `http://127.0.0.1:5000/api/get_random_img?type=${type}`
-      );
+      const response: Response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/generateImage`, {
+        method: 'GET',
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to fetch image');
+    }
       const data = await response.json();
       const newRounds = [...rounds];
-      newRounds[currentRound].aiImage = data.imageUrl;
+      newRounds[currentRound].aiImage = data.imagePath;
       setRounds(newRounds);
     } catch (error) {
       console.error("Error generating AI image:", error);
@@ -39,8 +54,36 @@ const DualGameMaker = () => {
     setCurrentRound(currentRound + 1);
   };
 
-  const handleFinish = () => {
-    setGameCode(Math.random().toString(36).substring(2, 15));
+  const handleFinish = async () => {
+    const img_urls = rounds.flatMap((round) => [round.realImage, round.aiImage]);
+    const gameData = {
+      username : "admin",
+      image_urls : img_urls,
+      game_board: "dual",
+      game_mode: "competitive",
+      game_status: "active"
+      }
+    console.log("gameData", gameData);
+
+    const response : Response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/createDualGame`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(gameData),
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to create dual game');
+    }
+
+    const data = await response.json();
+    console.log("Raw API response:", data);
+
+    setGameCode(data.game_code);
+
+    // setGameCode(Math.random().toString(36).substring(2, 15));
   };
 
   return (
@@ -51,7 +94,7 @@ const DualGameMaker = () => {
           <p className="mb-4">Game Code: {gameCode}</p>
           <button
             className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700 transition-colors duration-300"
-            onClick={() => (window.location.href = "/game/competitions")}
+            onClick={() => (window.location.href = "/admin/competitions?game_code=" + gameCode)}
           >
             Create Competition
           </button>
