@@ -34,7 +34,7 @@ const DualGameMaker = () => {
     }
   };
 
-  const handleGenerateAIImage = async (type: string) => {
+  const handleGenerateAIImage = async () => {
     try {
       const response: Response = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/generateImage`,
@@ -140,25 +140,25 @@ const DualGameMaker = () => {
                 <div className="grid grid-cols-2 gap-4 mb-8">
                   <button
                     className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700 transition-colors duration-300"
-                    onClick={() => handleGenerateAIImage("male")}
+                    onClick={() => handleGenerateAIImage()}
                   >
                     Male
                   </button>
                   <button
                     className="px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-700 transition-colors duration-300"
-                    onClick={() => handleGenerateAIImage("female")}
+                    onClick={() => handleGenerateAIImage()}
                   >
                     Female
                   </button>
                   <button
                     className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-700 transition-colors duration-300"
-                    onClick={() => handleGenerateAIImage("healthy")}
+                    onClick={() => handleGenerateAIImage()}
                   >
                     Healthy
                   </button>
                   <button
                     className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-700 transition-colors duration-300"
-                    onClick={() => handleGenerateAIImage("diseased")}
+                    onClick={() => handleGenerateAIImage()}
                   >
                     Diseased
                   </button>

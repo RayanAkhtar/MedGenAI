@@ -7,8 +7,8 @@ import Timer from "./Timer";
 import ScoreDisplay from "./ScoreDisplay";
 import Loader from "./Loader";
 import GameBackground from "./GameBackground";
-import { useGame } from "@/app/context/GameContext";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 interface DualGameProps {
   gameMode: "classic" | "competition" | "custom";
@@ -32,15 +32,6 @@ interface DualGameProps {
 }
 
 const DualGame: React.FC<DualGameProps> = ({ gameMode, gameData }) => {
-  const {
-    gameId,
-    images: gameImages,
-    selectedImages,
-    setSelectedImages,
-    setGameData,
-    clearGameData,
-  } = useGame();
-
   const router = useRouter();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isTimeUp, setIsTimeUp] = useState(false);
@@ -54,19 +45,6 @@ const DualGame: React.FC<DualGameProps> = ({ gameMode, gameData }) => {
   const rounds = gameData.rounds;
   const timerPerRound = gameData.settings.timerPerRound;
   console.log("gameData", gameData);
-  useEffect(() => {
-    setGameData(
-      gameData.gameCode,
-      rounds.length,
-      rounds.flatMap((round) =>
-        round.images.map((image) => ({
-          id: Number(image.id),
-          path: image.url,
-          type: image.isCorrect ? "real" : "ai",
-        }))
-      )
-    );
-  }, []); // Ensure this useEffect runs only once
 
   useEffect(() => {
     if (currentRound >= rounds.length) {
@@ -125,11 +103,10 @@ const DualGame: React.FC<DualGameProps> = ({ gameMode, gameData }) => {
   const handleReturnToDashboard = async () => {
     try {
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      clearGameData();
-      router.push('/dashboard');
+      router.push("/dashboard");
     } catch (error) {
-      console.error('Error clearing game data', error);
-      router.push('/dashboard');
+      console.error("Error returning to dashboard", error);
+      router.push("/dashboard");
     }
   };
 
@@ -137,7 +114,7 @@ const DualGame: React.FC<DualGameProps> = ({ gameMode, gameData }) => {
     window.location.reload();
   };
 
-  if (!gameId) {
+  if (!gameData.gameId) {
     return <Loader message="Loading game..." />;
   }
 
@@ -163,10 +140,12 @@ const DualGame: React.FC<DualGameProps> = ({ gameMode, gameData }) => {
                 }}
                 onClick={() => handleImageSelect(image.url)}
               >
-                <img
+                <Image
                   src={image.url}
                   alt={`Image ${index + 1}`}
                   className="w-full h-auto object-contain"
+                  width={500}
+                  height={500}
                 />
               </div>
             ))}
@@ -212,10 +191,12 @@ const DualGame: React.FC<DualGameProps> = ({ gameMode, gameData }) => {
                 }}
                 onClick={() => handleImageSelect(image.url)}
               >
-                <img
+                <Image
                   src={image.url}
                   alt={`Image ${index + 1}`}
                   className="w-full h-auto object-contain"
+                  width={500}
+                  height={500}
                 />
               </div>
             ))}
@@ -223,14 +204,13 @@ const DualGame: React.FC<DualGameProps> = ({ gameMode, gameData }) => {
         </div>
       )}
       {isTimeUp && (
-        
-          <GameComplete
-            score={score}
-            totalImages={rounds.length}
-            gameId={gameId}
-            returnToDashboard={handleReturnToDashboard}
-            playAgain={handlePlayAgain}
-          />
+        <GameComplete
+          score={score}
+          totalImages={rounds.length}
+          gameId={gameData.gameId}
+          returnToDashboard={handleReturnToDashboard}
+          playAgain={handlePlayAgain}
+        />
       )}
       <FeedbackPopup
         isOpen={isFeedbackOpen}

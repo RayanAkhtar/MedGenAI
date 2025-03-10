@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Modal from "./Modal";
+import Image from "next/image";
 
 interface FeedbackPopupProps {
   isOpen: boolean;
@@ -52,10 +53,12 @@ const FeedbackPopup: React.FC<FeedbackPopupProps> = ({
         className="relative aspect-[4/3] mb-4 rounded-xl overflow-hidden shadow-lg cursor-pointer"
         onClick={handleImageClick}
       >
-        <img
+        <Image
           src={imageUrl}
           alt="Feedback Image"
           className="object-contain w-full h-full"
+          width={500}
+          height={500}
         />
         {clickPosition && (
           <div

@@ -7,7 +7,6 @@ import { useAuth } from '@/app/context/AuthContext';
 import { useGame } from '@/app/context/GameContext';
 import FeedbackBox from '@/app/components/feedback';
 import { auth } from '@/app/firebase/firebase';
-import Link from 'next/link';
 import GameBackground from '@/app/components/GameBackground';
 import GameComplete from '@/app/components/GameComplete';
 
