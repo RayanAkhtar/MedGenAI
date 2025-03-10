@@ -70,10 +70,10 @@ const DualGame: React.FC<DualGameProps> = ({ gameMode, gameData }) => {
     );
     if (selectedImageData) {
       if (selectedImageData.isCorrect) {
-        setScore(score + 10);
+        setScore(score + 1);
         setCorrectCount(correctCount + 1);
       } else {
-        setScore(score + 2);
+        setScore(score);
       }
     }
     setIsFeedbackOpen(true);
