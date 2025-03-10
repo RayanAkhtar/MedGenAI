@@ -113,7 +113,7 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
 
         const data = await response.json();
         console.log("Raw API response:", data);
-        const gameCode = data.gameId;
+        const gameCode = data.gameCode;
 
         if (selectedBoard === "Single") {
           const formattedImages = data.images.map(
@@ -127,7 +127,7 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
           console.log("Formatted images:", formattedImages);
 
           // Set game data in context
-          setGameData(data.gameId, imageCount, formattedImages);
+          setGameData(data.gameCode, data.gameId, imageCount, formattedImages);
         }
         
         closeModal();
@@ -197,11 +197,11 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
             );
             
             // Set game data in context
-            setGameData(data.gameId || customCode, imageCount || 10, formattedImages);
+            setGameData(data.gameCode, data.gameId || customCode, imageCount || 10, formattedImages);
           }
           
           // Redirect to the appropriate game page
-          router.push(`/game/classic/${boardType}?code=${data.gameId || customCode}`);
+          router.push(`/game/classic/${boardType}?code=${data.gameCode}`);
         } catch (error: unknown) {
           console.error("Failed to start custom game:", error);
           if (error instanceof Error) {
@@ -258,11 +258,11 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
             );
             
             // Set game data in context
-            setGameData(data.gameId, data.images.length, formattedImages);
+            setGameData(data.gameCode, data.gameId || customCode, data.images.length, formattedImages);
           }
           
           // Redirect to the appropriate game page
-          router.push(`/game/competition/${boardType}?code=${data.gameId}`);
+          router.push(`/game/competition/${boardType}?code=${data.gameCode}`);
         } catch (error: unknown) {
           console.error("Failed to start competition game:", error);
           if (error instanceof Error) {

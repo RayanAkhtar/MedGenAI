@@ -89,7 +89,7 @@ export default function ClassicGame() {
             console.log('Formatted images:', formattedImages);
 
             // Set game data in context using the game ID from the response
-            setGameData(data.game_id, data.images.length, formattedImages);
+            setGameData(data.game_code, data.game_id, data.images.length, formattedImages);
           }
         } catch (error) {
           console.error('Error fetching game data:', error);
