@@ -2,12 +2,13 @@
 import React, { useState, useEffect } from "react";
 import ConfidenceSelector from "./ConfidenceSelector";
 import FeedbackPopup from "./FeedbackPopup";
-import Summary from "./Summary";
+import GameComplete from "./GameComplete";
 import Timer from "./Timer";
 import ScoreDisplay from "./ScoreDisplay";
 import Loader from "./Loader";
 import GameBackground from "./GameBackground";
 import { useGame } from "@/app/context/GameContext";
+import { useRouter } from "next/navigation";
 
 interface DualGameProps {
   gameMode: "classic" | "competition" | "custom";
@@ -40,6 +41,7 @@ const DualGame: React.FC<DualGameProps> = ({ gameMode, gameData }) => {
     clearGameData,
   } = useGame();
 
+  const router = useRouter();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isTimeUp, setIsTimeUp] = useState(false);
   const [confidenceScore, setConfidenceScore] = useState<number | null>(null);
@@ -118,6 +120,21 @@ const DualGame: React.FC<DualGameProps> = ({ gameMode, gameData }) => {
     setConfidenceScore(null);
     setIsTimerRunning(true);
     setCurrentRound(currentRound + 1);
+  };
+
+  const handleReturnToDashboard = async () => {
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      clearGameData();
+      router.push('/dashboard');
+    } catch (error) {
+      console.error('Error clearing game data', error);
+      router.push('/dashboard');
+    }
+  };
+
+  const handlePlayAgain = () => {
+    window.location.reload();
   };
 
   if (!gameId) {
@@ -206,12 +223,14 @@ const DualGame: React.FC<DualGameProps> = ({ gameMode, gameData }) => {
         </div>
       )}
       {isTimeUp && (
-        <div className="text-center text-red-500 flex-grow flex items-center justify-center">
-          <Summary
-            stats={{ score, correct: correctCount, avgTime: 10, roundsCompleted: currentRound }} // Example avgTime
-            gameMode={gameMode}
+        
+          <GameComplete
+            score={score}
+            totalImages={rounds.length}
+            gameId={gameId}
+            returnToDashboard={handleReturnToDashboard}
+            playAgain={handlePlayAgain}
           />
-        </div>
       )}
       <FeedbackPopup
         isOpen={isFeedbackOpen}

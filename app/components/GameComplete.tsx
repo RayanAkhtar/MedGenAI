@@ -81,9 +81,9 @@ const GameComplete: React.FC<GameCompleteProps> = ({
               onClick={() => {
                 if (gameId) {
                   navigator.clipboard.writeText(gameId);
-                  alert("Game ID copied to clipboard!");
+                  alert("Game code copied to clipboard!");
                 } else {
-                  alert("Game ID is not available.");
+                  alert("Game code is not available.");
                 }
               }}
               className="block w-full py-3 bg-gradient-to-r from-purple-500 to-pink-600 text-white font-medium rounded-xl hover:from-purple-600 hover:to-pink-700 transition-all transform hover:scale-[1.02] hover:shadow-lg text-center"
