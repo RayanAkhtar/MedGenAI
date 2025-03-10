@@ -17,6 +17,7 @@ const ManageTags = () => {
   const [editingTag, setEditingTag] = useState<{ id: number; name: string } | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newTag, setNewTag] = useState({ name: '', adminId: null as number | null });
+  const [confirmDelete, setConfirmDelete] = useState<number | null>(null);
 
   const fetchTags = async () => {
     setLoading(true);
@@ -27,7 +28,7 @@ const ManageTags = () => {
       const data = await res.json();
       setTags(data);
     } catch (err) {
-      setError('Failed to load data. Please try again.');
+      setError(`Failed to load data. Please try again. ${err}`);
     } finally {
       setLoading(false);
     }
@@ -39,11 +40,20 @@ const ManageTags = () => {
 
   const handleRename = async (id: number, name: string) => {
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/updateTag/${id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/updateTag/${id}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name }),
       });
+      const data = await res.json();
+      if (!res.ok) {
+        if (data.error && data.error.includes('already exists')) {
+          alert(data.error);
+        } else {
+          console.error('Error updating tag:', data.error || 'Unknown error');
+        }
+        return;
+      }
       setTags((prev) => prev.map((tag) => (tag.tag_id === id ? { ...tag, name } : tag)));
       setEditingTag(null);
     } catch (error) {
@@ -55,6 +65,7 @@ const ManageTags = () => {
     try {
       await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/deleteTag/${id}`, { method: 'DELETE' });
       setTags((prev) => prev.filter((tag) => tag.tag_id !== id));
+      setConfirmDelete(null);
     } catch (error) {
       console.error('Error deleting tag:', error);
     }
@@ -70,6 +81,14 @@ const ManageTags = () => {
         body: JSON.stringify(newTag),
       });
       const createdTag = await res.json();
+      if (!res.ok) {
+        if (createdTag.error && createdTag.error.includes('already exists')) {
+          alert(createdTag.error);
+        } else {
+          console.error('Error updating tag:', createdTag.error || 'Unknown error');
+        }
+        return;
+      }
       setTags((prev) => [...prev, createdTag]);
       setIsModalOpen(false);
       setNewTag({ name: '', adminId: null });
@@ -103,9 +122,12 @@ const ManageTags = () => {
     );
   }
 
+  const handleCancelDelete = () => {
+    setConfirmDelete(null); 
+  };
+
   return (
     <div className="min-h-screen bg-white text-black overflow-y-auto">
-      <Navbar />
 
       <div className="mt-10">
         <Link href="/admin">
@@ -139,31 +161,60 @@ const ManageTags = () => {
               {tags.map((tag) => (
                 <tr key={tag.tag_id} className="hover:bg-gray-100 transition">
                   <td className="p-3 border">{tag.name}</td>
-                  <td className="p-3 border">
+                  <td className="p-3 border" onBlur={() => setEditingTag(null)}>
                     {editingTag?.id === tag.tag_id ? (
                       <input
                         type="text"
-                        value={editingTag.name}
+                        value={editingTag?.name || ''}
                         onChange={(e) => setEditingTag({ id: tag.tag_id, name: e.target.value })}
-                        onBlur={() => handleRename(tag.tag_id, editingTag.name)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && editingTag) {
+                            handleRename(tag.tag_id, editingTag.name);
+                            setEditingTag(null);  // Exit edit mode after pressing Enter
+                          } else if (e.key === 'Escape') {
+                            setEditingTag(null);  // Exit edit mode on Escape
+                          }
+                        }}
                         className="border p-2 w-full"
+                        autoFocus
                       />
                     ) : (
                       <button
-                        onClick={() => setEditingTag({ id: tag.tag_id, name: tag.name })}
+                        onClick={(e) => {
+                          e.stopPropagation();  // Prevent triggering onBlur immediately
+                          setEditingTag({ id: tag.tag_id, name: tag.name });
+                        }}
                         className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600"
                       >
                         Edit
                       </button>
                     )}
                   </td>
+
                   <td className="p-3 border">
-                    <button
-                      onClick={() => handleDelete(tag.tag_id)}
-                      className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
-                    >
-                      Delete
-                    </button>
+                    {confirmDelete === tag.tag_id ? (
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleDelete(tag.tag_id)}
+                          className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600"
+                        >
+                          Confirm
+                        </button>
+                        <button
+                          onClick={handleCancelDelete}
+                          className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setConfirmDelete(tag.tag_id)}
+                        className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                      >
+                        Delete
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}
@@ -181,13 +232,6 @@ const ManageTags = () => {
                 placeholder="Tag name"
                 value={newTag.name}
                 onChange={(e) => setNewTag({ ...newTag, name: e.target.value })}
-                className="w-full border p-2 mb-4"
-              />
-              <input
-                type="number"
-                placeholder="Admin ID (optional)"
-                value={newTag.adminId || ''}
-                onChange={(e) => setNewTag({ ...newTag, adminId: e.target.value ? parseInt(e.target.value) : null })}
                 className="w-full border p-2 mb-4"
               />
               <div className="flex justify-end mt-4 space-x-2">

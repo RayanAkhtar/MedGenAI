@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import Navbar from '@/app/components/Navbar';
 import { Feedback } from '@/app/types/Feedback';
 import FeedbackTable from '@/app/admin/feedback-page/FeedbackTable';
 import Pagination from '@/app/admin/Pagination';
@@ -47,7 +46,7 @@ const FeedbackPage = () => {
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getFeedbackCount?image_type=${filters.type}&resolved=${filters.resolved}&sex=${filters.sex}&disease=${filters.disease}&age_range=${filters.ageRange}`
       );
       const { total_count } = await countRes.json();
-      setTotalPages(Math.ceil(total_count / 20));
+      setTotalPages(Math.max(1, Math.ceil(total_count / 20)));
     } catch (error) {
       console.error('Error fetching feedback count:', error);
     }
@@ -82,8 +81,7 @@ const FeedbackPage = () => {
 
   return (
     <div className="bg-white">
-      <Navbar />
-      <div className="mt-10">
+      <div className="pt-10">
         <Link href="/admin">
           <button className="ml-5 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-all mb-10">
             Back to Admin
