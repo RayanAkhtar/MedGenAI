@@ -6,6 +6,7 @@ import Summary from "./Summary";
 import Timer from "./Timer";
 import ScoreDisplay from "./ScoreDisplay";
 import Loader from "./Loader";
+import GameBackground from "./GameBackground";
 import { useGame } from "@/app/context/GameContext";
 
 interface DualGameProps {
@@ -125,6 +126,7 @@ const DualGame: React.FC<DualGameProps> = ({ gameMode, gameData }) => {
 
   return (
     <div className="p-4 space-y-4 h-screen flex flex-col justify-center">
+      <GameBackground />
       {!isTimeUp && currentRound < rounds.length && (
         <div className="flex justify-between items-start gap-6 p-4 flex-grow">
           <div className="flex-1 flex justify-center">
