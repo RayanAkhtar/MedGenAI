@@ -23,7 +23,7 @@ export default function Competitions() {
     function convertToLink(game_code: string, game_board: 'dual' | 'single'): string {
         return game_board === 'dual' 
             ? `/game/competition/dual/${game_code}` 
-            : `/game/competition/single/${game_code}`
+            : `/game/classic/single?code=${game_code}`
     }
 
     useEffect(() => {

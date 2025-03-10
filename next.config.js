@@ -32,6 +32,12 @@ const nextConfig = {
         port: "5328",
         pathname: "/api/images/**",
       },
+      {
+        protocol: "http",
+        hostname: "127.0.0.1", 
+        port: "5328",
+        pathname: "/admin/**",
+      }
     ],
   },
   experimental: {
