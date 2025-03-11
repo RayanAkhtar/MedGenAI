@@ -22,7 +22,7 @@ export default function Competitions() {
     const [showExpired, setShowExpired] = useState<boolean>(false)
 
     function convertToLink(game_code: string, game_board: 'dual' | 'single'): string {
-        return game_board === 'dual' ? `/game/classic/dual/${game_code}` : `/game/classic/single/${game_code}`
+        return game_board === 'dual' ? `/game/classic/dual/${game_code}` : `/game/classic/single/game_code=${game_code}`
     }
 
     useEffect(() => {
