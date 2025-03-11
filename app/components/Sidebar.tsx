@@ -73,20 +73,6 @@ const Sidebar = () => {
                         Assigned Games
                     </Link>
 
-                    <Link href="/leaderboard" 
-                        className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg"
-                    >
-                        <FontAwesomeIcon icon={faTrophy} className="w-5 h-5 mr-3" />
-                        Leaderboard
-                    </Link>
-
-                    <Link href="/history" 
-                        className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg"
-                    >
-                        <FontAwesomeIcon icon={faHistory} className="w-5 h-5 mr-3" />
-                        History
-                    </Link>
-
                     <Link href="/profile" 
                         className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg"
                     >
