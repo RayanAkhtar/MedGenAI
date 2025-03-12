@@ -73,7 +73,7 @@ const UserPage = () => {
     setSelectedUsers([]);
     setSelectAll(false);
     fetchUserCount();
-  }, [filters.tags, filters.all])
+  }, [filters.tags, filters.all, fetchUserCount])
 
   const handleToggleSelectAll = () => {
     setSelectAll((prev) => !prev);
