@@ -8,9 +8,10 @@ interface AssignTagsButtonProps {
   selectAll: boolean;
   filterTags: string[];
   all: boolean;
+  totalResults: number;
 }
 
-export default function AssignTagsButton({ usernames, selectAll, filterTags, all }: AssignTagsButtonProps) {
+export default function AssignTagsButton({ usernames, selectAll, filterTags, all, totalResults }: AssignTagsButtonProps) {
   const [loading, setLoading] = useState(false);
   const [failed, setFailed] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -87,11 +88,11 @@ export default function AssignTagsButton({ usernames, selectAll, filterTags, all
             ? 'bg-red-500'
             : success
             ? 'bg-green-500'
-            : (!selectAll && usernames.length === 0)
+            : ((!selectAll && usernames.length === 0) || (selectAll && usernames.length === totalResults))
             ? 'bg-gray-300 cursor-not-allowed'
             : 'bg-purple-500'
         } text-white rounded hover:${
-          (!selectAll && usernames.length === 0) ? 'bg-gray-300' : 'bg-purple-600'
+          ((!selectAll && usernames.length === 0) || (selectAll && usernames.length === totalResults)) ? 'bg-gray-300' : 'bg-purple-600'
         } transition-colors`}
       >
         {loading

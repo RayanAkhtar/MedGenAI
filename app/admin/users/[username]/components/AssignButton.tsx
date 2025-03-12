@@ -5,9 +5,10 @@ interface AssignButtonProps {
   selectAll: boolean;
   filterTags: string[];
   all: boolean;
+  totalResults: number;
 }
 
-export default function AssignButton({ usernames, selectAll, filterTags, all }: AssignButtonProps) {
+export default function AssignButton({ usernames, selectAll, filterTags, all, totalResults }: AssignButtonProps) {
   const [loading, setLoading] = useState(false);
   const [failed, setFailed] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -89,11 +90,11 @@ export default function AssignButton({ usernames, selectAll, filterTags, all }: 
             ? 'bg-red-500'
             : success
             ? 'bg-green-500'
-            : (usernames.length === 0 && !selectAll)
+            : ((!selectAll && usernames.length === 0) || (selectAll && usernames.length === totalResults))
             ? 'bg-gray-300 cursor-not-allowed'
             : 'bg-[var(--heartflow-red)]'
         } text-white rounded hover:${
-          (usernames.length === 0 && !selectAll) ? 'bg-gray-300' : 'bg-[var(--heartflow-blue)]'
+          ((!selectAll && usernames.length === 0) || (selectAll && usernames.length === totalResults)) ? 'bg-gray-300' : 'bg-[var(--heartflow-blue)]'
         } transition-colors`}
       >
         {loading ? 'Assigning...' : failed ? 'Assign Failed' : success ? 'Assigned!' : 'Assign Game'}

@@ -19,6 +19,7 @@ const UserPage = () => {
   });
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
+  const [totalResults, setTotalResults] = useState<number>(0);
   const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
   const [selectAll, setSelectAll] = useState(false);
 
@@ -31,11 +32,12 @@ const UserPage = () => {
         .map((tag) => `tags=${encodeURIComponent(tag)}`)
         .join('&')
         : '';
-      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/count-users-by-tags?${tagsParam}&all=${filters.all == 'all'}`
+      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/count-users-by-tags?${tagsParam}&all=${filters.all === 'all'}`
       console.log(url);
       const response = await fetch(url);
       const result = await response.json();
       if (response.ok) {
+        setTotalResults(result['count']);
         setTotalPages(Math.max(1, Math.ceil(result['count'] / limit)));
       }
     } catch (err) {
@@ -50,7 +52,7 @@ const UserPage = () => {
         .map((tag) => `tags=${encodeURIComponent(tag)}`)
         .join('&')
         : '';
-      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/filter-users?${tagsParam}&all=${filters.all == 'all'}&sort_by=${filters.sortBy}&desc=${filters.sortOrder === 'desc'}&limit=${limit}&offset=${(currentPage - 1) * limit}`;
+      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/filter-users?${tagsParam}&all=${filters.all === 'all'}&sort_by=${filters.sortBy}&desc=${filters.sortOrder === 'desc'}&limit=${limit}&offset=${(currentPage - 1) * limit}`;
       console.log(url);
       const response = await fetch(url);
       const result = await response.json();
@@ -63,42 +65,57 @@ const UserPage = () => {
   }, [filters, currentPage]);
 
   useEffect(() => {
-    fetchUserCount();
     fetchData();
-  }, [filters, currentPage, fetchUserCount, fetchData])
+  }, [filters, currentPage, fetchData])
 
   useEffect(() => {
     setCurrentPage(1);
     setSelectedUsers([]);
+    setSelectAll(false);
+    fetchUserCount();
   }, [filters.tags, filters.all])
 
   const handleToggleSelectAll = () => {
     setSelectAll((prev) => !prev);
     setSelectedUsers([]);
   };
+  
   const handleSelectUser = (checked: boolean, user: User) => {
     setSelectedUsers((prev) => {
       const alreadySelected = prev.some((u) => u.username === user.username);
+      let updatedSelection;
   
       // If we're in "selectAll" mode, we treat "selectedUsers" as "excluded"
       if (selectAll) {
         if (checked) {
           // The user is now "checked" in the table => that means *remove* them
           // from the array (they are no longer excluded)
-          return prev.filter((u) => u.username !== user.username);
+          updatedSelection = prev.filter((u) => u.username !== user.username);
         } else {
           // The user is now "unchecked" => that means *add* them to the array (they are excluded)
-          return alreadySelected ? prev : [...prev, user];
+          updatedSelection = alreadySelected ? prev : [...prev, user];
         }
       }
       // Normal mode: "selectedUsers" is truly the selected users
       else {
         if (checked) {
-          return alreadySelected ? prev : [...prev, user];
+          updatedSelection = alreadySelected ? prev : [...prev, user];
         } else {
-          return prev.filter((u) => u.username !== user.username);
+          updatedSelection = prev.filter((u) => u.username !== user.username);
         }
       }
+      if (selectAll && updatedSelection.length === totalResults) {
+        console.log("Deselecting manually");
+        setSelectAll(false);
+        return [];
+      }
+      if (!selectAll && updatedSelection.length === totalResults) {
+        console.log("Selecting manually");
+        setSelectAll(true);
+        return [];
+      }
+
+      return updatedSelection;
     });
   };
 
@@ -119,20 +136,22 @@ const UserPage = () => {
             onClick={handleToggleSelectAll}
             className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-all"
           >
-            {selectAll ? 'Deselect All' : 'Select All'}
+            {(selectAll) ? 'Deselect All' : 'Select All'}
           </button>
           <div className="flex space-x-4">
             <AssignTagsButton 
               usernames={selectedUsers.map((u) => u.username)}
               filterTags={filters.tags}
               selectAll={selectAll}
-              all={filters.all == 'all'}
+              all={filters.all === 'all'}
+              totalResults={totalResults}
             />
             <AssignButton
             usernames={selectedUsers.map((u) => u.username)}
             filterTags={filters.tags}
             selectAll={selectAll}
-            all={filters.all == 'all'}
+            all={filters.all === 'all'}
+            totalResults={totalResults}
           />
           </div>
         </div>
