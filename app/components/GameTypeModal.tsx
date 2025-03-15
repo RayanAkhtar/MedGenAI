@@ -152,6 +152,13 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
       } finally {
         setIsLoading(false);
       }
+    } else if (route == "/game/custom" && selectedBoard == "Dual" && customCode) {
+      try {
+        closeModal();
+        router.push(`/game/classic/dual/${customCode}`);
+      } catch (error: unknown) {
+        console.error("Failed to start custom game:", error);
+      }
     } else if (route === "/game/custom") {
       if (selectedBoard && customCode) {
         try {

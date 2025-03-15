@@ -21,12 +21,12 @@ interface DualGameProps {
       images: {
         id: string;
         url: string;
-        isCorrect: boolean;
+        isCorrect: boolean; // Represents the AI generated one
       }[];
     }[];
     settings: {
       timerPerRound: number;
-      maxRounds: number;
+      totalRounds: number;
     };
   };
 }
@@ -114,7 +114,7 @@ const DualGame: React.FC<DualGameProps> = ({ gameMode, gameData }) => {
     window.location.reload();
   };
 
-  if (!gameData.gameId) {
+  if (!gameData.gameCode) {
     return <Loader message="Loading game..." />;
   }
 
@@ -207,7 +207,7 @@ const DualGame: React.FC<DualGameProps> = ({ gameMode, gameData }) => {
         <GameComplete
           score={score}
           totalImages={rounds.length}
-          gameId={gameData.gameId}
+          gameId={gameData.gameCode}
           returnToDashboard={handleReturnToDashboard}
           playAgain={handlePlayAgain}
         />
