@@ -79,7 +79,7 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
   ];
 
   const handleGameSelect = async (route: string) => {
-    if (route === "/game/classic" && imageCount && selectedBoard) {
+    if (route === "/game/classic" && imageCount && selectedBoard === "Single") {
       try {
         setIsLoading(true);
         const user = auth.currentUser;
@@ -88,16 +88,8 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
         }
 
         const idToken = await user.getIdToken(true);
-        let apiUrl = "";
-        let bodyData = {};
-
-        if (selectedBoard === "Single") {
-          apiUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/game/initialize-classic-game`;
-          bodyData = { imageCount: imageCount };
-        } else if (selectedBoard === "Dual") {
-          apiUrl = "http://127.0.0.1:5000/api/initialize_dual_game";
-          bodyData = { num_rounds: imageCount };
-        }
+        const apiUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/game/initialize-classic-game`;
+        const bodyData = { imageCount: imageCount };
 
         const response = await fetch(apiUrl, {
           method: "POST",
@@ -117,30 +109,21 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
         console.log("Raw API response:", data);
         const gameCode = data.gameCode;
 
-        if (selectedBoard === "Single") {
-          const formattedImages = data.images.map(
-            (img: ImageData, index: number) => ({
-              id: index + 1,
-              path: img.url,
-              type: img.type,
-            })
-          );
+        const formattedImages = data.images.map(
+          (img: ImageData, index: number) => ({
+            id: index + 1,
+            path: img.url,
+            type: img.type,
+          })
+        );
 
-          console.log("Formatted images:", formattedImages);
+        console.log("Formatted images:", formattedImages);
 
-          // Set game data in context
-          setGameData(data.gameCode, data.gameId, imageCount, formattedImages);
-        }
+        // Set game data in context
+        setGameData(data.gameCode, data.gameId, imageCount, formattedImages);
 
         closeModal();
-
-        // Route using query parameter instead of path segment
-        const boardType = selectedBoard.toLowerCase();
-        if (selectedBoard === "Dual") {
-          router.push(`/game/classic/dual/${gameCode}`);
-        } else {
-          router.push(`/game/classic/${boardType}?code=${gameCode}`);
-        }
+        router.push(`/game/classic/single?code=${gameCode}`);
       } catch (error: unknown) {
         console.error("Failed to start game:", error);
 
@@ -152,139 +135,114 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
       } finally {
         setIsLoading(false);
       }
-    } else if (route == "/game/custom" && selectedBoard == "Dual" && customCode) {
+    } else if (route == "/game/classic" && imageCount && selectedBoard === "Dual") {
+      closeModal();
+      router.push("/game/classic/dual?num_rounds=" + imageCount);
+    } else if (route === "/game/custom" && selectedBoard === "Single" && customCode) {
       try {
+        setIsLoading(true);
+        const user = auth.currentUser;
+        if (!user) {
+          throw new Error("No user logged in");
+        }
+
+        const idToken = await user.getIdToken(true);
+        const apiUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/game/initialize-single-game-with-code`;
+
+        const response = await fetch(apiUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${idToken}`,
+          },
+          body: JSON.stringify({
+            gameCode: customCode,
+            imageCount: imageCount || 10, // Default to 10 if not specified
+          }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || "Failed to initialize custom game");
+        }
+
+        const data = await response.json();
+        console.log("Custom game initialized:", data);
+
+        const formattedImages = data.images.map(
+          (img: ImageData, index: number) => ({
+            id: index + 1,
+            path: img.url,
+            type: img.type,
+          })
+        );
+
+        // Set game data in context
+        setGameData(data.gameCode, data.gameId || customCode, imageCount || 10, formattedImages);
+
         closeModal();
-        router.push(`/game/classic/dual/${customCode}`);
+        router.push(`/game/classic/single?code=${data.gameCode}`);
       } catch (error: unknown) {
         console.error("Failed to start custom game:", error);
-      }
-    } else if (route === "/game/custom") {
-      if (selectedBoard && customCode) {
-        try {
-          setIsLoading(true);
-          const user = auth.currentUser;
-          if (!user) {
-            throw new Error("No user logged in");
-          }
-
-          const idToken = await user.getIdToken(true);
-          
-          // Different API endpoint based on board type
-          const apiUrl = selectedBoard === "Single" 
-            ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/game/initialize-single-game-with-code`
-            : `${process.env.NEXT_PUBLIC_API_BASE_URL}/game/initialize-dual-game-with-code`;
-          
-          const response = await fetch(apiUrl, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${idToken}`,
-            },
-            body: JSON.stringify({
-              gameCode: customCode,
-              imageCount: imageCount || 10, // Default to 10 if not specified
-            }),
-          });
-
-          if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || "Failed to initialize custom game");
-          }
-
-          const data = await response.json();
-          console.log("Custom game initialized:", data);
-          
-          closeModal();
-          const boardType = selectedBoard.toLowerCase();
-          
-          // For single board, set game data in context
-          if (selectedBoard === "Single" && data.images) {
-            const formattedImages = data.images.map(
-              (img: ImageData, index: number) => ({
-                id: index + 1,
-                path: img.url,
-                type: img.type,
-              })
-            );
-            
-            // Set game data in context
-            setGameData(data.gameCode, data.gameId || customCode, imageCount || 10, formattedImages);
-          }
-          
-          // Redirect to the appropriate game page
-          router.push(`/game/classic/${boardType}?code=${data.gameCode}`);
-        } catch (error: unknown) {
-          console.error("Failed to start custom game:", error);
-          if (error instanceof Error) {
-            setError(error.message);
-          } else {
-            setError("An unknown error occurred");
-          }
-        } finally {
-          setIsLoading(false);
+        if (error instanceof Error) {
+          setError(error.message);
+        } else {
+          setError("An unknown error occurred");
         }
+      } finally {
+        setIsLoading(false);
       }
-    } else if (route === "/game/competition") {
-      if (selectedBoard) {
-        try {
-          setIsLoading(true);
-          const user = auth.currentUser;
-          if (!user) {
-            throw new Error("No user logged in");
-          }
-
-          const idToken = await user.getIdToken(true);
-          
-          // Different API endpoint based on board type
-          const apiUrl = selectedBoard === "Single" 
-            ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/game/competition-single-game`
-            : `${process.env.NEXT_PUBLIC_API_BASE_URL}/game/competition-dual-game`;
-          
-          const response = await fetch(apiUrl, {
-            method: 'GET',
-            headers: {
-              'Authorization': `Bearer ${idToken}`
-            }
-          });
-
-          if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || "Failed to get competition game");
-          }
-
-          const data = await response.json();
-          console.log("Competition game data:", data);
-          
-          closeModal();
-          const boardType = selectedBoard.toLowerCase();
-          
-          // For single board, set game data in context
-          if (selectedBoard === "Single" && data.images) {
-            const formattedImages = data.images.map(
-              (img: ImageData, index: number) => ({
-                id: index + 1,
-                path: `${process.env.NEXT_PUBLIC_API_BASE_URL}${img.url}`,
-                type: img.type,
-              })
-            );
-            
-            // Set game data in context
-            setGameData(data.gameCode, data.gameId || customCode, data.images.length, formattedImages);
-          }
-          
-          // Redirect to the appropriate game page
-          router.push(`/game/competition/${boardType}?code=${data.gameCode}`);
-        } catch (error: unknown) {
-          console.error("Failed to start competition game:", error);
-          if (error instanceof Error) {
-            setError(error.message);
-          } else {
-            setError("An unknown error occurred");
-          }
-        } finally {
-          setIsLoading(false);
+    } else if (route == "/game/custom" && selectedBoard === "Dual" && customCode) {
+      closeModal();
+      router.push("/game/classic/dual/" + customCode);
+    } else if (route === "/game/competition" && selectedBoard === "Single") {
+      try {
+        setIsLoading(true);
+        const user = auth.currentUser;
+        if (!user) {
+          throw new Error("No user logged in");
         }
+
+        const idToken = await user.getIdToken(true);
+        const apiUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/game/competition-single-game`;
+
+        const response = await fetch(apiUrl, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${idToken}`
+          }
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || "Failed to get competition game");
+        }
+
+        const data = await response.json();
+        console.log("Competition game data:", data);
+
+        const formattedImages = data.images.map(
+          (img: ImageData, index: number) => ({
+            id: index + 1,
+            path: `${process.env.NEXT_PUBLIC_API_BASE_URL}${img.url}`,
+            type: img.type,
+          })
+        );
+
+        // Set game data in context
+        setGameData(data.gameCode, data.gameId || customCode, data.images.length, formattedImages);
+
+        closeModal();
+        router.push(`/game/competition/single?code=${data.gameCode}`);
+      } catch (error: unknown) {
+        console.error("Failed to start competition game:", error);
+        if (error instanceof Error) {
+          setError(error.message);
+        } else {
+          setError("An unknown error occurred");
+        }
+      } finally {
+        setIsLoading(false);
       }
     } else {
       console.error("Invalid game route:", route);
@@ -292,7 +250,6 @@ const GameTypeModal = ({ isOpen, closeModal }: GameTypeModalProps) => {
       router.push(route);
     }
   };
-  
 
   const handleMouseEnter = (name: string) => {
     setHoveredType(name);
