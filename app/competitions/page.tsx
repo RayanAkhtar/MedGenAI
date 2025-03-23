@@ -9,6 +9,7 @@ interface Competition {
     id: number;
     name: string;
     game_board: 'dual' | 'single';
+    game_code: string;
     start_date: string;
     end_date: string;
 }
@@ -19,10 +20,10 @@ export default function Competitions() {
     const [isLoading, setIsLoading] = useState<boolean>(true)
     const [competitions, setCompetitions] = useState<Competition[]>([])
 
-    function convertToLink(game_id: number, game_board: 'dual' | 'single'): string {
+    function convertToLink(game_code: string, game_board: 'dual' | 'single'): string {
         return game_board === 'dual' 
-            ? `/game/competition/dual/${game_id}` 
-            : `/game/competition/single/${game_id}`
+            ? `/game/competition/dual/${game_code}` 
+            : `/game/classic/single?code=${game_code}`
     }
 
     useEffect(() => {
@@ -100,7 +101,7 @@ export default function Competitions() {
                                         {competitions.map((comp) => (
                                             <tr key={comp.id} className="text-sm">
                                                 <td className="py-3">
-                                                    <a href={convertToLink(comp.id, comp.game_board)} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
+                                                    <a href={convertToLink(comp.game_code, comp.game_board)} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
                                                         {comp.name}
                                                     </a>
                                                 </td>

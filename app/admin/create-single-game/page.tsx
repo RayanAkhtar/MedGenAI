@@ -43,20 +43,9 @@ export default function CreateSingleGame() {
             const data = await response.json();
             console.log("Game created successfully:", data);
 
-            const game_code_fetch = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/getGame/${data.gameId}` , {
-                method: 'GET',
-            })
-
-            if (!game_code_fetch) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || "Failed to get game code");
-            }
-
-            const game_code = await game_code_fetch.json()
-            
-
-
-            setGameCode(game_code);
+        
+            setGameCode(data.gameCode); // Extract just the game_code string
+            console.log("Game code:", data.gameCode);
             
         } catch (error: unknown) {
             if (error instanceof Error) {
@@ -108,9 +97,7 @@ export default function CreateSingleGame() {
                         <div className="space-y-4">
                             <div className="p-4 bg-green-50 border border-green-200 rounded-md">
                                 <p className="text-green-700 font-medium">Game created successfully!</p>
-                                {/* <p className="text-green-600 mt-1">Game Code: <span className="font-mono font-bold">{gameCode}</span></p> */}
                                 <p className="text-green-600 mt-1">Game Code: <span className="font-mono font-bold">{gameCode}</span></p>
-
                             </div>
                             
                             <div className="flex flex-col sm:flex-row gap-3">
